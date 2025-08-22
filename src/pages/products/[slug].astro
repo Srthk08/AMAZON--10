@@ -1,0 +1,424 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getProductBySlug, getProducts } from '../../lib/supabase';
+
+export async function getStaticPaths() {
+  let products = [];
+  try {
+    products = await getProducts();
+  } catch (error) {
+    console.error('Error loading products for static paths:', error);
+    products = [];
+  }
+  
+  return products.map((product) => ({
+    params: { slug: product.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/products');
+}
+
+let product = null;
+try {
+  product = await getProductBySlug(slug);
+} catch (error) {
+  console.error('Error loading product:', error);
+  product = null;
+}
+
+if (!product) {
+  return Astro.redirect('/products');
+}
+
+const categoryStyles = {
+  restaurant: {
+    gradient: 'from-green-500 to-emerald-600',
+    bg: 'bg-green-50',
+    text: 'text-green-700',
+    icon: '🍽️'
+  },
+  mobile: {
+    gradient: 'from-blue-500 to-indigo-600',
+    bg: 'bg-blue-50',
+    text: 'text-blue-700',
+    icon: '📱'
+  },
+  tv: {
+    gradient: 'from-purple-500 to-violet-600',
+    bg: 'bg-purple-50',
+    text: 'text-purple-700',
+    icon: '📺'
+  },
+  web: {
+    gradient: 'from-orange-500 to-red-600',
+    bg: 'bg-orange-50',
+    text: 'text-orange-700',
+    icon: '🌐'
+  }
+};
+
+const style = categoryStyles[product.category];
+---
+
+<Layout title={`${product.name} - DevExpress`} description={product.description}>
+  <!-- Hero Section -->
+  <section class={`bg-gradient-to-br ${style.gradient} text-white py-20`}>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <span class="text-2xl">{style.icon}</span>
+            <span class="text-lg opacity-90 capitalize">{product.category} Solution</span>
+          </div>
+          <h1 class="text-4xl md:text-5xl font-bold mb-6">{product.name}</h1>
+          <p class="text-xl text-gray-100 mb-8">{product.description}</p>
+          <div class="flex items-center space-x-6">
+            <div class="text-center">
+              <div class="text-3xl font-bold">24hrs</div>
+              <div class="text-sm opacity-90">Delivery Time</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold">100%</div>
+              <div class="text-sm opacity-90">Custom Built</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold">30d</div>
+              <div class="text-sm opacity-90">Free Support</div>
+            </div>
+          </div>
+        </div>
+        <div class="relative">
+          <img src={product.featured_image} alt={product.name} class="rounded-lg shadow-2xl" />
+          <div class="absolute -bottom-6 -right-6 bg-white p-4 rounded-lg shadow-lg">
+            <div class="text-2xl font-bold text-gray-900">₹{product.base_price.toLocaleString()}</div>
+            <div class="text-sm text-gray-600">Starting Price</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">What's Included</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {product.features.map((feature, index) => (
+          <div class={`${style.bg} p-6 rounded-lg animate-fade-in`} style={`animation-delay: ${index * 0.1}s;`}>
+            <div class="flex items-center space-x-3">
+              <div class={`w-8 h-8 bg-gradient-to-r ${style.gradient} rounded-full flex items-center justify-center`}>
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <span class={`font-medium ${style.text}`}>{feature}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Plans -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Choose Your Plan</h2>
+        <p class="text-xl text-gray-600">Select the perfect plan for your needs. All plans include 24-hour delivery.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {product.product_plans.map((plan, index) => (
+          <div class={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 ${plan.is_popular ? 'ring-2 ring-primary-500 relative' : ''}`}>
+            {plan.is_popular && (
+              <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span class="bg-primary-500 text-white px-4 py-1 rounded-full text-sm font-medium">Most Popular</span>
+              </div>
+            )}
+            
+            <div class="p-8">
+              <h3 class="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+              <p class="text-gray-600 mb-6">{plan.description}</p>
+              
+              <div class="mb-6">
+                <span class="text-4xl font-bold text-gray-900">₹{plan.price.toLocaleString()}</span>
+                <span class="text-gray-600 ml-2">one-time</span>
+              </div>
+
+              <div class="mb-8">
+                <div class="flex items-center text-sm text-gray-600 mb-2">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Delivered in {plan.delivery_days} day{plan.delivery_days > 1 ? 's' : ''}
+                </div>
+              </div>
+
+              <ul class="space-y-3 mb-8">
+                {plan.features.map((feature) => (
+                  <li class="flex items-start">
+                    <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-gray-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <button 
+                class={`w-full py-3 px-6 rounded-lg font-semibold transition-all ${
+                  plan.is_popular 
+                    ? 'bg-primary-600 hover:bg-primary-700 text-white' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                }`}
+                onclick={`addToCart('${product.id}', '${plan.id}', '${plan.name}')`}
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Process Section -->
+  <section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Development Process</h2>
+        <p class="text-xl text-gray-600">Here's how we deliver your {product.name.toLowerCase()} in 24 hours</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="text-center">
+          <div class={`w-16 h-16 bg-gradient-to-r ${style.gradient} rounded-full flex items-center justify-center mx-auto mb-4`}>
+            <span class="text-white font-bold text-xl">1</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Requirements</h3>
+          <p class="text-gray-600 text-sm">You provide project details and requirements through our smart forms</p>
+        </div>
+
+        <div class="text-center">
+          <div class={`w-16 h-16 bg-gradient-to-r ${style.gradient} rounded-full flex items-center justify-center mx-auto mb-4`}>
+            <span class="text-white font-bold text-xl">2</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Design</h3>
+          <p class="text-gray-600 text-sm">Our team creates custom designs based on your brand and preferences</p>
+        </div>
+
+        <div class="text-center">
+          <div class={`w-16 h-16 bg-gradient-to-r ${style.gradient} rounded-full flex items-center justify-center mx-auto mb-4`}>
+            <span class="text-white font-bold text-xl">3</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Development</h3>
+          <p class="text-gray-600 text-sm">Rapid development using proven frameworks and best practices</p>
+        </div>
+
+        <div class="text-center">
+          <div class={`w-16 h-16 bg-gradient-to-r ${style.gradient} rounded-full flex items-center justify-center mx-auto mb-4`}>
+            <span class="text-white font-bold text-xl">4</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Delivery</h3>
+          <p class="text-gray-600 text-sm">Complete solution delivered with documentation and support</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Frequently Asked Questions</h2>
+      
+      <div class="space-y-6">
+        <div class="bg-white rounded-lg shadow-sm">
+          <button class="faq-button w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
+            <span class="font-semibold text-gray-900">How can you deliver in just 24 hours?</span>
+            <svg class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="faq-content hidden px-6 pb-4">
+            <p class="text-gray-600">We use proven templates, pre-built components, and streamlined development processes. Our experienced team works around the clock to ensure rapid delivery without compromising quality.</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm">
+          <button class="faq-button w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
+            <span class="font-semibold text-gray-900">What if I need revisions?</span>
+            <svg class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="faq-content hidden px-6 pb-4">
+            <p class="text-gray-600">All plans include 30 days of free support and minor revisions. Major changes can be handled through our revision packages at affordable rates.</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm">
+          <button class="faq-button w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
+            <span class="font-semibold text-gray-900">Do you provide source code?</span>
+            <svg class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="faq-content hidden px-6 pb-4">
+            <p class="text-gray-600">Yes, you receive complete source code, documentation, and deployment instructions. You own the code and can modify it as needed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class={`py-16 bg-gradient-to-r ${style.gradient} text-white`}>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+      <p class="text-xl mb-8 opacity-90">
+        Join hundreds of satisfied clients who got their {product.name.toLowerCase()} delivered in just 24 hours.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button 
+          id="add-to-cart-btn"
+          onclick={`addToCart('${product.id}', '${product.product_plans[0]?.id}', '${product.product_plans[0]?.name}')`}
+          class="bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-colors"
+        >
+          Add to Cart - ₹{product.product_plans[0]?.price.toLocaleString()}
+        </button>
+        <a href="/contact" class="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-3 rounded-lg font-semibold transition-all">
+          Contact Us
+        </a>
+      </div>
+      
+      <!-- Login Prompt for Unauthenticated Users -->
+      <div id="login-prompt" class="hidden mt-6 p-4 bg-white bg-opacity-20 rounded-lg">
+        <p class="text-white mb-3">Please sign in to add items to your cart</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a href="/login?redirect=/products/${product.slug}" class="bg-white text-gray-900 hover:bg-gray-100 px-6 py-2 rounded-lg font-medium transition-colors">
+            Sign In
+          </a>
+          <a href="/signup?redirect=/products/${product.slug}" class="border border-white text-white hover:bg-white hover:text-gray-900 px-6 py-2 rounded-lg font-medium transition-all">
+            Create Account
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Declare global types
+  declare global {
+    interface Window {
+      addToCart: (productId: string, planId: string, planName: string) => Promise<void>;
+    }
+  }
+
+  // FAQ functionality
+  document.querySelectorAll('.faq-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const content = button.nextElementSibling;
+      const icon = button.querySelector('svg');
+      
+      content.classList.toggle('hidden');
+      icon.classList.toggle('rotate-180');
+    });
+  });
+
+  // Add to cart functionality
+  window.addToCart = async (productId: string, planId: string, planName: string) => {
+    try {
+      const response = await fetch('/api/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId,
+          planId,
+          quantity: 1
+        })
+      });
+
+      if (response.ok) {
+        // Show success message
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+        toast.textContent = `${planName} added to cart!`;
+        document.body.appendChild(toast);
+
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+          toast.remove();
+        }, 3000);
+
+        // Update cart count
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
+        
+        // Hide login prompt if it was shown
+        const loginPrompt = document.getElementById('login-prompt');
+        if (loginPrompt) {
+          loginPrompt.classList.add('hidden');
+        }
+      } else if (response.status === 401) {
+        // Show login prompt for unauthenticated users
+        const loginPrompt = document.getElementById('login-prompt');
+        if (loginPrompt) {
+          loginPrompt.classList.remove('hidden');
+          
+          // Scroll to the prompt
+          loginPrompt.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        throw new Error('Failed to add to cart');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      
+      // Show error message
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+      toast.textContent = 'Error adding to cart. Please try again.';
+      document.body.appendChild(toast);
+
+      // Remove toast after 3 seconds
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+  };
+
+  // Animation on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-fade-in');
+      }
+    });
+  });
+
+  document.querySelectorAll('.animate-fade-in').forEach(el => {
+    observer.observe(el);
+  });
+</script>
+
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .rotate-180 {
+    transform: rotate(180deg);
+  }
+</style>

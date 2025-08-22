@@ -1,0 +1,60 @@
+---
+export interface Props {
+  redirectTo?: string;
+}
+
+const { redirectTo = '/login' } = Astro.props;
+---
+
+<div id="auth-guard" data-redirect-to={redirectTo}>
+  <slot />
+</div>
+
+<script>
+  import { simpleAuth } from '../lib/simple-auth';
+
+  // Function to check authentication and redirect if needed
+  function checkAuth() {
+    const authGuard = document.getElementById('auth-guard');
+    if (!authGuard) return;
+
+    const redirectTo = authGuard.dataset.redirectTo || '/login';
+    
+    // Initialize auth first
+    simpleAuth.init();
+    
+    // Add a small delay to ensure initialization is complete
+    setTimeout(() => {
+      // Check if user is authenticated
+      if (!simpleAuth.isAuthenticated()) {
+        console.log('User not authenticated, redirecting to:', redirectTo);
+        // Redirect to login page
+        window.location.href = redirectTo;
+        return;
+      }
+      
+      console.log('User authenticated, allowing access');
+    }, 100);
+  }
+
+  // Check authentication immediately
+  checkAuth();
+
+  // Also check when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkAuth);
+  } else {
+    // DOM already loaded, check immediately
+    setTimeout(checkAuth, 100);
+  }
+
+  // Listen for storage changes (when user logs in/out in another tab)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'simple-auth-user' || e.key === 'simple-auth-session') {
+      checkAuth();
+    }
+  });
+
+  // Listen for custom auth events
+  window.addEventListener('auth-state-changed', checkAuth);
+</script>

@@ -1,0 +1,1369 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { simpleAuth } from '../lib/simple-auth';
+---
+
+<Layout title="Shopping Cart">
+  <div class="min-h-screen bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Page Header -->
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Shopping Cart</h1>
+        <p class="text-xl text-gray-600">Customize your project and proceed to checkout</p>
+      </div>
+
+      <!-- Authentication Check -->
+      <div id="auth-check" class="hidden">
+        <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Authentication Required</h2>
+          <p class="text-gray-600 mb-6">Please sign in to access your shopping cart</p>
+          <div class="space-x-4">
+            <a href="/login" class="inline-block bg-primary-600 hover:bg-primary-700 text-white font-medium px-8 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+              Sign In
+            </a>
+            <a href="/signup" class="inline-block bg-secondary-600 hover:bg-secondary-700 text-white font-medium px-8 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+              Sign Up
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cart Content - Only visible after login -->
+      <div id="cart-content" class="hidden">
+        <!-- Empty Cart Message -->
+        <div id="empty-cart" class="text-center py-16">
+          <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0V19a2 2 0 002 2h7a2 2 0 002-2v-.5"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
+          <p class="text-gray-600 mb-6">Browse our products and add something to get started</p>
+          <a href="/products" class="inline-block bg-primary-600 hover:bg-primary-700 text-white font-medium px-8 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+            Browse Products
+          </a>
+        </div>
+
+        <!-- Cart Items -->
+        <div id="cart-items" class="hidden space-y-6">
+          <!-- Cart Item Template -->
+          <div id="cart-item-template" class="hidden bg-white rounded-xl shadow-lg p-8">
+            <div class="flex flex-col lg:flex-row gap-8">
+              <!-- Product Info -->
+              <div class="flex-1">
+                <div class="flex items-start justify-between mb-6">
+                  <div>
+                    <h3 class="text-2xl font-bold text-gray-900 product-name mb-2">Product Name</h3>
+                    <p class="text-gray-600 product-description text-lg mb-4">Product description</p>
+                    <p class="text-3xl font-bold text-primary-600 product-price">₹0</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Customization Options -->
+              <div class="flex-1 space-y-6">
+                <!-- Product Name Input -->
+                <div>
+                  <label class="block text-lg font-semibold text-gray-700 mb-3">Custom Product Name</label>
+                  <input type="text" class="product-name-input w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your custom product name">
+                  <p class="text-sm text-gray-500 mt-2">Give your product a unique name</p>
+                </div>
+
+                <!-- Logo Upload -->
+                <div>
+                  <label class="block text-lg font-semibold text-gray-700 mb-3">Upload Your Logo</label>
+                  <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <input type="file" accept="image/*" class="logo-upload hidden" />
+                    <button type="button" class="logo-upload-btn w-full sm:w-auto px-6 py-3 border-2 border-primary-300 rounded-lg text-lg font-medium text-primary-600 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all transform hover:scale-105">
+                      Choose Logo File
+                    </button>
+                    <div class="logo-preview w-20 h-20 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center flex-shrink-0">
+                      <span class="text-gray-400 text-sm">Logo</span>
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-2">Upload your company or brand logo</p>
+                </div>
+
+                <!-- Color Selection -->
+                <div>
+                  <label class="block text-lg font-semibold text-gray-700 mb-3">Choose Color Theme</label>
+                  <div class="flex flex-wrap gap-4">
+                    <button type="button" class="color-option w-12 h-12 rounded-full border-4 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-110" data-color="#3B82F6" style="background-color: #3B82F6;"></button>
+                    <button type="button" class="color-option w-12 h-12 rounded-full border-4 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-110" data-color="#8B5CF6" style="background-color: #8B5CF6;"></button>
+                    <button type="button" class="color-option w-12 h-12 rounded-full border-4 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-110" data-color="#10B981" style="background-color: #10B981;"></button>
+                    <button type="button" class="color-option w-12 h-12 rounded-full border-4 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-110" data-color="#F59E0B" style="background-color: #F59E0B;"></button>
+                    <button type="button" class="color-option w-12 h-12 rounded-full border-4 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-110" data-color="#EF4444" style="background-color: #EF4444;"></button>
+                    <button type="button" class="color-option w-12 h-12 rounded-full border-4 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-110" data-color="#000000" style="background-color: #000000;"></button>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-2">Select your preferred color scheme</p>
+                </div>
+
+                <!-- Additional Options -->
+                <div>
+                  <label class="block text-lg font-semibold text-gray-700 mb-3">Additional Features</label>
+                  <div class="space-y-3">
+                    <label class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                      <input type="checkbox" class="feature-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-5 h-5" data-feature="responsive" data-price="500">
+                      <span class="ml-3 text-lg text-gray-700">Responsive Design (+₹500)</span>
+                    </label>
+                    <label class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                      <input type="checkbox" class="feature-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-5 h-5" data-feature="seo" data-price="300">
+                      <span class="ml-3 text-lg text-gray-700">SEO Optimization (+₹300)</span>
+                    </label>
+                    <label class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                      <input type="checkbox" class="feature-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-5 h-5" data-feature="analytics" data-price="200">
+                      <span class="ml-3 text-lg text-gray-700">Analytics Integration (+₹200)</span>
+                    </label>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-2">Select additional features for your product</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div id="cart-actions" class="hidden mt-8 space-y-4">
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button id="delete-selected" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
+              Delete Project
+            </button>
+            <button id="proceed-to-requirements" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
+              Next: Project Requirements
+            </button>
+          </div>
+        </div>
+
+        <!-- Project Requirements Form -->
+        <div id="project-requirements" class="hidden bg-white rounded-xl shadow-lg p-8 mt-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Project Requirements</h3>
+          
+          <form id="requirements-form" class="space-y-8">
+            <!-- Project Details Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                  Project Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="projectName" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your project name">
+              </div>
+              
+              <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                  Contact Person <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="contactPerson" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Your full name">
+              </div>
+              
+              <!-- Dynamic Project Type Fields -->
+              <div id="restaurant-fields">
+                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                  Restaurant Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="restaurantName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter restaurant name">
+              </div>
+              
+              <div id="restaurant-cuisine-fields">
+                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                  Cuisine Type
+                </label>
+                <select name="cuisineType" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg">
+                  <option value="">Select cuisine type</option>
+                  <option value="indian">Indian</option>
+                  <option value="chinese">Chinese</option>
+                  <option value="italian">Italian</option>
+                  <option value="mexican">Mexican</option>
+                  <option value="continental">Continental</option>
+                  <option value="fast-food">Fast Food</option>
+                  <option value="beverages">Beverages</option>
+                  <option value="desserts">Desserts</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <!-- TV App Fields (hidden by default) -->
+              <div id="tv-app-fields" class="hidden">
+                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                  App Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="appName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your app name">
+              </div>
+
+              <!-- Mobile App Fields (hidden by default) -->
+              <div id="mobile-app-fields" class="hidden">
+                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                  App Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="appName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your mobile app name">
+              </div>
+            </div>
+
+            <!-- Dynamic Upload Section -->
+            <div id="logo-upload-section">
+              <label class="block text-lg font-semibold text-gray-700 mb-3">
+                <span id="upload-label">Restaurant Logo</span>
+              </label>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                </div>
+                <p class="text-lg font-medium text-gray-700 mb-2" id="upload-text">Upload logo or drag and drop</p>
+                <p class="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                <input type="file" name="restaurantLogo" accept="image/*" class="hidden" id="logo-upload">
+                <button type="button" onclick="document.getElementById('logo-upload').click()" class="mt-4 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all transform hover:scale-105">
+                  Choose File
+                </button>
+                <div id="upload-status" class="mt-3 text-sm font-medium hidden"></div>
+              </div>
+            </div>
+
+            <!-- Contact Information Section -->
+            <div>
+              <h4 class="text-xl font-semibold text-gray-800 mb-4">Contact Information</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-lg font-semibold text-gray-700 mb-3">
+                    Email <span class="text-red-500">*</span>
+                  </label>
+                  <input type="email" name="email" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="your@email.com">
+                </div>
+                
+                <div>
+                  <label class="block text-lg font-semibold text-gray-700 mb-3">
+                    Phone Number <span class="text-red-500">*</span>
+                  </label>
+                  <input type="tel" name="phone" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="+91 9876543210">
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Menu/App Photos Section -->
+            <div id="photos-upload-section">
+              <label class="block text-lg font-semibold text-gray-700 mb-3">
+                <span id="photos-label">Menu Photos (Optional)</span>
+              </label>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 0 002 2z"></path>
+                  </svg>
+                </div>
+                <p class="text-lg font-medium text-gray-700 mb-2" id="photos-text">Upload menu photos or drag and drop</p>
+                <p class="text-sm text-gray-500">Multiple images allowed</p>
+                <input type="file" name="menuPhotos" accept="image/*" multiple class="hidden" id="menu-upload">
+                <button type="button" onclick="document.getElementById('menu-upload').click()" class="mt-4 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all transform hover:scale-105">
+                  Choose Files
+                </button>
+                <div id="photos-status" class="mt-3 text-sm font-medium hidden"></div>
+              </div>
+            </div>
+
+            <!-- Brand Colors Section -->
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-3">
+                Brand Colors (Optional)
+              </label>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-600 mb-2">Primary</label>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-8 h-2 bg-blue-500 rounded"></div>
+                    <input type="color" name="primaryColor" value="#3B82F6" class="w-12 h-10 border-2 border-gray-300 rounded-lg cursor-pointer">
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-600 mb-2">Secondary</label>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-8 h-2 bg-yellow-500 rounded"></div>
+                    <input type="color" name="secondaryColor" value="#A5CF6" class="w-12 h-10 border-2 border-gray-300 rounded-lg cursor-pointer">
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-600 mb-2">Accent</label>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-8 h-2 bg-orange-500 rounded"></div>
+                    <input type="color" name="accentColor" value="#F59E0B" class="w-12 h-10 border-2 border-gray-300 rounded-lg cursor-pointer">
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-600 mb-2">Text</label>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-8 h-2 bg-gray-800 rounded"></div>
+                    <input type="color" name="textColor" value="#1F2937" class="w-12 h-10 border-2 border-gray-300 rounded-lg cursor-pointer">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Requirements Section -->
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-3">
+                Additional Requirements
+              </label>
+              <textarea name="additionalRequirements" rows="4" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Any specific features, integrations, or customizations you need..."></textarea>
+            </div>
+
+            <!-- Requirements Form Actions -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+              <button type="button" id="back-to-cart" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                Back to Cart
+              </button>
+              <button type="button" id="proceed-to-payment" class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                Proceed to Payment
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Order Review Section -->
+        <div id="order-review" class="hidden bg-white rounded-xl shadow-lg p-8 mt-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Review Your Order</h3>
+          
+          <div class="space-y-6">
+            <!-- Project Summary -->
+            <div class="bg-gray-50 rounded-lg p-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Project Summary</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p class="text-sm text-gray-600">Project Name:</p>
+                  <p class="font-medium" id="review-project-name">-</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-600">Contact Person:</p>
+                  <p class="font-medium" id="review-contact-person">-</p>
+                </div>
+                <div id="review-restaurant-info" class="hidden">
+                  <p class="text-sm text-gray-600">Restaurant Name:</p>
+                  <p class="font-medium" id="review-restaurant-name">-</p>
+                </div>
+                <div id="review-cuisine-info" class="hidden">
+                  <p class="text-sm text-gray-600">Cuisine Type:</p>
+                  <p class="font-medium" id="review-cuisine-type">-</p>
+                </div>
+                <div id="review-app-info" class="hidden">
+                  <p class="text-sm text-gray-600">App Name:</p>
+                  <p class="font-medium" id="review-app-name">-</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customization Summary -->
+            <div class="bg-gray-50 rounded-lg p-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Customization</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p class="text-sm text-gray-600">Selected Colors:</p>
+                  <div class="flex space-x-2 mt-2">
+                    <div class="w-6 h-6 rounded-full border-2 border-gray-300" id="review-primary-color" style="background-color: #3B82F6;"></div>
+                    <div class="w-6 h-6 rounded-full border-2 border-gray-300" id="review-secondary-color" style="background-color: #A5CF6;"></div>
+                    <div class="w-6 h-6 rounded-full border-2 border-gray-300" id="review-accent-color" style="background-color: #F59E0B;"></div>
+                    <div class="w-6 h-6 rounded-full border-2 border-gray-300" id="review-text-color" style="background-color: #1F2937;"></div>
+                  </div>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-600">Logo Status:</p>
+                  <p class="font-medium" id="review-logo-status">Not uploaded</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-600">Photos Status:</p>
+                  <p class="font-medium" id="review-photos-status">Not uploaded</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Amount -->
+            <div class="bg-primary-50 rounded-lg p-6">
+              <div class="flex justify-between items-center">
+                <h4 class="text-lg font-semibold text-primary-800">Total Amount</h4>
+                <div class="text-2xl font-bold text-primary-600" id="review-total">₹0</div>
+              </div>
+            </div>
+
+            <!-- Review Actions -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+              <button type="button" id="back-to-requirements" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                Back to Requirements
+              </button>
+              <button type="button" id="proceed-to-payment" class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                Proceed to Payment
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Section -->
+        <div id="payment-section" class="hidden bg-white rounded-xl shadow-lg p-8 mt-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Payment Options</h3>
+          
+          <div class="space-y-6">
+            <!-- Payment Methods -->
+            <div>
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Choose Payment Method</h4>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-400 transition-colors cursor-pointer">
+                  <input type="radio" name="paymentMethod" value="card" class="w-5 h-5 text-primary-600 focus:ring-primary-500" checked>
+                  <div class="ml-3">
+                    <div class="font-medium text-gray-900">Credit/Debit Card</div>
+                    <div class="text-sm text-gray-500">Visa, Mastercard, RuPay</div>
+                  </div>
+                </label>
+                
+                <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-400 transition-colors cursor-pointer">
+                  <input type="radio" name="paymentMethod" value="upi" class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                  <div class="ml-3">
+                    <div class="font-medium text-gray-900">UPI</div>
+                    <div class="text-sm text-gray-500">Google Pay, PhonePe, Paytm</div>
+                  </div>
+                </label>
+                
+                <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-400 transition-colors cursor-pointer">
+                  <input type="radio" name="paymentMethod" value="netbanking" class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                  <div class="ml-3">
+                    <div class="font-medium text-gray-900">Net Banking</div>
+                    <div class="text-sm text-gray-500">All major banks</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Card Details (shown when card is selected) -->
+            <div id="card-details" class="border-2 border-gray-200 rounded-lg p-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Card Details</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                  <input type="text" name="cardNumber" placeholder="1234 5678 9012 3456" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
+                  <input type="text" name="cardholderName" placeholder="John Doe" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                  <input type="text" name="expiryDate" placeholder="MM/YY" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                  <input type="text" name="cvv" placeholder="123" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+              </div>
+            </div>
+
+            <!-- UPI Details (hidden by default) -->
+            <div id="upi-details" class="hidden border-2 border-gray-200 rounded-lg p-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">UPI Details</h4>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
+                <input type="text" name="upiId" placeholder="username@upi" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              </div>
+            </div>
+
+            <!-- Net Banking Details (hidden by default) -->
+            <div id="netbanking-details" class="hidden border-2 border-gray-200 rounded-lg p-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Net Banking</h4>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select Bank</label>
+                <select name="bank" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                  <option value="">Choose your bank</option>
+                  <option value="sbi">State Bank of India</option>
+                  <option value="hdfc">HDFC Bank</option>
+                  <option value="icici">ICICI Bank</option>
+                  <option value="axis">Axis Bank</option>
+                  <option value="kotak">Kotak Mahindra Bank</option>
+                  <option value="yes">Yes Bank</option>
+                  <option value="other">Other Banks</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Final Payment Button -->
+            <div class="pt-6 border-t border-gray-200">
+              <button id="final-payment" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl text-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                Pay ₹<span id="final-amount">0</span> & Complete Order
+              </button>
+              <p class="text-sm text-gray-500 text-center mt-3">Your payment is secured with SSL encryption</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { simpleAuth } from '../lib/simple-auth';
+
+  // Cart functionality
+  class Cart {
+    constructor() {
+      this.items = [];
+      this.requirements = {};
+      this.init();
+    }
+
+    init() {
+      this.loadCart();
+      this.checkUrlParams();
+      this.renderCart();
+      this.bindEvents();
+    }
+
+    checkUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const product = urlParams.get('product');
+      const price = urlParams.get('price');
+
+      if (product && price) {
+        this.addProductFromUrl(product, parseInt(price));
+        // Clear URL parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    addProductFromUrl(productId, price) {
+      // Clear existing items first - only one product at a time
+      this.items = [];
+      
+      const productNames = {
+        'restaurant-menu': 'Restaurant Menu System',
+        'android-tv': 'Android TV App',
+        'mobile-streaming': 'Mobile Streaming App'
+      };
+
+      const productDescriptions = {
+        'restaurant-menu': 'Digital menu system with QR code ordering, real-time updates, and analytics dashboard.',
+        'android-tv': 'Custom Android TV application with streaming capabilities and smart remote support.',
+        'mobile-streaming': 'Cross-platform mobile app for video streaming with offline download support.'
+      };
+
+      const newItem = {
+        id: productId,
+        name: productNames[productId] || 'Custom Product',
+        description: productDescriptions[productId] || 'Professional digital solution',
+        price: price,
+        quantity: 1,
+        customName: '',
+        logo: null,
+        color: '#3B82F6',
+        features: []
+      };
+
+      this.items.push(newItem);
+      this.saveCart();
+    }
+
+    loadCart() {
+      const cartData = localStorage.getItem('cart-items');
+      if (cartData) {
+        this.items = JSON.parse(cartData);
+      }
+    }
+
+    saveCart() {
+      localStorage.setItem('cart-items', JSON.stringify(this.items));
+    }
+
+    addItem(product) {
+      // Only allow one product at a time
+      if (this.items.length > 0) {
+        // Replace existing item
+        this.items = [];
+      }
+      
+      this.items.push({
+        ...product,
+        quantity: 1,
+        customName: '',
+        logo: null,
+        color: '#3B82F6',
+        features: []
+      });
+      this.saveCart();
+      this.renderCart();
+    }
+
+    removeItem(productId) {
+      this.items = this.items.filter(item => item.id !== productId);
+      this.saveCart();
+      this.renderCart();
+    }
+
+    updateItem(productId, updates) {
+      const item = this.items.find(item => item.id === productId);
+      if (item) {
+        Object.assign(item, updates);
+        this.saveCart();
+        this.renderCart();
+      }
+    }
+
+    renderCart() {
+      const emptyCart = document.getElementById('empty-cart');
+      const cartItems = document.getElementById('cart-items');
+      const authCheck = document.getElementById('auth-check');
+      const cartActions = document.getElementById('cart-actions');
+      const projectRequirements = document.getElementById('project-requirements');
+      const cartContent = document.getElementById('cart-content');
+
+      if (!simpleAuth.isAuthenticated()) {
+        cartContent?.classList.add('hidden');
+        authCheck?.classList.remove('hidden');
+        return;
+      }
+
+      cartContent?.classList.remove('hidden');
+      authCheck?.classList.add('hidden');
+
+      if (this.items.length === 0) {
+        emptyCart?.classList.remove('hidden');
+        cartItems?.classList.add('hidden');
+        cartActions?.classList.add('hidden');
+        projectRequirements?.classList.add('hidden');
+        return;
+      }
+
+      emptyCart?.classList.add('hidden');
+      cartItems?.classList.remove('hidden');
+      cartActions?.classList.remove('hidden');
+      projectRequirements?.classList.add('hidden');
+
+      this.renderCartItems();
+      this.updateSummary();
+    }
+
+    renderCartItems() {
+      const cartItemsContainer = document.getElementById('cart-items');
+      if (!cartItemsContainer) return;
+
+      cartItemsContainer.innerHTML = '';
+      
+      this.items.forEach(item => {
+        const itemElement = this.createCartItemElement(item);
+        cartItemsContainer.appendChild(itemElement);
+      });
+    }
+
+    createCartItemElement(item) {
+      const template = document.getElementById('cart-item-template');
+      if (!template) return document.createElement('div');
+
+      const clone = template.cloneNode(true);
+      clone.classList.remove('hidden');
+      clone.id = `cart-item-${item.id}`;
+
+      // Set product info
+      clone.querySelector('.product-name').textContent = item.name;
+      clone.querySelector('.product-description').textContent = item.description;
+      clone.querySelector('.product-price').textContent = `₹${item.price}`;
+
+      // Set custom name if exists
+      const nameInput = clone.querySelector('.product-name-input');
+      if (nameInput && item.customName) {
+        nameInput.value = item.customName;
+      }
+
+      // Set selected color
+      const colorOptions = clone.querySelectorAll('.color-option');
+      colorOptions.forEach(option => {
+        if (option.dataset.color === item.color) {
+          option.classList.add('border-2', 'border-gray-900');
+        }
+      });
+
+      // Set selected features
+      const featureCheckboxes = clone.querySelectorAll('.feature-checkbox');
+      featureCheckboxes.forEach(checkbox => {
+        if (item.features.includes(checkbox.dataset.feature)) {
+          checkbox.checked = true;
+        }
+      });
+
+      // Bind events
+      this.bindItemEvents(clone, item);
+
+      return clone;
+    }
+
+    bindItemEvents(itemElement, item) {
+      // Custom name input
+      const nameInput = itemElement.querySelector('.product-name-input');
+      nameInput?.addEventListener('input', (e) => {
+        this.updateItem(item.id, { customName: e.target.value });
+      });
+
+      // Logo upload
+      const logoUpload = itemElement.querySelector('.logo-upload');
+      const logoUploadBtn = itemElement.querySelector('.logo-upload-btn');
+      const logoPreview = itemElement.querySelector('.logo-preview');
+
+      logoUploadBtn.addEventListener('click', () => logoUpload.click());
+      logoUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            logoPreview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-lg">`;
+            this.updateItem(item.id, { logo: e.target.result });
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Color selection
+      const colorOptions = itemElement.querySelectorAll('.color-option');
+      colorOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          colorOptions.forEach(opt => opt.classList.remove('border-2', 'border-gray-900'));
+          option.classList.add('border-2', 'border-gray-900');
+          this.updateItem(item.id, { color: option.dataset.color });
+        });
+      });
+
+      // Feature selection
+      const featureCheckboxes = itemElement.querySelectorAll('.feature-checkbox');
+      featureCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          const features = Array.from(featureCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.dataset.feature);
+          this.updateItem(item.id, { features });
+        });
+      });
+    }
+
+    updateSummary() {
+      const subtotal = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const featuresTotal = this.items.reduce((sum, item) => {
+        return sum + (item.features.length * 500); // Each feature costs ₹500
+      }, 0);
+      const tax = Math.round((subtotal + featuresTotal) * 0.18); // 18% GST
+      const total = subtotal + featuresTotal + tax;
+
+      // Update summary display
+      const subtotalElement = document.getElementById('subtotal');
+      const featuresTotalElement = document.getElementById('features-total');
+      const taxElement = document.getElementById('tax');
+      const totalElement = document.getElementById('total');
+      const finalAmountElement = document.getElementById('final-amount');
+
+      if (subtotalElement) subtotalElement.textContent = `₹${subtotal.toLocaleString()}`;
+      if (featuresTotalElement) featuresTotalElement.textContent = `₹${featuresTotal.toLocaleString()}`;
+      if (taxElement) taxElement.textContent = `₹${tax.toLocaleString()}`;
+      if (totalElement) totalElement.textContent = `₹${total.toLocaleString()}`;
+      if (finalAmountElement) finalAmountElement.textContent = total.toLocaleString();
+    }
+
+    bindEvents() {
+      // Delete selected project button
+      document.getElementById('delete-selected')?.addEventListener('click', () => {
+        this.deleteSelectedProject();
+      });
+
+      // Proceed to requirements button
+      document.getElementById('proceed-to-requirements')?.addEventListener('click', () => {
+        this.showProjectRequirements();
+      });
+
+      // Back to cart button
+      document.getElementById('back-to-cart')?.addEventListener('click', () => {
+        this.backToCart();
+      });
+
+      // Proceed to payment button (from requirements)
+      document.getElementById('proceed-to-payment')?.addEventListener('click', () => {
+        this.showOrderReview();
+      });
+
+      // Back to requirements button
+      document.getElementById('back-to-requirements')?.addEventListener('click', () => {
+        this.backToRequirements();
+      });
+
+      // Final proceed to payment button (from review)
+      document.getElementById('final-proceed-to-payment')?.addEventListener('click', () => {
+        this.proceedToPayment();
+      });
+
+      // Payment method switching
+      document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          this.switchPaymentMethod(e.target.value);
+        });
+      });
+
+      // Final payment
+      document.getElementById('final-payment')?.addEventListener('click', () => {
+        this.processFinalPayment();
+      });
+    }
+
+    continueShopping() {
+      // Clear cart and redirect to products
+      this.items = [];
+      this.saveCart();
+      window.location.href = '/products';
+    }
+
+    deleteSelectedProject() {
+      if (confirm('Are you sure you want to delete this project? You will be redirected to products page.')) {
+        // Clear cart
+        this.items = [];
+        this.saveCart();
+        // Redirect to products page
+        window.location.href = '/products';
+      }
+    }
+
+    showProjectRequirements() {
+      // Hide cart actions and show requirements form
+      const cartActions = document.getElementById('cart-actions');
+      const projectRequirements = document.getElementById('project-requirements');
+      
+      if (cartActions) cartActions.classList.add('hidden');
+      if (projectRequirements) projectRequirements.classList.remove('hidden');
+      
+      // Pre-fill form with user data if logged in
+      this.prefillRequirementsForm();
+      
+      // Show appropriate fields based on project type
+      this.showProjectTypeFields();
+      
+      // Scroll to requirements form
+      projectRequirements?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    showProjectTypeFields() {
+      if (this.items.length === 0) return;
+      
+      const item = this.items[0];
+      const restaurantFields = document.getElementById('restaurant-fields');
+      const restaurantCuisineFields = document.getElementById('restaurant-cuisine-fields');
+      const tvAppFields = document.getElementById('tv-app-fields');
+      const mobileAppFields = document.getElementById('mobile-app-fields');
+
+      // Update upload labels and text based on project type
+      const uploadLabel = document.getElementById('upload-label');
+      const uploadText = document.getElementById('upload-text');
+      const photosLabel = document.getElementById('photos-label');
+      const photosText = document.getElementById('photos-text');
+
+      // Hide all fields first
+      restaurantFields?.classList.add('hidden');
+      restaurantCuisineFields?.classList.add('hidden');
+      tvAppFields?.classList.add('hidden');
+      mobileAppFields?.classList.add('hidden');
+
+      // Show appropriate fields based on project type
+      if (item.id === 'restaurant-menu') {
+        restaurantFields?.classList.remove('hidden');
+        restaurantCuisineFields?.classList.remove('hidden');
+        // Make restaurant fields required
+        const restaurantNameInput = document.querySelector('input[name="restaurantName"]');
+        if (restaurantNameInput) restaurantNameInput.required = true;
+        
+        // Update upload labels for restaurant
+        if (uploadLabel) uploadLabel.textContent = 'Restaurant Logo';
+        if (uploadText) uploadText.textContent = 'Upload logo or drag and drop';
+        if (photosLabel) photosLabel.textContent = 'Menu Photos (Optional)';
+        if (photosText) photosText.textContent = 'Upload menu photos or drag and drop';
+      } else if (item.id === 'android-tv') {
+        tvAppFields?.classList.remove('hidden');
+        // Make app name required
+        const appNameInput = document.querySelector('input[name="appName"]');
+        if (appNameInput) appNameInput.required = true;
+        
+        // Update upload labels for TV app
+        if (uploadLabel) uploadLabel.textContent = 'App Icon';
+        if (uploadText) uploadText.textContent = 'Upload app icon or drag and drop';
+        if (photosLabel) photosLabel.textContent = 'App Screenshots (Optional)';
+        if (photosText) photosText.textContent = 'Upload app screenshots or drag and drop';
+      } else if (item.id === 'mobile-streaming') {
+        mobileAppFields?.classList.remove('hidden');
+        // Make app name required
+        const appNameInput = document.querySelector('input[name="appName"]');
+        if (appNameInput) appNameInput.required = true;
+        
+        // Update upload labels for mobile app
+        if (uploadLabel) uploadLabel.textContent = 'App Icon';
+        if (uploadText) uploadText.textContent = 'Upload app icon or drag and drop';
+        if (photosLabel) photosLabel.textContent = 'App Screenshots (Optional)';
+        if (photosText) photosText.textContent = 'Upload app screenshots or drag and drop';
+      }
+    }
+
+    prefillRequirementsForm() {
+      const currentUser = simpleAuth.getCurrentUser();
+      if (!currentUser) return;
+
+      // Pre-fill contact information
+      const emailInput = document.querySelector('input[name="email"]');
+      const phoneInput = document.querySelector('input[name="phone"]');
+      
+      if (emailInput) emailInput.value = currentUser.email || '';
+      if (phoneInput) phoneInput.value = currentUser.phone || '';
+
+      // Add file upload event listeners
+      this.setupFileUploads();
+    }
+
+    setupFileUploads() {
+      // Logo upload
+      const logoUpload = document.getElementById('logo-upload');
+      if (logoUpload) {
+        logoUpload.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            this.showUploadSuccess('logo-upload', file.name);
+            // Store logo file in cart item
+            if (this.items.length > 0) {
+              this.items[0].logo = file;
+              console.log('Logo stored:', file.name);
+            }
+          }
+        });
+      }
+
+      // Photos upload
+      const photosUpload = document.getElementById('menu-upload');
+      if (photosUpload) {
+        photosUpload.addEventListener('change', (e) => {
+          const files = Array.from(e.target.files);
+          if (files.length > 0) {
+            this.showUploadSuccess('photos-upload', `${files.length} files selected`);
+            // Store photos in cart item
+            if (this.items.length > 0) {
+              this.items[0].photos = files;
+              console.log('Photos stored:', files.map(f => f.name));
+            }
+          }
+        });
+      }
+
+      // Add drag and drop functionality
+      this.setupDragAndDrop();
+    }
+
+    setupDragAndDrop() {
+      const logoSection = document.querySelector('#logo-upload-section .border-dashed');
+      const photosSection = document.querySelector('#photos-upload-section .border-dashed');
+
+      if (logoSection) {
+        logoSection.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          logoSection.classList.add('border-primary-400', 'bg-primary-50');
+        });
+
+        logoSection.addEventListener('dragleave', (e) => {
+          e.preventDefault();
+          logoSection.classList.remove('border-primary-400', 'bg-primary-50');
+        });
+
+        logoSection.addEventListener('drop', (e) => {
+          e.preventDefault();
+          logoSection.classList.remove('border-primary-400', 'bg-primary-50');
+          
+          const files = Array.from(e.dataTransfer.files);
+          if (files.length > 0) {
+            const logoFile = files[0];
+            document.getElementById('logo-upload').files = e.dataTransfer.files;
+            this.showUploadSuccess('logo-upload', logoFile.name);
+            if (this.items.length > 0) {
+              this.items[0].logo = logoFile;
+            }
+          }
+        });
+      }
+
+      if (photosSection) {
+        photosSection.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          photosSection.classList.add('border-primary-400', 'bg-primary-50');
+        });
+
+        photosSection.addEventListener('dragleave', (e) => {
+          e.preventDefault();
+          photosSection.classList.remove('border-primary-400', 'bg-primary-50');
+        });
+
+        photosSection.addEventListener('drop', (e) => {
+          e.preventDefault();
+          photosSection.classList.remove('border-primary-400', 'bg-primary-50');
+          
+          const files = Array.from(e.dataTransfer.files);
+          if (files.length > 0) {
+            document.getElementById('menu-upload').files = e.dataTransfer.files;
+            this.showUploadSuccess('photos-upload', `${files.length} files selected`);
+            if (this.items.length > 0) {
+              this.items[0].photos = files;
+            }
+          }
+        });
+      }
+    }
+
+    showUploadSuccess(uploadType, message) {
+      const statusElement = document.getElementById(uploadType === 'logo-upload' ? 'upload-status' : 'photos-status');
+      if (statusElement) {
+        statusElement.textContent = `✓ ${message}`;
+        statusElement.className = 'mt-3 text-sm font-medium text-green-600';
+        statusElement.classList.remove('hidden');
+        
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+          statusElement.classList.add('hidden');
+        }, 3000);
+      }
+    }
+
+    backToCart() {
+      // Hide requirements form and show cart actions
+      const projectRequirements = document.getElementById('project-requirements');
+      const cartActions = document.getElementById('cart-actions');
+      
+      if (projectRequirements) projectRequirements.classList.add('hidden');
+      if (cartActions) cartActions.classList.remove('hidden');
+      
+      // Scroll to cart actions
+      cartActions?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async saveCartToSupabase() {
+      // This would integrate with your Supabase backend
+      // For now, we'll just save to localStorage
+      const orderData = {
+        userId: simpleAuth.getCurrentUser()?.id,
+        items: this.items,
+        total: this.calculateTotal(),
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('pending-order', JSON.stringify(orderData));
+    }
+
+    calculateTotal() {
+      const subtotal = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const featuresTotal = this.items.reduce((sum, item) => {
+        const featurePrices = {
+          responsive: 500,
+          seo: 300,
+          analytics: 200
+        };
+        return sum + item.features.reduce((fsum, feature) => fsum + (featurePrices[feature] || 0), 0);
+      }, 0);
+      const tax = (subtotal + featuresTotal) * 0.18;
+      return Math.round(subtotal + featuresTotal + tax);
+    }
+
+    declineOrder() {
+      if (confirm('Are you sure you want to decline this order? You will be redirected to products page.')) {
+        // Clear cart
+        this.items = [];
+        this.saveCart();
+        // Redirect to products page
+        window.location.href = '/products';
+      }
+    }
+
+    deleteItem() {
+      if (confirm('Are you sure you want to delete this item? You will be redirected to products page.')) {
+        // Clear cart
+        this.items = [];
+        this.saveCart();
+        // Redirect to products page
+        window.location.href = '/products';
+      }
+    }
+
+    switchPaymentMethod(method) {
+      const cardDetails = document.getElementById('card-details');
+      const upiDetails = document.getElementById('upi-details');
+      const netbankingDetails = document.getElementById('netbanking-details');
+
+      // Hide all payment forms
+      cardDetails?.classList.add('hidden');
+      upiDetails?.classList.add('hidden');
+      netbankingDetails?.classList.add('hidden');
+
+      // Show selected payment form
+      switch (method) {
+        case 'card':
+          cardDetails?.classList.remove('hidden');
+          break;
+        case 'upi':
+          upiDetails?.classList.remove('hidden');
+          break;
+        case 'netbanking':
+          netbankingDetails?.classList.remove('hidden');
+          break;
+      }
+    }
+
+    showOrderReview() {
+      // Validate requirements form
+      const form = document.getElementById('requirements-form');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      // Collect form data
+      this.requirements = {
+        projectName: form.querySelector('[name="projectName"]').value,
+        contactPerson: form.querySelector('[name="contactPerson"]').value,
+        restaurantName: form.querySelector('[name="restaurantName"]').value,
+        cuisineType: form.querySelector('[name="cuisineType"]').value,
+        appName: form.querySelector('[name="appName"]').value,
+        email: form.querySelector('[name="email"]').value,
+        phone: form.querySelector('[name="phone"]').value,
+        additionalRequirements: form.querySelector('[name="additionalRequirements"]').value
+      };
+
+      // Update review page with collected data
+      this.updateOrderReview();
+
+      // Hide requirements form and show review
+      const projectRequirements = document.getElementById('project-requirements');
+      const orderReview = document.getElementById('order-review');
+      
+      if (projectRequirements) projectRequirements.classList.add('hidden');
+      if (orderReview) orderReview.classList.remove('hidden');
+      
+      // Scroll to review
+      orderReview?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    updateOrderReview() {
+      // Update project summary
+      document.getElementById('review-project-name').textContent = this.requirements.projectName || '-';
+      document.getElementById('review-contact-person').textContent = this.requirements.contactPerson || '-';
+      
+      // Show/hide restaurant or app info based on project type
+      const item = this.items[0];
+      if (item.id === 'restaurant-menu') {
+        document.getElementById('review-restaurant-info').classList.remove('hidden');
+        document.getElementById('review-cuisine-info').classList.remove('hidden');
+        document.getElementById('review-app-info').classList.add('hidden');
+        document.getElementById('review-restaurant-name').textContent = this.requirements.restaurantName || '-';
+        document.getElementById('review-cuisine-type').textContent = this.requirements.cuisineType || '-';
+      } else {
+        document.getElementById('review-restaurant-info').classList.add('hidden');
+        document.getElementById('review-cuisine-info').classList.add('hidden');
+        document.getElementById('review-app-info').classList.remove('hidden');
+        document.getElementById('review-app-name').textContent = this.requirements.appName || '-';
+      }
+
+      // Update colors
+      const primaryColor = document.querySelector('input[name="primaryColor"]')?.value || '#3B82F6';
+      const secondaryColor = document.querySelector('input[name="secondaryColor"]')?.value || '#A5CF6';
+      const accentColor = document.querySelector('input[name="accentColor"]')?.value || '#F59E0B';
+      const textColor = document.querySelector('input[name="textColor"]')?.value || '#1F2937';
+
+      document.getElementById('review-primary-color').style.backgroundColor = primaryColor;
+      document.getElementById('review-secondary-color').style.backgroundColor = secondaryColor;
+      document.getElementById('review-accent-color').style.backgroundColor = accentColor;
+      document.getElementById('review-text-color').style.backgroundColor = textColor;
+
+      // Update logo and photos status
+      const logoFile = document.getElementById('logo-upload').files[0];
+      const photosFiles = document.getElementById('menu-upload').files;
+      
+      document.getElementById('review-logo-status').textContent = logoFile ? `✓ ${logoFile.name}` : 'Not uploaded';
+      document.getElementById('review-photos-status').textContent = photosFiles.length > 0 ? `✓ ${photosFiles.length} photos selected` : 'Not uploaded';
+
+      // Update total
+      document.getElementById('review-total').textContent = `₹${this.calculateTotal().toLocaleString()}`;
+    }
+
+    backToRequirements() {
+      const orderReview = document.getElementById('order-review');
+      const projectRequirements = document.getElementById('project-requirements');
+      
+      if (orderReview) orderReview.classList.add('hidden');
+      if (projectRequirements) projectRequirements.classList.remove('hidden');
+      
+      projectRequirements?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    proceedToPayment() {
+      // Save cart and show payment
+      this.saveCart();
+      this.showPaymentSection();
+    }
+
+    showPaymentSection() {
+      // Hide requirements form and show payment
+      const projectRequirements = document.getElementById('project-requirements');
+      const paymentSection = document.getElementById('payment-section');
+      
+      if (projectRequirements) projectRequirements.classList.add('hidden');
+      if (paymentSection) paymentSection.classList.remove('hidden');
+      
+      // Scroll to payment section
+      paymentSection?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    processFinalPayment() {
+      // Validate payment form
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+      
+      if (!paymentMethod) {
+        alert('Please select a payment method');
+        return;
+      }
+
+      // Validate based on payment method
+      let isValid = true;
+      let message = '';
+
+      switch (paymentMethod) {
+        case 'card':
+          const cardNumber = document.querySelector('input[name="cardNumber"]').value;
+          const cardholderName = document.querySelector('input[name="cardholderName"]').value;
+          const expiryDate = document.querySelector('input[name="expiryDate"]').value;
+          const cvv = document.querySelector('input[name="cvv"]').value;
+          
+          if (!cardNumber || !cardholderName || !expiryDate || !cvv) {
+            isValid = false;
+            message = 'Please fill in all card details';
+          }
+          break;
+          
+        case 'upi':
+          const upiId = document.querySelector('input[name="upiId"]').value;
+          if (!upiId) {
+            isValid = false;
+            message = 'Please enter your UPI ID';
+          }
+          break;
+          
+        case 'netbanking':
+          const bank = document.querySelector('select[name="bank"]').value;
+          if (!bank) {
+            isValid = false;
+            message = 'Please select your bank';
+          }
+          break;
+      }
+
+      if (!isValid) {
+        alert(message);
+        return;
+      }
+
+      // Process payment (simulated)
+      this.simulatePayment();
+    }
+
+    simulatePayment() {
+      const finalPaymentBtn = document.getElementById('final-payment');
+      const originalText = finalPaymentBtn.innerHTML;
+      
+      // Show loading state
+      finalPaymentBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Processing Payment...
+      `;
+      finalPaymentBtn.disabled = true;
+
+      // Simulate payment processing
+      setTimeout(() => {
+        // Save order to user's order history
+        this.saveOrderToHistory();
+        
+        // Clear cart
+        this.items = [];
+        this.saveCart();
+        
+        // Show success
+        finalPaymentBtn.innerHTML = `
+          <svg class="w-5 h-5 text-white inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          Payment Successful!
+        `;
+
+        // Redirect to orders page after 2 seconds
+        setTimeout(() => {
+          window.location.href = '/orders?order=success';
+        }, 2000);
+      }, 3000);
+    }
+
+    saveOrderToHistory() {
+      if (this.items.length === 0) return;
+
+      const currentUser = simpleAuth.getCurrentUser();
+      if (!currentUser) return;
+
+      const item = this.items[0];
+      const total = this.calculateTotal();
+
+      // Get color values from requirements form
+      const primaryColor = document.querySelector('input[name="primaryColor"]')?.value || '#3B82F6';
+      const secondaryColor = document.querySelector('input[name="secondaryColor"]')?.value || '#A5CF6';
+      const accentColor = document.querySelector('input[name="accentColor"]')?.value || '#F59E0B';
+      const textColor = document.querySelector('input[name="textColor"]')?.value || '#1F2937';
+
+      const order = {
+        orderId: `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        userId: currentUser.email,
+        projectName: item.name,
+        description: item.description,
+        total: total,
+        orderDate: new Date().toISOString(),
+        requirements: {
+          ...this.requirements,
+          primaryColor: primaryColor,
+          secondaryColor: secondaryColor,
+          accentColor: accentColor,
+          textColor: textColor
+        },
+        features: item.features || [],
+        logo: item.logo || null,
+        color: item.color || '#3B82F6',
+        customName: item.customName || ''
+      };
+
+      // Load existing orders
+      let userOrders = [];
+      const existingOrders = localStorage.getItem('user-orders');
+      if (existingOrders) {
+        userOrders = JSON.parse(existingOrders);
+      }
+
+      // Add new order
+      userOrders.push(order);
+
+      // Save back to localStorage
+      localStorage.setItem('user-orders', JSON.stringify(userOrders));
+
+      // Log for debugging
+      console.log('Order saved:', order);
+      console.log('All orders:', userOrders);
+    }
+
+
+  }
+
+  // Initialize cart when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    new Cart();
+  });
+</script>

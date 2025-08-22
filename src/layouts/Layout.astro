@@ -1,0 +1,493 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Toast from '../components/Toast.astro';
+
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description || "Professional development services for restaurants, mobile apps, TV apps, and websites. 24-hour delivery guaranteed."} />
+    <title>{title}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <!-- Tailwind CSS -->
+    <script is:inline src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js for interactivity -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: '#eff6ff',
+                100: '#dbeafe',
+                200: '#bfdbfe',
+                300: '#93c5fd',
+                400: '#60a5fa',
+                500: '#3b82f6',
+                600: '#2563eb',
+                700: '#1d4ed8',
+                800: '#1e40af',
+                900: '#1e3a8a',
+                950: '#172554',
+              },
+              secondary: {
+                50: '#faf5ff',
+                100: '#f3e8ff',
+                200: '#e9d5ff',
+                300: '#d8b4fe',
+                400: '#c084fc',
+                500: '#a855f7',
+                600: '#9333ea',
+                700: '#7c3aed',
+                800: '#6b21a8',
+                900: '#581c87',
+                950: '#3b0764',
+              },
+              accent: {
+                50: '#fefce8',
+                100: '#fef9c3',
+                200: '#fef08a',
+                300: '#fde047',
+                400: '#facc15',
+                500: '#eab308',
+                600: '#ca8a04',
+                700: '#a16207',
+                800: '#854d0e',
+                900: '#713f12',
+                950: '#422006',
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-in-out',
+              'slide-up': 'slideUp 0.3s ease-out',
+              'bounce-in': 'bounceIn 0.6s ease-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              slideUp: {
+                '0%': { transform: 'translateY(10px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
+              },
+              bounceIn: {
+                '0%': { transform: 'scale(0.3)', opacity: '0' },
+                '50%': { transform: 'scale(1.05)' },
+                '70%': { transform: 'scale(0.9)' },
+                '100%': { transform: 'scale(1)', opacity: '1' },
+              },
+            },
+          },
+        },
+      }
+    </script>
+    
+    <!-- Custom CSS -->
+    <style is:global>
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+      
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      
+      /* Focus styles */
+      *:focus {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+      }
+      
+      /* Button focus */
+      button:focus {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+      }
+      
+      /* Link focus */
+      a:focus {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+      }
+      
+      /* Input focus */
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+      }
+      
+      /* Disable focus outline for mouse users */
+      *:focus:not(:focus-visible) {
+        outline: none;
+      }
+      
+      /* Loading animation */
+      .loading-dots::after {
+        content: '';
+        animation: loading-dots 1.5s infinite;
+      }
+      
+      @keyframes loading-dots {
+        0%, 20% { content: ''; }
+        40% { content: '.'; }
+        60% { content: '..'; }
+        80%, 100% { content: '...'; }
+      }
+      
+      /* Gradient text */
+      .gradient-text {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      /* Glass effect */
+      .glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      /* Hover effects */
+      .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      
+      .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Card hover effects */
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      
+      .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Button animations */
+      .btn-primary {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+      }
+      
+      .btn-primary:hover::before {
+        left: 100%;
+      }
+      
+      /* Form animations */
+      .form-input {
+        transition: all 0.3s ease;
+      }
+      
+      .form-input:focus {
+        transform: scale(1.02);
+      }
+      
+      /* Page transitions */
+      .page-transition {
+        animation: pageTransition 0.3s ease-out;
+      }
+      
+      @keyframes pageTransition {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      /* Responsive utilities */
+      @media (max-width: 640px) {
+        .mobile-hidden {
+          display: none;
+        }
+      }
+      
+      @media (min-width: 641px) {
+        .desktop-hidden {
+          display: none;
+        }
+      }
+      
+      /* Print styles */
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  
+  <body class="h-full bg-gray-50 font-sans text-gray-900 antialiased">
+    <!-- Header -->
+    <Header />
+    
+    <!-- Main Content -->
+    <main class="min-h-screen page-transition">
+      <slot />
+    </main>
+    
+    <!-- Footer -->
+    <Footer />
+    
+    <!-- Toast Notifications -->
+    <Toast />
+    
+    <!-- Global Scripts -->
+    <script>
+      // Global utility functions
+      window.utils = {
+        // Format currency
+        formatCurrency: (amount, currency = 'INR') => {
+          return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: currency,
+          }).format(amount);
+        },
+        
+        // Format date
+        formatDate: (date, options = {}) => {
+          const defaultOptions = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            ...options
+          };
+          return new Intl.DateTimeFormat('en-IN', defaultOptions).format(new Date(date));
+        },
+        
+        // Debounce function
+        debounce: (func, wait) => {
+          let timeout;
+          return function executedFunction(...args) {
+            const later = () => {
+              clearTimeout(timeout);
+              func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+          };
+        },
+        
+        // Throttle function
+        throttle: (func, limit) => {
+          let inThrottle;
+          return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+              func.apply(context, args);
+              inThrottle = true;
+              setTimeout(() => inThrottle = false, limit);
+            }
+          }
+        },
+        
+        // Copy to clipboard
+        copyToClipboard: async (text) => {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch (err) {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+              return true;
+            } catch (err) {
+              document.body.removeChild(textArea);
+              return false;
+            }
+          }
+        },
+        
+        // Generate random ID
+        generateId: () => {
+          return Math.random().toString(36).substr(2, 9);
+        },
+        
+        // Validate email
+        isValidEmail: (email) => {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(email);
+        },
+        
+        // Validate phone number (Indian format)
+        isValidPhone: (phone) => {
+          const phoneRegex = /^(\+91[\-\s]?)?[789]\d{9}$/;
+          return phoneRegex.test(phone);
+        },
+        
+        // Scroll to element
+        scrollToElement: (elementId, offset = 0) => {
+          const element = document.getElementById(elementId);
+          if (element) {
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+        },
+        
+        // Show loading state
+        showLoading: (element) => {
+          if (element) {
+            element.disabled = true;
+            element.dataset.originalText = element.textContent;
+            element.innerHTML = `
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Loading...
+            `;
+          }
+        },
+        
+        // Hide loading state
+        hideLoading: (element) => {
+          if (element && element.dataset.originalText) {
+            element.disabled = false;
+            element.textContent = element.dataset.originalText;
+            delete element.dataset.originalText;
+          }
+        }
+      };
+      
+      // Global event listeners
+      document.addEventListener('DOMContentLoaded', () => {
+        // Add loading states to forms
+        document.querySelectorAll('form').forEach(form => {
+          form.addEventListener('submit', (e) => {
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+              window.utils.showLoading(submitButton);
+            }
+          });
+        });
+        
+        // Add smooth scrolling to anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            window.utils.scrollToElement(targetId, 80);
+          });
+        });
+        
+        // Add intersection observer for animations
+        const observerOptions = {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('animate-fade-in');
+            }
+          });
+        }, observerOptions);
+        
+        // Observe elements with animation classes
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+          observer.observe(el);
+        });
+      });
+      
+      // Handle page visibility changes
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          document.title = '👋 Come back soon! - DevExpress';
+        } else {
+          document.title = document.title.replace('👋 Come back soon! - ', '');
+        }
+      });
+      
+      // Handle online/offline status
+      window.addEventListener('online', () => {
+        if (typeof window.showToast === 'function') {
+          window.showToast('You are back online!', 'success');
+        }
+      });
+      
+      window.addEventListener('offline', () => {
+        if (typeof window.showToast === 'function') {
+          window.showToast('You are currently offline. Some features may not work.', 'warning');
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,217 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AuthGuard from '../components/AuthGuard.astro';
+---
+
+<Layout title="Dashboard - DevExpress">
+  <AuthGuard>
+    <section class="py-12 bg-gray-50 min-h-screen">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Welcome Header -->
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            Welcome back, <span id="user-welcome">User</span>!
+          </h1>
+          <p class="text-gray-600">Manage your projects and orders from your dashboard.</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+              <div class="p-2 bg-blue-100 rounded-lg">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Active Orders</p>
+                <p class="text-2xl font-bold text-gray-900">0</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+              <div class="p-2 bg-green-100 rounded-lg">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Completed</p>
+                <p class="text-2xl font-bold text-gray-900">0</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+              <div class="p-2 bg-purple-100 rounded-lg">
+                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Spent</p>
+                <p class="text-2xl font-bold text-gray-900">₹0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+            <div class="space-y-3">
+              <a href="/products" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <svg class="w-5 h-5 text-primary-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                <span class="text-gray-700">Browse Products</span>
+              </a>
+              <a href="/cart" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <svg class="w-5 h-5 text-primary-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0V19a2 2 0 002 2h7a2 2 0 002-2v-.5"></path>
+                </svg>
+                <span class="text-gray-700">View Cart</span>
+              </a>
+              <a href="/orders" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <svg class="w-5 h-5 text-primary-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                <span class="text-gray-700">View Orders</span>
+              </a>
+              <button id="logout-btn" class="w-full flex items-center p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors text-red-700">
+                <svg class="w-5 h-5 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Info</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Name:</span>
+                <span id="user-full-name" class="font-medium">Loading...</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Email:</span>
+                <span id="user-email" class="font-medium">Loading...</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Phone:</span>
+                <span id="user-phone" class="font-medium">Loading...</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Company:</span>
+                <span id="user-company" class="font-medium">Loading...</span>
+              </div>
+            </div>
+            <div class="mt-4">
+              <a href="/profile" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                Edit Profile →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <div class="text-center py-8">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No recent activity</h3>
+            <p class="mt-1 text-sm text-gray-500">Start by browsing our products and placing your first order.</p>
+            <div class="mt-6">
+              <a href="/products" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
+                Browse Products
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </AuthGuard>
+</Layout>
+
+<script>
+  import { simpleAuth } from '../lib/simple-auth';
+
+  // Function to update user information on the dashboard
+  function updateUserInfo() {
+    const currentUser = simpleAuth.getCurrentUser();
+    
+    if (currentUser) {
+      // Update welcome message
+      const userWelcome = document.getElementById('user-welcome');
+      if (userWelcome) {
+        userWelcome.textContent = currentUser.fullName || currentUser.email;
+      }
+      
+      // Update account info
+      const userFullName = document.getElementById('user-full-name');
+      if (userFullName) {
+        userFullName.textContent = currentUser.fullName || 'Not set';
+      }
+      
+      const userEmail = document.getElementById('user-email');
+      if (userEmail) {
+        userEmail.textContent = currentUser.email;
+      }
+      
+      const userPhone = document.getElementById('user-phone');
+      if (userPhone) {
+        userPhone.textContent = currentUser.phone || 'Not set';
+      }
+      
+      const userCompany = document.getElementById('user-company');
+      if (userCompany) {
+        userCompany.textContent = currentUser.companyName || 'Not set';
+      }
+    }
+  }
+
+  // Update user info when page loads
+  document.addEventListener('DOMContentLoaded', updateUserInfo);
+
+  // Also update when the script loads (in case DOMContentLoaded already fired)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateUserInfo);
+  } else {
+    updateUserInfo();
+  }
+
+  // Add logout functionality
+  const logoutBtn = document.getElementById('logout-btn');
+  logoutBtn?.addEventListener('click', async () => {
+    try {
+      // Sign out
+      await simpleAuth.signOut();
+      
+      // Dispatch auth state change event
+      window.dispatchEvent(new CustomEvent('auth-state-changed'));
+      
+      // Show success message
+      if (typeof window.showToast === 'function') {
+        window.showToast('Successfully signed out!', 'success');
+      }
+      
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000);
+    } catch (error) {
+      console.error('Logout error:', error);
+      if (typeof window.showToast === 'function') {
+        window.showToast('Error signing out. Please try again.', 'error');
+      }
+    }
+  });
+</script>
