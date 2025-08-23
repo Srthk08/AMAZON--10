@@ -18,23 +18,23 @@ const { title, description } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description || "Professional development services for restaurants, mobile apps, TV apps, and websites. 24-hour delivery guaranteed."} />
     <title>{title}</title>
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    
+
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    
+
     <!-- Tailwind CSS -->
     <script is:inline src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Alpine.js for interactivity -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
+
     <!-- Custom Tailwind Config -->
     <script>
       tailwind.config = {
@@ -109,50 +109,50 @@ const { title, description } = Astro.props;
         },
       }
     </script>
-    
+
     <!-- Custom CSS -->
     <style is:global>
       /* Smooth scrolling */
       html {
         scroll-behavior: smooth;
       }
-      
+
       /* Custom scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
       }
-      
+
       ::-webkit-scrollbar-track {
         background: #f1f5f9;
       }
-      
+
       ::-webkit-scrollbar-thumb {
         background: #cbd5e1;
         border-radius: 4px;
       }
-      
+
       ::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
       }
-      
+
       /* Focus styles */
       *:focus {
         outline: 2px solid #3b82f6;
         outline-offset: 2px;
       }
-      
+
       /* Button focus */
       button:focus {
         outline: 2px solid #3b82f6;
         outline-offset: 2px;
       }
-      
+
       /* Link focus */
       a:focus {
         outline: 2px solid #3b82f6;
         outline-offset: 2px;
       }
-      
+
       /* Input focus */
       input:focus,
       textarea:focus,
@@ -160,25 +160,25 @@ const { title, description } = Astro.props;
         outline: 2px solid #3b82f6;
         outline-offset: 2px;
       }
-      
+
       /* Disable focus outline for mouse users */
       *:focus:not(:focus-visible) {
         outline: none;
       }
-      
+
       /* Loading animation */
       .loading-dots::after {
         content: '';
         animation: loading-dots 1.5s infinite;
       }
-      
+
       @keyframes loading-dots {
         0%, 20% { content: ''; }
         40% { content: '.'; }
         60% { content: '..'; }
         80%, 100% { content: '...'; }
       }
-      
+
       /* Gradient text */
       .gradient-text {
         background: linear-gradient(135deg, #3b82f6 0%, #8b5cf7 100%);
@@ -186,41 +186,41 @@ const { title, description } = Astro.props;
         -webkit-text-fill-color: transparent;
         background-clip: text;
       }
-      
+
       /* Glass effect */
       .glass {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
       }
-      
+
       /* Hover effects */
       .hover-lift {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
-      
+
       .hover-lift:hover {
         transform: translateY(-2px);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       }
-      
+
       /* Card hover effects */
       .card-hover {
         transition: all 0.3s ease;
       }
-      
+
       .card-hover:hover {
         transform: translateY(-4px);
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       }
-      
+
       /* Button animations */
       .btn-primary {
         position: relative;
         overflow: hidden;
         transition: all 0.3s ease;
       }
-      
+
       .btn-primary::before {
         content: '';
         position: absolute;
@@ -231,25 +231,25 @@ const { title, description } = Astro.props;
         background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
         transition: left 0.5s ease;
       }
-      
+
       .btn-primary:hover::before {
         left: 100%;
       }
-      
+
       /* Form animations */
       .form-input {
         transition: all 0.3s ease;
       }
-      
+
       .form-input:focus {
         transform: scale(1.02);
       }
-      
+
       /* Page transitions */
       .page-transition {
         animation: pageTransition 0.3s ease-out;
       }
-      
+
       @keyframes pageTransition {
         from {
           opacity: 0;
@@ -260,20 +260,20 @@ const { title, description } = Astro.props;
           transform: translateY(0);
         }
       }
-      
+
       /* Responsive utilities */
       @media (max-width: 640px) {
         .mobile-hidden {
           display: none;
         }
       }
-      
+
       @media (min-width: 641px) {
         .desktop-hidden {
           display: none;
         }
       }
-      
+
       /* Print styles */
       @media print {
         .no-print {
@@ -282,22 +282,22 @@ const { title, description } = Astro.props;
       }
     </style>
   </head>
-  
+
   <body class="h-full bg-gray-50 font-sans text-gray-900 antialiased">
     <!-- Header -->
     <Header />
-    
+
     <!-- Main Content -->
     <main class="min-h-screen page-transition">
       <slot />
     </main>
-    
+
     <!-- Footer -->
     <Footer />
-    
+
     <!-- Toast Notifications -->
     <Toast />
-    
+
     <!-- Global Scripts -->
     <script>
       // Global utility functions
@@ -309,7 +309,7 @@ const { title, description } = Astro.props;
             currency: currency,
           }).format(amount);
         },
-        
+
         // Format date
         formatDate: (date, options = {}) => {
           const defaultOptions = {
@@ -320,7 +320,7 @@ const { title, description } = Astro.props;
           };
           return new Intl.DateTimeFormat('en-IN', defaultOptions).format(new Date(date));
         },
-        
+
         // Debounce function
         debounce: (func, wait) => {
           let timeout;
@@ -333,7 +333,7 @@ const { title, description } = Astro.props;
             timeout = setTimeout(later, wait);
           };
         },
-        
+
         // Throttle function
         throttle: (func, limit) => {
           let inThrottle;
@@ -347,7 +347,7 @@ const { title, description } = Astro.props;
             }
           }
         },
-        
+
         // Copy to clipboard
         copyToClipboard: async (text) => {
           try {
@@ -370,24 +370,24 @@ const { title, description } = Astro.props;
             }
           }
         },
-        
+
         // Generate random ID
         generateId: () => {
           return Math.random().toString(36).substr(2, 9);
         },
-        
+
         // Validate email
         isValidEmail: (email) => {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           return emailRegex.test(email);
         },
-        
+
         // Validate phone number (Indian format)
         isValidPhone: (phone) => {
           const phoneRegex = /^(\+91[\-\s]?)?[789]\d{9}$/;
           return phoneRegex.test(phone);
         },
-        
+
         // Scroll to element
         scrollToElement: (elementId, offset = 0) => {
           const element = document.getElementById(elementId);
@@ -400,7 +400,7 @@ const { title, description } = Astro.props;
             });
           }
         },
-        
+
         // Show loading state
         showLoading: (element) => {
           if (element) {
@@ -415,7 +415,7 @@ const { title, description } = Astro.props;
             `;
           }
         },
-        
+
         // Hide loading state
         hideLoading: (element) => {
           if (element && element.dataset.originalText) {
@@ -425,19 +425,21 @@ const { title, description } = Astro.props;
           }
         }
       };
-      
+
       // Global event listeners
-      document.addEventListener('DOMContentLoaded', () => {
-        // Add loading states to forms
-        document.querySelectorAll('form').forEach(form => {
-          form.addEventListener('submit', (e) => {
-            const submitButton = form.querySelector('button[type="submit"]');
-            if (submitButton) {
-              window.utils.showLoading(submitButton);
-            }
-          });
-        });
-        
+    // ...existing code...
+document.addEventListener('DOMContentLoaded', () => {
+  // Add loading states to opt-in forms only (use data-auto-loading="true")
+  document.querySelectorAll('form[data-auto-loading="true"]').forEach(form => {
+    form.addEventListener('submit', (e) => {
+      const submitButton = form.querySelector('button[type="submit"]');
+      if (submitButton) {
+        window.utils.showLoading(submitButton);
+      }
+    });
+  });
+
+
         // Add smooth scrolling to anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
           anchor.addEventListener('click', function (e) {
@@ -446,13 +448,13 @@ const { title, description } = Astro.props;
             window.utils.scrollToElement(targetId, 80);
           });
         });
-        
+
         // Add intersection observer for animations
         const observerOptions = {
           threshold: 0.1,
           rootMargin: '0px 0px -50px 0px'
         };
-        
+
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -460,13 +462,13 @@ const { title, description } = Astro.props;
             }
           });
         }, observerOptions);
-        
+
         // Observe elements with animation classes
         document.querySelectorAll('.animate-on-scroll').forEach(el => {
           observer.observe(el);
         });
       });
-      
+
       // Handle page visibility changes
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
@@ -475,14 +477,14 @@ const { title, description } = Astro.props;
           document.title = document.title.replace('👋 Come back soon! - ', '');
         }
       });
-      
+
       // Handle online/offline status
       window.addEventListener('online', () => {
         if (typeof window.showToast === 'function') {
           window.showToast('You are back online!', 'success');
         }
       });
-      
+
       window.addEventListener('offline', () => {
         if (typeof window.showToast === 'function') {
           window.showToast('You are currently offline. Some features may not work.', 'warning');

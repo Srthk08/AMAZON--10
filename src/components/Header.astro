@@ -1,7 +1,3 @@
----
-// Header component with navigation and authentication
----
-
 <header class="bg-gradient-to-r from-primary-600 to-secondary-600 shadow-xl border-b border-primary-700">
   <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
     <div class="flex justify-between items-center h-24">
@@ -36,8 +32,15 @@
 
       <!-- User Menu / Auth Buttons -->
       <div class="flex items-center space-x-6">
+        <!-- Loading state (hidden by default) -->
+        <div id="auth-loading" class="hidden">
+          <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
+            <div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </div>
+
         <!-- Auth Buttons - Only visible before login -->
-        <div id="auth-buttons" class="flex items-center space-x-6">
+        <div id="auth-buttons" class="hidden flex items-center space-x-6">
           <a href="/login" class="text-white text-opacity-90 hover:text-white px-8 py-3 text-lg font-medium transition-all duration-300 rounded-xl hover:bg-white hover:bg-opacity-20 hover:scale-105">
             Sign In
           </a>
@@ -147,25 +150,42 @@
   // Global variables
   let isUserMenuOpen = false;
 
+  // Function to get auth state from sessionStorage for immediate access
+  function getCachedAuthState() {
+    try {
+      const authData = sessionStorage.getItem('simple-auth-cache');
+      if (authData) {
+        return JSON.parse(authData);
+      }
+    } catch (e) {
+      console.error('Error reading auth cache:', e);
+    }
+    return null;
+  }
+
   // Function to update the header based on authentication state
   function updateHeader() {
     const isAuthenticated = simpleAuth.isAuthenticated();
     const authButtons = document.getElementById('auth-buttons');
     const userMenu = document.getElementById('user-menu');
+    const authLoading = document.getElementById('auth-loading');
     const userEmail = document.getElementById('user-email');
     const userName = document.getElementById('user-name');
     const userAvatar = document.getElementById('user-avatar');
 
-    // Prevent any flickering by using a single update
+    // Hide loading state
+    if (authLoading && !authLoading.classList.contains('hidden')) {
+      authLoading.classList.add('hidden');
+    }
+
+    // Update UI based on authentication state
     if (isAuthenticated) {
-      // User is logged in - hide auth buttons immediately, show user menu
+      // User is logged in
       if (authButtons && !authButtons.classList.contains('hidden')) {
-        authButtons.style.visibility = 'hidden';
         authButtons.classList.add('hidden');
       }
       if (userMenu && userMenu.classList.contains('hidden')) {
         userMenu.classList.remove('hidden');
-        userMenu.style.visibility = 'visible';
       }
 
       // Update user info
@@ -175,17 +195,82 @@
         if (userName) userName.textContent = user.fullName || user.email.split('@')[0];
         if (userAvatar) userAvatar.textContent = (user.fullName || user.email).charAt(0).toUpperCase();
       }
+
+      // Cache the auth state for faster loading on next page
+      try {
+        sessionStorage.setItem('simple-auth-cache', JSON.stringify({
+          isAuthenticated: true,
+          user: user
+        }));
+      } catch (e) {
+        console.error('Error caching auth state:', e);
+      }
     } else {
-      // User is not logged in - show auth buttons immediately, hide user menu
+      // User is not logged in
       if (userMenu && !userMenu.classList.contains('hidden')) {
-        userMenu.style.visibility = 'hidden';
         userMenu.classList.add('hidden');
-        // Close dropdown if open
         closeUserDropdown();
       }
       if (authButtons && authButtons.classList.contains('hidden')) {
         authButtons.classList.remove('hidden');
-        authButtons.style.visibility = 'visible';
+      }
+
+      // Cache the auth state for faster loading on next page
+      try {
+        sessionStorage.setItem('simple-auth-cache', JSON.stringify({
+          isAuthenticated: false,
+          user: null
+        }));
+      } catch (e) {
+        console.error('Error caching auth state:', e);
+      }
+    }
+  }
+
+  // Function to set initial UI state based on cached auth data
+  function setInitialUIState() {
+    const cachedAuth = getCachedAuthState();
+    const authButtons = document.getElementById('auth-buttons');
+    const userMenu = document.getElementById('user-menu');
+    const authLoading = document.getElementById('auth-loading');
+
+    // Show loading state initially
+    if (authLoading) {
+      authLoading.classList.remove('hidden');
+    }
+
+    // Hide both auth buttons and user menu until we know the actual state
+    if (authButtons && !authButtons.classList.contains('hidden')) {
+      authButtons.classList.add('hidden');
+    }
+    if (userMenu && !userMenu.classList.contains('hidden')) {
+      userMenu.classList.add('hidden');
+    }
+
+    // If we have cached data, use it to show the correct UI immediately
+    if (cachedAuth) {
+      if (cachedAuth.isAuthenticated) {
+        if (userMenu) userMenu.classList.remove('hidden');
+
+        // Update user info from cache
+        const userEmail = document.getElementById('user-email');
+        const userName = document.getElementById('user-name');
+        const userAvatar = document.getElementById('user-avatar');
+
+        if (userEmail && cachedAuth.user) userEmail.textContent = cachedAuth.user.email;
+        if (userName && cachedAuth.user) {
+          userName.textContent = cachedAuth.user.fullName || cachedAuth.user.email.split('@')[0];
+        }
+        if (userAvatar && cachedAuth.user) {
+          userAvatar.textContent = (cachedAuth.user.fullName || cachedAuth.user.email).charAt(0).toUpperCase();
+        }
+      } else {
+        if (authButtons) authButtons.classList.remove('hidden');
+      }
+
+      // Hide loading state since we have cached data
+      if (authLoading) {
+        authLoading.classList.add('hidden');
       }
     }
   }
@@ -215,10 +300,10 @@
   function toggleUserDropdown() {
     const userDropdown = document.getElementById('user-dropdown');
     const userMenuArrow = document.getElementById('user-menu-arrow');
-    
+
     if (userDropdown && userMenuArrow) {
       isUserMenuOpen = !isUserMenuOpen;
-      
+
       if (isUserMenuOpen) {
         userDropdown.classList.remove('hidden');
         userMenuArrow.style.transform = 'rotate(180deg)';
@@ -232,7 +317,7 @@
   function closeUserDropdown() {
     const userDropdown = document.getElementById('user-dropdown');
     const userMenuArrow = document.getElementById('user-menu-arrow');
-    
+
     if (userDropdown && userMenuArrow) {
       userDropdown.classList.add('hidden');
       userMenuArrow.style.transform = 'rotate(0deg)';
@@ -243,6 +328,8 @@
   // Sign out function
   window.signOut = async function() {
     try {
+      // Clear cached auth state
+      sessionStorage.removeItem('simple-auth-cache');
       await simpleAuth.signOut();
       closeUserDropdown();
       updateHeader();
@@ -266,10 +353,14 @@
 
   // Initialize everything when page loads
   document.addEventListener('DOMContentLoaded', () => {
-    // Small delay to ensure auth state is properly loaded
+    // Set initial UI state immediately using cached data
+    setInitialUIState();
+
+    // Then update with actual auth state (with a small delay to ensure auth is loaded)
     setTimeout(() => {
       updateHeader();
     }, 50);
+
     initUserDropdown();
     initMobileMenu();
   });

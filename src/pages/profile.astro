@@ -18,7 +18,7 @@ import AuthGuard from '../components/AuthGuard.astro';
           <div class="px-6 py-4 border-b border-gray-200">
             <h2 class="text-lg font-medium text-gray-900">Personal Information</h2>
           </div>
-          
+
           <form id="profile-form" class="p-6 space-y-6">
             <!-- Success Message -->
             <div id="success-message" class="hidden p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -121,7 +121,7 @@ import AuthGuard from '../components/AuthGuard.astro';
           <div class="px-6 py-4 border-b border-gray-200">
             <h2 class="text-lg font-medium text-gray-900">Change Password</h2>
           </div>
-          
+
           <form id="password-form" class="p-6 space-y-6">
             <!-- Password Success Message -->
             <div id="password-success-message" class="hidden p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -232,7 +232,7 @@ import AuthGuard from '../components/AuthGuard.astro';
         successMessage.classList.add('hidden');
       }, 5000);
     }
-    
+
     // Reset button state when showing success message
     const updateBtn = document.getElementById('update-btn') as HTMLButtonElement;
     if (updateBtn) {
@@ -282,7 +282,7 @@ import AuthGuard from '../components/AuthGuard.astro';
   const profileForm = document.getElementById('profile-form') as HTMLFormElement;
   profileForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData(profileForm);
     const fullName = formData.get('full_name') as string;
     const phone = formData.get('phone') as string;
@@ -322,7 +322,7 @@ import AuthGuard from '../components/AuthGuard.astro';
 
       // Show success message
       showSuccess('Profile updated successfully!');
-      
+
       // Hide any previous error messages
       const errorMessage = document.getElementById('error-message');
       if (errorMessage) {
@@ -331,7 +331,7 @@ import AuthGuard from '../components/AuthGuard.astro';
 
       // Dispatch auth state change event
       window.dispatchEvent(new CustomEvent('auth-state-changed'));
-      
+
     } catch (error: any) {
       showError(error.message || 'Failed to update profile');
     } finally {
@@ -391,10 +391,10 @@ import AuthGuard from '../components/AuthGuard.astro';
 
       // Show success message
       showPasswordSuccess('Password changed successfully!');
-      
+
       // Clear password form
       passwordForm.reset();
-      
+
       // Hide any previous error messages
       const passwordErrorMessage = document.getElementById('password-error-message');
       if (passwordErrorMessage) {
@@ -403,7 +403,7 @@ import AuthGuard from '../components/AuthGuard.astro';
 
       // Dispatch auth state change event
       window.dispatchEvent(new CustomEvent('auth-state-changed'));
-      
+
     } catch (error: any) {
       showPasswordError(error.message || 'Failed to change password');
     } finally {
