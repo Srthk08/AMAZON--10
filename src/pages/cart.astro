@@ -1,9 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { simpleAuth } from '../lib/simple-auth';
+import AuthGuard from '../components/AuthGuard.astro';
+import { sharedDataStore } from '../lib/shared-data-store';
 ---
 
 <Layout title="Shopping Cart">
+  <AuthGuard>
   <div class="min-h-screen bg-gray-50 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Page Header -->
@@ -12,29 +14,8 @@ import { simpleAuth } from '../lib/simple-auth';
         <p class="text-xl text-gray-600">Customize your project and proceed to checkout</p>
       </div>
 
-      <!-- Authentication Check -->
-      <div id="auth-check" class="hidden">
-        <div class="bg-white rounded-xl shadow-lg p-8 text-center">
-          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-            </svg>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">Authentication Required</h2>
-          <p class="text-gray-600 mb-6">Please sign in to access your shopping cart</p>
-          <div class="space-x-4">
-            <a href="/login" class="inline-block bg-primary-600 hover:bg-primary-700 text-white font-medium px-8 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-              Sign In
-            </a>
-            <a href="/signup" class="inline-block bg-secondary-600 hover:bg-secondary-700 text-white font-medium px-8 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-              Sign Up
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Cart Content - Only visible after login -->
-      <div id="cart-content" class="hidden">
+        <!-- Cart Content - Now always visible since AuthGuard handles authentication -->
+        <div id="cart-content">
         <!-- Empty Cart Message -->
         <div id="empty-cart" class="text-center py-16">
           <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -501,16 +482,23 @@ import { simpleAuth } from '../lib/simple-auth';
       </div>
     </div>
   </div>
+  </AuthGuard>
 </Layout>
 
 <script>
-  import { simpleAuth } from '../lib/simple-auth';
+  import AuthGuard from '../components/AuthGuard.astro';
+  import { sharedDataStore } from '../lib/shared-data-store';
 
   // Cart functionality
   class Cart {
+    private items: any[];
+    private requirements: any;
+    private currentSharedOrderId: string | null;
+
     constructor() {
       this.items = [];
       this.requirements = {};
+      this.currentSharedOrderId = null;
       this.init();
     }
 
@@ -613,19 +601,9 @@ import { simpleAuth } from '../lib/simple-auth';
     renderCart() {
       const emptyCart = document.getElementById('empty-cart');
       const cartItems = document.getElementById('cart-items');
-      const authCheck = document.getElementById('auth-check');
       const cartActions = document.getElementById('cart-actions');
       const projectRequirements = document.getElementById('project-requirements');
       const cartContent = document.getElementById('cart-content');
-
-      if (!simpleAuth.isAuthenticated()) {
-        cartContent?.classList.add('hidden');
-        authCheck?.classList.remove('hidden');
-        return;
-      }
-
-      cartContent?.classList.remove('hidden');
-      authCheck?.classList.add('hidden');
 
       if (this.items.length === 0) {
         emptyCart?.classList.remove('hidden');
@@ -905,7 +883,8 @@ import { simpleAuth } from '../lib/simple-auth';
     }
 
     prefillRequirementsForm() {
-      const currentUser = simpleAuth.getCurrentUser();
+        const authManager = window.globalAuthManager || window.simpleAuthManager;
+        const currentUser = authManager?.getCurrentUser();
       if (!currentUser) return;
 
       // Pre-fill contact information
@@ -1044,7 +1023,7 @@ import { simpleAuth } from '../lib/simple-auth';
       // This would integrate with your Supabase backend
       // For now, we'll just save to localStorage
       const orderData = {
-        userId: simpleAuth.getCurrentUser()?.id,
+        userId: AuthGuard.getCurrentUser()?.id,
         items: this.items,
         total: this.calculateTotal(),
         status: 'pending',
@@ -1115,21 +1094,21 @@ import { simpleAuth } from '../lib/simple-auth';
     showOrderReview() {
       // Validate requirements form
       const form = document.getElementById('requirements-form');
-      if (!form.checkValidity()) {
-        form.reportValidity();
+      if (!(form as HTMLFormElement).checkValidity()) {
+        (form as HTMLFormElement).reportValidity();
         return;
       }
 
       // Collect form data
       this.requirements = {
-        projectName: form.querySelector('[name="projectName"]').value,
-        contactPerson: form.querySelector('[name="contactPerson"]').value,
-        restaurantName: form.querySelector('[name="restaurantName"]').value,
-        cuisineType: form.querySelector('[name="cuisineType"]').value,
-        appName: form.querySelector('[name="appName"]').value,
-        email: form.querySelector('[name="email"]').value,
-        phone: form.querySelector('[name="phone"]').value,
-        additionalRequirements: form.querySelector('[name="additionalRequirements"]').value
+        projectName: (form.querySelector('[name="projectName"]') as HTMLInputElement)?.value || '',
+        contactPerson: (form.querySelector('[name="contactPerson"]') as HTMLInputElement)?.value || '',
+        restaurantName: (form.querySelector('[name="restaurantName"]') as HTMLInputElement)?.value || '',
+        cuisineType: (form.querySelector('[name="cuisineType"]') as HTMLInputElement)?.value || '',
+        appName: (form.querySelector('[name="appName"]') as HTMLInputElement)?.value || '',
+        email: (form.querySelector('[name="email"]') as HTMLInputElement)?.value || '',
+        phone: (form.querySelector('[name="phone"]') as HTMLInputElement)?.value || '',
+        additionalRequirements: (form.querySelector('[name="additionalRequirements"]') as HTMLTextAreaElement)?.value || ''
       };
 
       // Update review page with collected data
@@ -1201,7 +1180,13 @@ import { simpleAuth } from '../lib/simple-auth';
     proceedToPayment() {
       // Save cart and show payment
       this.saveCart();
+      
+      // Create order first (with status 'pending')
+      this.createOrder();
+      
       this.showPaymentSection();
+      
+      // Order is already created with 'pending' status, no need to update
     }
 
     showPaymentSection() {
@@ -1287,6 +1272,9 @@ import { simpleAuth } from '../lib/simple-auth';
         // Save order to user's order history
         this.saveOrderToHistory();
         
+        // Update order status to confirmed when payment is successful
+        this.updateOrderStatusToConfirmed();
+        
         // Clear cart
         this.items = [];
         this.saveCart();
@@ -1309,7 +1297,7 @@ import { simpleAuth } from '../lib/simple-auth';
     saveOrderToHistory() {
       if (this.items.length === 0) return;
 
-      const currentUser = simpleAuth.getCurrentUser();
+      const currentUser = AuthGuard.getCurrentUser();
       if (!currentUser) return;
 
       const item = this.items[0];
@@ -1321,6 +1309,45 @@ import { simpleAuth } from '../lib/simple-auth';
       const accentColor = document.querySelector('input[name="accentColor"]')?.value || '#F59E0B';
       const textColor = document.querySelector('input[name="textColor"]')?.value || '#1F2937';
 
+      // Create order for shared data store (admin panel visibility)
+      const orderData = {
+        userId: currentUser.email,
+        customerName: currentUser.fullName || 'User',
+        customerEmail: currentUser.email,
+        serviceName: item.name,
+        serviceType: 'web_development',
+        status: 'cart' as const, // Starts as cart, changes to pending when payment is initiated
+        paymentStatus: 'pending' as const, // Explicitly type as the literal 'pending'
+        amount: total,
+        currency: 'INR',
+        requirements: {
+          primaryColor: primaryColor,
+          secondaryColor: secondaryColor,
+          accentColor: accentColor,
+          textColor: textColor,
+          customName: item.customName || '',
+          logo: item.logo || null,
+          features: item.features || [],
+          description: item.description
+        }
+      };
+
+      // Save to shared data store for admin panel
+      try {
+        const sharedOrder = sharedDataStore.createOrder(orderData);
+        console.log('Order saved to shared store:', sharedOrder);
+        // Store the order ID for later status updates
+        this.currentSharedOrderId = sharedOrder.id;
+        
+        // Debug: Check if order was actually saved
+        const allOrders = sharedDataStore.getOrders();
+        console.log('All orders in shared store after creation:', allOrders);
+        console.log('Current shared order ID:', this.currentSharedOrderId);
+      } catch (error) {
+        console.error('Error saving to shared store:', error);
+      }
+
+      // Also save to user's local orders for backward compatibility
       const order = {
         orderId: `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         userId: currentUser.email,
@@ -1355,11 +1382,86 @@ import { simpleAuth } from '../lib/simple-auth';
       localStorage.setItem('user-orders', JSON.stringify(userOrders));
 
       // Log for debugging
-      console.log('Order saved:', order);
-      console.log('All orders:', userOrders);
+      console.log('Order saved to user orders:', order);
+      console.log('All user orders:', userOrders);
     }
 
+    createOrder() {
+      if (this.items.length === 0) return;
 
+        const authManager = window.globalAuthManager || window.simpleAuthManager;
+        const currentUser = authManager?.getCurrentUser();
+      if (!currentUser) return;
+
+      const item = this.items[0];
+      const total = this.calculateTotal();
+
+      // Get color values from requirements form
+      const primaryColor = document.querySelector('input[name="primaryColor"]')?.value || '#3B82F6';
+      const secondaryColor = document.querySelector('input[name="secondaryColor"]')?.value || '#A5CF6';
+      const accentColor = document.querySelector('input[name="accentColor"]')?.value || '#F59E0B';
+      const textColor = document.querySelector('input[name="textColor"]')?.value || '#1F2937';
+
+      // Create order for shared data store (admin panel visibility)
+      const orderData = {
+        userId: currentUser.email,
+        customerName: currentUser.fullName || 'User',
+        customerEmail: currentUser.email,
+        serviceName: item.name,
+        serviceType: 'web_development',
+        status: 'pending' as const, // Explicitly type as the literal 'pending'
+        paymentStatus: 'pending' as const, // Explicitly type as the literal 'pending'
+        amount: total,
+        currency: 'INR',
+        requirements: {
+          primaryColor: primaryColor,
+          secondaryColor: secondaryColor,
+          accentColor: accentColor,
+          textColor: textColor,
+          customName: item.customName || '',
+          logo: item.logo || null,
+          features: item.features || [],
+          description: item.description
+        }
+      };
+
+      // Save to shared data store for admin panel
+      try {
+        const sharedOrder = sharedDataStore.createOrder(orderData);
+        console.log('Order created in shared store:', sharedOrder);
+        // Store the order ID for later status updates
+        this.currentSharedOrderId = sharedOrder.id;
+        
+        // Debug: Check if order was actually saved
+        const allOrders = sharedDataStore.getOrders();
+        console.log('All orders in shared store after creation:', allOrders);
+        console.log('Current shared order ID:', this.currentSharedOrderId);
+      } catch (error) {
+        console.error('Error creating order in shared store:', error);
+      }
+    }
+
+    updateOrderStatusToPending() {
+      if (this.currentSharedOrderId) {
+        try {
+          sharedDataStore.updateOrderStatus(this.currentSharedOrderId, 'pending', 'Payment initiated');
+          console.log('Order status updated to pending');
+        } catch (error) {
+          console.error('Error updating order status:', error);
+        }
+      }
+    }
+
+    updateOrderStatusToConfirmed() {
+      if (this.currentSharedOrderId) {
+        try {
+          sharedDataStore.updateOrderStatus(this.currentSharedOrderId, 'confirmed', 'Payment successful - Order confirmed');
+          console.log('Order status updated to confirmed');
+        } catch (error) {
+          console.error('Error updating order status:', error);
+        }
+      }
+    }
   }
 
   // Initialize cart when page loads

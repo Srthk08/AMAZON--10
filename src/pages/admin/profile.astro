@@ -1,0 +1,226 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import AdminGuard from '../../components/AdminGuard.astro';
+---
+
+<AdminLayout title="Admin Profile - DevExpress">
+  <AdminGuard>
+    <div class="space-y-6">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Admin Profile</h1>
+        <p class="text-gray-600 mt-2">Manage your admin account settings</p>
+      </div>
+
+      <!-- Profile Information -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Profile Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <p id="admin-full-name" class="text-sm text-gray-900">No data</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <p id="admin-email" class="text-sm text-gray-900">No data</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <p id="admin-role" class="text-sm text-gray-900">Admin</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+              Active
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Orders Managed</p>
+              <p id="orders-managed" class="text-2xl font-semibold text-gray-900">0</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Users Managed</p>
+              <p id="users-managed" class="text-2xl font-semibold text-gray-900">0</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Tickets Resolved</p>
+              <p id="tickets-resolved" class="text-2xl font-semibold text-gray-900">0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
+        <div id="recent-activity" class="space-y-4">
+          <!-- Recent activity will be populated here -->
+        </div>
+      </div>
+    </div>
+  </AdminGuard>
+</AdminLayout>
+
+<script>
+  import { adminDataStore } from '../../lib/admin-data';
+
+  // Initialize admin profile page
+  function initializeAdminProfile() {
+    loadAdminInfo();
+    loadAdminStats();
+    loadRecentActivity();
+  }
+
+  // Load admin information
+  function loadAdminInfo() {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('simple-auth-user') || '{}');
+      if (currentUser.email) {
+        document.getElementById('admin-full-name').textContent = currentUser.fullName || 'Admin User';
+        document.getElementById('admin-email').textContent = currentUser.email;
+      }
+    } catch (error) {
+      console.error('Error loading admin info:', error);
+    }
+  }
+
+  // Load admin statistics
+  function loadAdminStats() {
+    try {
+      const stats = adminDataStore.getStats();
+      
+      document.getElementById('orders-managed').textContent = stats.totalOrders.toString();
+      document.getElementById('users-managed').textContent = stats.totalUsers.toString();
+      document.getElementById('tickets-resolved').textContent = (stats.openTickets + stats.highPriorityTickets).toString();
+      
+    } catch (error) {
+      console.error('Error loading admin stats:', error);
+    }
+  }
+
+  // Load recent activity
+  function loadRecentActivity() {
+    const container = document.getElementById('recent-activity');
+    if (!container) return;
+
+    try {
+      const orders = adminDataStore.getOrders().slice(0, 5);
+      const tickets = adminDataStore.getSupportTickets().slice(0, 3);
+      
+      const activities = [];
+      
+      // Add order activities
+      orders.forEach(order => {
+        activities.push({
+          type: 'order',
+          icon: 'shopping-cart',
+          color: 'blue',
+          title: `Order ${order.status}`,
+          description: `${order.serviceName} - ${order.customerName}`,
+          time: new Date(order.updatedAt).toLocaleDateString()
+        });
+      });
+
+      // Add ticket activities
+      tickets.forEach(ticket => {
+        activities.push({
+          type: 'ticket',
+          icon: 'question-mark-circle',
+          color: 'yellow',
+          title: `Support Ticket ${ticket.status}`,
+          description: `${ticket.subject} - ${ticket.customerName}`,
+          time: new Date(ticket.updatedAt).toLocaleDateString()
+        });
+      });
+
+      // Sort by date and take top 5
+      activities.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+      activities.splice(5);
+
+      if (activities.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-gray-500">
+            <p>No recent activity</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = activities.map(activity => `
+        <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+          <div class="w-8 h-8 bg-${activity.color}-100 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4 text-${activity.color}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              ${getActivityIcon(activity.icon)}
+            </svg>
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-900">${activity.title}</p>
+            <p class="text-sm text-gray-500">${activity.description}</p>
+          </div>
+          <span class="text-sm text-gray-400">${activity.time}</span>
+        </div>
+      `).join('');
+
+    } catch (error) {
+      console.error('Error loading recent activity:', error);
+      container.innerHTML = `
+        <div class="text-center py-8 text-gray-500">
+          <p>Error loading recent activity</p>
+        </div>
+      `;
+    }
+  }
+
+  // Get activity icon
+  function getActivityIcon(type: string) {
+    switch (type) {
+      case 'shopping-cart':
+        return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>';
+      case 'question-mark-circle':
+        return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+      default:
+        return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+    }
+  }
+
+  // Initialize page when DOM loads
+  document.addEventListener('DOMContentLoaded', initializeAdminProfile);
+</script>

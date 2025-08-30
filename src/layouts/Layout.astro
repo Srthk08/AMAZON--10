@@ -8,7 +8,7 @@ export interface Props {
   description?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description = "DevExpress - 24 Hour Delivery" } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -16,7 +16,7 @@ const { title, description } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description || "Professional development services for restaurants, mobile apps, TV apps, and websites. 24-hour delivery guaranteed."} />
+    <meta name="description" content={description} />
     <title>{title}</title>
 
     <!-- Favicon -->
@@ -34,6 +34,9 @@ const { title, description } = Astro.props;
 
     <!-- Alpine.js for interactivity -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- EmailJS for email notifications -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <!-- Custom Tailwind Config -->
     <script>
@@ -489,6 +492,238 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof window.showToast === 'function') {
           window.showToast('You are currently offline. Some features may not work.', 'warning');
         }
+      });
+
+      // Initialize EmailJS for email notifications
+      if (typeof emailjs !== 'undefined') {
+        emailjs.init('YOUR_USER_ID'); // Replace with your actual EmailJS user ID
+        console.log('EmailJS initialized successfully');
+      } else {
+        console.log('EmailJS not available');
+      }
+    </script>
+
+    <!-- Global Authentication Manager - Loads on every page -->
+    <script>
+      // Global Authentication State Manager
+      // This prevents reloads while maintaining login state across ALL pages
+      
+      class GlobalAuthManager {
+        constructor() {
+          this.isAuthenticated = false;
+          this.currentUser = null;
+          this.init();
+        }
+
+        init() {
+          // Check if user is already logged in
+          this.checkExistingSession();
+          
+          // Listen for login events
+          window.addEventListener('user-logged-in', (e) => {
+            this.handleLogin(e.detail);
+          });
+          
+          window.addEventListener('user-logged-out', () => {
+            this.handleLogout();
+          });
+
+          // Make it globally available
+          window.globalAuthManager = this;
+          window.simpleAuthManager = this; // For backward compatibility
+          
+          console.log('✅ Global Auth Manager initialized');
+        }
+
+        checkExistingSession() {
+          try {
+            // Check sessionStorage first (most recent)
+            const sessionData = sessionStorage.getItem('simple-auth-session');
+            if (sessionData) {
+              const session = JSON.parse(sessionData);
+              if (session.user && session.access_token) {
+                this.isAuthenticated = true;
+                this.currentUser = session.user;
+                console.log('✅ Existing session found:', this.currentUser.email);
+                this.updateGlobalUI();
+                return;
+              }
+            }
+
+            // Check localStorage as fallback
+            const storedUser = localStorage.getItem('simple-auth-user');
+            if (storedUser) {
+              const user = JSON.parse(storedUser);
+              if (user && user.email) {
+                this.isAuthenticated = true;
+                this.currentUser = user;
+                console.log('✅ Existing user found in localStorage:', this.currentUser.email);
+                this.updateGlobalUI();
+                return;
+              }
+            }
+
+            console.log('ℹ️ No existing session found');
+          } catch (error) {
+            console.error('Error checking existing session:', error);
+          }
+        }
+
+        handleLogin(userData) {
+          this.isAuthenticated = true;
+          this.currentUser = userData;
+          
+          // Store session in both sessionStorage and localStorage for persistence
+          const sessionData = {
+            user: userData,
+            access_token: 'simple-token-' + Date.now(),
+            timestamp: Date.now()
+          };
+          
+          sessionStorage.setItem('simple-auth-session', JSON.stringify(sessionData));
+          localStorage.setItem('simple-auth-user', JSON.stringify(userData));
+          
+          console.log('✅ User logged in globally:', userData.email);
+          this.updateGlobalUI();
+        }
+
+        handleLogout() {
+          this.isAuthenticated = false;
+          this.currentUser = null;
+          
+          // Clear session from both storages
+          sessionStorage.removeItem('simple-auth-session');
+          localStorage.removeItem('simple-auth-user');
+          
+          console.log('✅ User logged out globally');
+          this.updateGlobalUI();
+        }
+
+        updateGlobalUI() {
+          // Update header if it exists
+          this.updateHeader();
+          
+          // Update dashboard if it exists
+          this.updateDashboard();
+          
+          // Update any other components that need auth state
+          this.updateOtherComponents();
+        }
+
+        updateHeader() {
+          const authButtons = document.getElementById('auth-buttons');
+          const userMenu = document.getElementById('user-menu');
+          const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
+          const mobileUserMenu = document.getElementById('mobile-user-menu');
+
+          if (this.isAuthenticated && this.currentUser) {
+            // User is logged in
+            if (authButtons) authButtons.classList.add('hidden');
+            if (userMenu) userMenu.classList.remove('hidden');
+            if (mobileAuthButtons) mobileAuthButtons.classList.add('hidden');
+            if (mobileUserMenu) mobileUserMenu.classList.remove('hidden');
+
+            // Update user info
+            this.updateHeaderUserInfo();
+          } else {
+            // User is not logged in
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userMenu) userMenu.classList.add('hidden');
+            if (mobileAuthButtons) mobileAuthButtons.classList.remove('hidden');
+            if (mobileUserMenu) mobileUserMenu.classList.add('hidden');
+          }
+        }
+
+        updateHeaderUserInfo() {
+          if (!this.currentUser) return;
+
+          const userEmail = document.getElementById('user-email');
+          const userName = document.getElementById('user-name');
+          const userAvatar = document.getElementById('user-avatar');
+          const mobileUserEmail = document.getElementById('mobile-user-email');
+
+          if (userEmail) userEmail.textContent = this.currentUser.email || '';
+          if (userName) userName.textContent = this.currentUser.full_name || this.currentUser.email?.split('@')[0] || 'User';
+          if (userAvatar) userAvatar.textContent = (this.currentUser.full_name || this.currentUser.email || 'U').charAt(0).toUpperCase();
+          if (mobileUserEmail) mobileUserEmail.textContent = this.currentUser.email || '';
+        }
+
+        updateDashboard() {
+          const userWelcome = document.getElementById('user-welcome');
+          const userFullName = document.getElementById('user-full-name');
+          const userEmailDashboard = document.getElementById('user-email');
+          const userPhone = document.getElementById('user-phone');
+          const userCompany = document.getElementById('user-company');
+
+          if (this.isAuthenticated && this.currentUser) {
+            // User is logged in, show real data
+            if (userWelcome) userWelcome.textContent = this.currentUser.full_name || this.currentUser.email?.split('@')[0] || 'User';
+            if (userFullName) userFullName.textContent = this.currentUser.full_name || 'Not set';
+            if (userEmailDashboard) userEmailDashboard.textContent = this.currentUser.email || 'Not set';
+            if (userPhone) userPhone.textContent = this.currentUser.phone || 'Not set';
+            if (userCompany) userCompany.textContent = this.currentUser.company_name || 'Not set';
+          } else {
+            // User is not logged in, show guest data
+            if (userWelcome) userWelcome.textContent = 'Guest';
+            if (userFullName) userFullName.textContent = 'Guest User';
+            if (userEmailDashboard) userEmailDashboard.textContent = 'Not logged in';
+            if (userPhone) userPhone.textContent = 'Not available';
+            if (userCompany) userCompany.textContent = 'Guest Company';
+          }
+        }
+
+        updateOtherComponents() {
+          // Update cart, profile, tickets, etc. if they exist
+          // This will be called whenever auth state changes
+        }
+
+        getCurrentUser() {
+          return this.currentUser;
+        }
+
+        isUserLoggedIn() {
+          return this.isAuthenticated;
+        }
+
+        logout() {
+          this.handleLogout();
+          window.location.href = '/';
+        }
+
+        // Check if user needs to be redirected to login
+        requireAuth(redirectUrl = '/login') {
+          if (!this.isAuthenticated) {
+            console.log('🔒 Authentication required, redirecting to:', redirectUrl);
+            window.location.href = redirectUrl;
+            return false;
+          }
+          return true;
+        }
+
+        // Update user profile data
+        updateProfile(profileData) {
+          if (this.currentUser) {
+            this.currentUser = { ...this.currentUser, ...profileData };
+            
+            // Update both storages
+            const sessionData = sessionStorage.getItem('simple-auth-session');
+            if (sessionData) {
+              const session = JSON.parse(sessionData);
+              session.user = this.currentUser;
+              sessionStorage.setItem('simple-auth-session', JSON.stringify(session));
+            }
+            
+            localStorage.setItem('simple-auth-user', JSON.stringify(this.currentUser));
+            
+            console.log('✅ Profile updated in global auth manager:', this.currentUser);
+            this.updateGlobalUI();
+          }
+        }
+      }
+
+      // Initialize global auth manager when page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        new GlobalAuthManager();
       });
     </script>
   </body>

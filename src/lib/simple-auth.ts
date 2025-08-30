@@ -114,17 +114,37 @@ const initializeAuth = () => {
         const parsedUser = JSON.parse(storedUser);
         const parsedSession = JSON.parse(storedSession);
         
-        // Find the user in mockUsers to get the full user data including password
-        const fullUser = mockUsers.find(u => u.id === parsedUser.id);
+        // First try to find the user in mockUsers to get the full user data
+        let fullUser = mockUsers.find(u => u.id === parsedUser.id);
+        
+        // If not found in mockUsers, try to find by email
+        if (!fullUser && parsedUser.email) {
+          fullUser = mockUsers.find(u => u.email === parsedUser.email);
+        }
+        
+        // If still not found, create a user object from stored data (this handles newly registered users)
+        if (!fullUser) {
+          console.log('User not found in mockUsers, creating from stored data:', parsedUser.email);
+          fullUser = {
+            id: parsedUser.id,
+            email: parsedUser.email,
+            fullName: parsedUser.fullName || '',
+            phone: parsedUser.phone || '',
+            companyName: parsedUser.companyName || '',
+            password: 'stored_user' // Default password for stored users
+          };
+          
+          // Add to mockUsers for future reference
+          mockUsers.push(fullUser);
+          // Update localStorage
+          safeLocalStorage.setItem('simple-auth-users', JSON.stringify(mockUsers));
+          console.log('Added user to mockUsers:', fullUser.email);
+        }
+        
         if (fullUser) {
           currentUser = fullUser;
           currentSession = parsedSession;
           console.log('Restored user session:', fullUser.email);
-        } else {
-          // User not found in mockUsers, clear invalid data
-          console.log('User not found in mockUsers, clearing invalid data');
-          safeLocalStorage.removeItem('simple-auth-user');
-          safeLocalStorage.removeItem('simple-auth-session');
         }
       } catch (e) {
         console.warn('Failed to parse stored user/session:', e);
@@ -256,14 +276,39 @@ export const simpleAuth = {
         const parsedUser = JSON.parse(storedUser);
         const parsedSession = JSON.parse(storedSession);
         
-        // Find the user in mockUsers to get the full user data including password
-        const fullUser = mockUsers.find(u => u.id === parsedUser.id);
+        // First try to find the user in mockUsers to get the full user data
+        let fullUser = mockUsers.find(u => u.id === parsedUser.id);
+        
+        // If not found in mockUsers, try to find by email
+        if (!fullUser && parsedUser.email) {
+          fullUser = mockUsers.find(u => u.email === parsedUser.email);
+        }
+        
+        // If still not found, use the stored user data (this handles newly registered users)
+        if (!fullUser) {
+          // Create a user object from stored data, with a default password
+          fullUser = {
+            id: parsedUser.id,
+            email: parsedUser.email,
+            fullName: parsedUser.fullName || '',
+            phone: parsedUser.phone || '',
+            companyName: parsedUser.companyName || '',
+            password: 'stored_user' // Default password for stored users
+          };
+          
+          // Add to mockUsers for future reference
+          mockUsers.push(fullUser);
+          // Update localStorage
+          safeLocalStorage.setItem('simple-auth-users', JSON.stringify(mockUsers));
+        }
+        
         if (fullUser) {
           currentUser = fullUser;
           currentSession = parsedSession;
           return currentUser;
         }
       } catch (e) {
+        console.warn('Failed to restore user from localStorage:', e);
         // Clear invalid data
         safeLocalStorage.removeItem('simple-auth-user');
         safeLocalStorage.removeItem('simple-auth-session');
@@ -368,15 +413,15 @@ export const simpleAuth = {
     safeLocalStorage.setItem('simple-auth-user', JSON.stringify(userWithoutPassword));
 
     // Update in mockUsers array
-    const userIndex = mockUsers.findIndex(u => u.id === currentUser.id);
+    const userIndex = mockUsers.findIndex(u => u.id === currentUser!.id);
     if (userIndex !== -1) {
-      mockUsers[userIndex] = { ...currentUser };
+      mockUsers[userIndex] = { ...currentUser! };
     }
 
     // Update stored users in localStorage
     safeLocalStorage.setItem('simple-auth-users', JSON.stringify(mockUsers));
 
-    console.log('Profile updated successfully for user:', currentUser.email);
+    console.log('Profile updated successfully for user:', currentUser!.email);
     return currentUser;
   },
 
@@ -395,15 +440,15 @@ export const simpleAuth = {
     currentUser.password = newPassword;
 
     // Update in mockUsers array
-    const userIndex = mockUsers.findIndex(u => u.id === currentUser.id);
+    const userIndex = mockUsers.findIndex(u => u.id === currentUser!.id);
     if (userIndex !== -1) {
-      mockUsers[userIndex] = { ...currentUser };
+      mockUsers[userIndex] = { ...currentUser! };
     }
 
     // Update stored users in localStorage
     safeLocalStorage.setItem('simple-auth-users', JSON.stringify(mockUsers));
 
-    console.log('Password changed successfully for user:', currentUser.email);
+    console.log('Password changed successfully for user:', currentUser!.email);
   },
 
   // Reset password using reset token and email
@@ -449,3 +494,5 @@ if (typeof window !== 'undefined') {
     document.addEventListener('DOMContentLoaded', initializeAuth);
   }
 }
+
+

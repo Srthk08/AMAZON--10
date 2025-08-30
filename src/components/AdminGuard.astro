@@ -1,0 +1,130 @@
+---
+// AdminGuard component - will check authentication on the client side
+---
+
+<div id="admin-guard">
+  <!-- Loading state -->
+  <div id="admin-loading" class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div class="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+      <p class="text-gray-600">Checking permissions...</p>
+    </div>
+  </div>
+
+  <!-- Access Denied -->
+  <div id="admin-denied" class="hidden min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+      <p class="text-gray-600 mb-6">You don't have permission to access the admin panel.</p>
+      <div class="space-y-3">
+        <a 
+          href="/login" 
+          class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+        >
+          Go to Login
+        </a>
+        <a 
+          href="/" 
+          class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+        >
+          Back to Home
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Content -->
+  <div id="admin-content" class="hidden">
+    <slot />
+  </div>
+</div>
+
+<script>
+  import { supabase } from '../lib/supabase';
+
+  // Client-side admin check using Supabase
+  document.addEventListener('DOMContentLoaded', async function() {
+    const loading = document.getElementById('admin-loading');
+    const denied = document.getElementById('admin-denied');
+    const content = document.getElementById('admin-content');
+
+    try {
+      // Check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // Not authenticated, redirect to login
+        console.log('User not authenticated, redirecting to login');
+        window.location.href = '/login';
+        return;
+      }
+
+      const user = session.user;
+      if (!user) {
+        // No user found, redirect to login
+        console.log('No user found, redirecting to login');
+        window.location.href = '/login';
+        return;
+      }
+
+      console.log('Checking admin access for user:', user.email);
+
+      // Check if user has admin role by fetching their profile
+      try {
+        const { data: profile, error } = await supabase
+          .from('user_profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user profile:', error);
+          showAccessDenied();
+          return;
+        }
+
+        if (profile && (profile.role === 'admin' || profile.role === 'developer' || profile.role === 'support')) {
+          console.log('Admin access granted for user with role:', profile.role, user.email);
+          showAdminContent();
+        } else {
+          console.log('Access denied for user with role:', profile?.role || 'no role', user.email);
+          showAccessDenied();
+        }
+      } catch (profileError) {
+        console.error('Error checking user profile:', profileError);
+        showAccessDenied();
+      }
+      
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      showAccessDenied();
+    }
+
+    function showAccessDenied() {
+      if (loading) loading.classList.add('hidden');
+      if (denied) denied.classList.remove('hidden');
+      if (content) content.classList.add('hidden');
+    }
+
+    function showAdminContent() {
+      if (loading) loading.classList.add('hidden');
+      if (denied) denied.classList.add('hidden');
+      if (content) content.classList.remove('hidden');
+    }
+  });
+
+  // Listen for auth state changes
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT') {
+      // User signed out, redirect to login
+      window.location.href = '/login';
+    }
+  });
+</script>

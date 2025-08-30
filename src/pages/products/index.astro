@@ -1,5 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { getProducts, getProductsByCategory } from '../../lib/products-data';
+
+const products = getProducts();
+const restaurantProducts = getProductsByCategory('restaurant');
+const mobileProducts = getProductsByCategory('mobile');
+const tvProducts = getProductsByCategory('tv');
+const webProducts = getProductsByCategory('web');
 ---
 
 <Layout title="Our Products - DevExpress" description="Explore our range of professional digital solutions delivered in 24 hours">
@@ -41,104 +48,58 @@ import Layout from '../../layouts/Layout.astro';
   <section class="py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid">
-        <!-- Restaurant Menu System -->
-        <div class="product-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-category="restaurant">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&h=300&fit=crop" alt="Restaurant Menu System" class="w-full h-48 object-cover rounded-t-xl" />
-            <div class="absolute top-4 left-4 px-3 py-1 rounded-full text-white text-sm font-medium bg-gradient-to-r from-green-500 to-emerald-600">
-              Restaurant Solutions
-            </div>
-          </div>
+        {products.map((product) => {
+          const categoryLabels = {
+            'restaurant': 'Restaurant Solutions',
+            'mobile': 'Mobile Apps',
+            'tv': 'TV Apps',
+            'web': 'Websites'
+          };
           
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Restaurant Menu System</h3>
-            <p class="text-gray-600 mb-4">Digital menu system with QR code ordering, real-time updates, and analytics dashboard.</p>
-            
-            <div class="mb-4">
-              <div class="flex flex-wrap gap-2">
-                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">QR Code Menu</span>
-                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">Real-time Updates</span>
-                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">Analytics</span>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="text-sm text-gray-500">Starting from</span>
-                <div class="text-2xl font-bold text-primary-600">₹15,000</div>
-              </div>
-              <button class="buy-now-btn bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl" data-product="restaurant-menu" data-price="15000">
-                Buy Now
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Android TV App -->
-        <div class="product-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-category="tv">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=500&h=300&fit=crop" alt="Android TV App" class="w-full h-48 object-cover rounded-t-xl" />
-            <div class="absolute top-4 left-4 px-3 py-1 rounded-full text-white text-sm font-medium bg-gradient-to-r from-purple-500 to-violet-600">
-              TV Apps
-            </div>
-          </div>
+          const categoryColors = {
+            'restaurant': 'from-green-500 to-emerald-600',
+            'mobile': 'from-blue-500 to-indigo-600',
+            'tv': 'from-purple-500 to-violet-600',
+            'web': 'from-orange-500 to-red-600'
+          };
           
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Android TV App</h3>
-            <p class="text-gray-600 mb-4">Custom Android TV application with streaming capabilities and smart remote support.</p>
-            
-            <div class="mb-4">
-              <div class="flex flex-wrap gap-2">
-                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">Streaming</span>
-                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">Smart Remote</span>
-                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">4K Support</span>
+          return (
+            <div class="product-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-category={product.category}>
+              <div class="relative">
+                <img src={product.featured_image} alt={product.name} class="w-full h-48 object-cover rounded-t-xl" />
+                <div class={`absolute top-4 left-4 px-3 py-1 rounded-full text-white text-sm font-medium bg-gradient-to-r ${categoryColors[product.category]}`}>
+                  {categoryLabels[product.category]}
+                </div>
               </div>
-            </div>
+              
+              <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
+                <p class="text-gray-600 mb-4">{product.short_description}</p>
+                
+                <div class="mb-4">
+                  <div class="flex flex-wrap gap-2">
+                    {product.features.slice(0, 3).map((feature) => (
+                      <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">{feature}</span>
+                    ))}
+                  </div>
+                </div>
 
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="text-sm text-gray-500">Starting from</span>
-                <div class="text-2xl font-bold text-primary-600">₹25,000</div>
-              </div>
-              <button class="buy-now-btn bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl" data-product="android-tv" data-price="25000">
-                Buy Now
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mobile Streaming App -->
-        <div class="product-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-category="mobile">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&h=300&fit=crop" alt="Mobile Streaming App" class="w-full h-48 object-cover rounded-t-xl" />
-            <div class="absolute top-4 left-4 px-3 py-1 rounded-full text-white text-sm font-medium bg-gradient-to-r from-blue-500 to-indigo-600">
-              Mobile Apps
-            </div>
-          </div>
-          
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Mobile Streaming App</h3>
-            <p class="text-gray-600 mb-4">Cross-platform mobile app for video streaming with offline download support.</p>
-            
-            <div class="mb-4">
-              <div class="flex flex-wrap gap-2">
-                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">Cross-platform</span>
-                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">Offline Download</span>
-                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">HD Streaming</span>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="text-sm text-gray-500">Starting from</span>
+                    <div class="text-2xl font-bold text-primary-600">₹{product.base_price.toLocaleString()}</div>
+                  </div>
+                  <a 
+                    href={`/products/${product.slug}`}
+                    class="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl inline-block text-center"
+                  >
+                    View Details
+                  </a>
+                </div>
               </div>
             </div>
-
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="text-sm text-gray-500">Starting from</span>
-                <div class="text-2xl font-bold text-primary-600">₹35,000</div>
-              </div>
-              <button class="buy-now-btn bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl" data-product="mobile-streaming" data-price="35000">
-                Buy Now
-              </button>
-            </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
     </div>
   </section>
@@ -186,16 +147,9 @@ import Layout from '../../layouts/Layout.astro';
     });
   });
 
-  // Buy Now button functionality
-  document.querySelectorAll('.buy-now-btn').forEach(button => {
-    button.addEventListener('click', () => {
-      const productId = button.dataset.product;
-      const productPrice = button.dataset.price;
 
-      // Redirect to cart page with product details
-      window.location.href = `/cart?product=${productId}&price=${productPrice}`;
-    });
-  });
+
+
 
   // Add animation classes
   const observer = new IntersectionObserver((entries) => {

@@ -1,28 +1,42 @@
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
 
-export const POST: APIRoute = async ({ cookies }) => {
+export const POST: APIRoute = async ({ cookies, request }) => {
   try {
-    // Get authentication tokens from cookies
-    const accessToken = cookies.get('sb-access-token');
-    const refreshToken = cookies.get('sb-refresh-token');
-
-    if (accessToken && refreshToken) {
-      // Set session for logout
-      await supabase.auth.setSession({
-        access_token: accessToken.value,
-        refresh_token: refreshToken.value,
-      });
-
-      // Sign out from Supabase
-      await supabase.auth.signOut();
+    // Get the request body to check logout type
+    const body = await request.json();
+    const logoutType = body?.type || 'supabase'; // Default to Supabase now
+    
+    if (logoutType === 'supabase') {
+      // Handle Supabase logout
+      try {
+        // Clear Supabase cookies if they exist
+        cookies.delete('sb-access-token', { path: '/' });
+        cookies.delete('sb-refresh-token', { path: '/' });
+        cookies.delete('supabase-auth-token', { path: '/' });
+        
+        // Clear any other Supabase-related cookies
+        const allCookies = cookies.getAll();
+        allCookies.forEach(cookie => {
+          if (cookie.name.startsWith('sb-') || cookie.name.includes('supabase')) {
+            cookies.delete(cookie.name, { path: '/' });
+          }
+        });
+      } catch (error) {
+        console.warn('Supabase logout cleanup failed:', error);
+      }
+    } else {
+      // Handle simple-auth logout (legacy)
+      // Clear any simple-auth related cookies
+      cookies.delete('simple-auth-token', { path: '/' });
+      cookies.delete('simple-auth-user', { path: '/' });
     }
 
-    // Clear cookies
-    cookies.delete('sb-access-token', { path: '/' });
-    cookies.delete('sb-refresh-token', { path: '/' });
-
-    return new Response(JSON.stringify({ success: true }), {
+    // Always return success for logout
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: 'Logged out successfully',
+      redirectUrl: '/login'
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -30,11 +44,53 @@ export const POST: APIRoute = async ({ cookies }) => {
   } catch (error) {
     console.error('Logout error:', error);
     
-    // Clear cookies even if there's an error
+    // Even if there's an error, return success to ensure logout proceeds
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: 'Logged out successfully',
+      redirectUrl: '/login'
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+};
+
+// Also handle GET requests for compatibility
+export const GET: APIRoute = async ({ cookies }) => {
+  try {
+    // Clear all auth-related cookies
     cookies.delete('sb-access-token', { path: '/' });
     cookies.delete('sb-refresh-token', { path: '/' });
+    cookies.delete('supabase-auth-token', { path: '/' });
+    cookies.delete('simple-auth-token', { path: '/' });
+    cookies.delete('simple-auth-user', { path: '/' });
 
-    return new Response(JSON.stringify({ success: true }), {
+    // Clear any other Supabase-related cookies
+    const allCookies = cookies.getAll();
+    allCookies.forEach(cookie => {
+      if (cookie.name.startsWith('sb-') || cookie.name.includes('supabase')) {
+        cookies.delete(cookie.name, { path: '/' });
+      }
+    });
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: 'Logged out successfully',
+      redirectUrl: '/login'
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+  } catch (error) {
+    console.error('Logout error:', error);
+    
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: 'Logged out successfully',
+      redirectUrl: '/login'
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });

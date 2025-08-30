@@ -1,0 +1,642 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import AdminGuard from '../../components/AdminGuard.astro';
+---
+
+<AdminLayout title="Support & Help Center - DevExpress">
+  <AdminGuard>
+    <div class="space-y-6">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Support & Help Center</h1>
+        <p class="text-gray-600 mt-2">Manage customer support tickets and AI chat logs</p>
+      </div>
+
+
+
+      <!-- Support Tickets -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-medium text-gray-900">Support Tickets</h3>
+            <div class="flex items-center space-x-3">
+              <span id="tickets-count" class="text-sm text-gray-500">Loading tickets...</span>
+              <button id="refresh-tickets" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+                Refresh
+              </button>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket #</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-tbody" class="bg-white divide-y divide-gray-200">
+              <!-- Tickets will be populated here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-tickets" class="hidden px-6 py-12 text-center">
+          <div class="flex flex-col items-center">
+            <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-lg font-medium text-gray-900 mb-2">No support tickets found</p>
+            <p class="text-gray-500">Support tickets will appear here when users create them</p>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="bg-white px-6 py-3 border-t border-gray-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-gray-700">Show</span>
+              <select class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <option>10</option>
+                <option>25</option>
+                <option>50</option>
+                <option>100</option>
+              </select>
+              <span class="text-sm text-gray-700">entries</span>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <button id="refresh-tickets" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Refresh
+              </button>
+              <span class="px-3 py-1 text-sm text-gray-700 bg-primary-50 border border-primary-200 rounded-md">1</span>
+              <button class="px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">2</button>
+              <button class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Chat Logs -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-medium text-gray-900">AI Chat Logs</h3>
+            <div class="flex items-center space-x-3">
+              <span class="text-sm text-gray-500">Recent conversations</span>
+              <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                View All Logs
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-4">
+          <!-- Chat Session 1 -->
+          <div class="border border-gray-200 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span class="text-sm font-medium text-blue-600">U</span>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">user_123</div>
+                  <div class="text-xs text-gray-500">Dec 15, 2024 - 2:30 PM</div>
+                </div>
+              </div>
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                Resolved
+              </span>
+            </div>
+            <div class="space-y-2 text-sm">
+              <div class="bg-gray-50 p-2 rounded">
+                <span class="font-medium text-gray-700">User:</span> How do I reset my password?
+              </div>
+              <div class="bg-blue-50 p-2 rounded">
+                <span class="font-medium text-blue-700">AI:</span> To reset your password, go to the login page and click "Forgot Password". Enter your email address and you'll receive a reset link.
+              </div>
+              <div class="bg-gray-50 p-2 rounded">
+                <span class="font-medium text-gray-700">User:</span> Thanks, that worked!
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Session 2 -->
+          <div class="border border-gray-200 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <span class="text-sm font-medium text-green-600">S</span>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">support_456</div>
+                  <div class="text-xs text-gray-500">Dec 15, 2024 - 1:45 PM</div>
+                </div>
+              </div>
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                Escalated
+              </span>
+            </div>
+            <div class="space-y-2 text-sm">
+              <div class="bg-gray-50 p-2 rounded">
+                <span class="font-medium text-gray-700">User:</span> My app keeps crashing when I try to upload files
+              </div>
+              <div class="bg-blue-50 p-2 rounded">
+                <span class="font-medium text-blue-700">AI:</span> I understand you're experiencing crashes during file uploads. Let me help you troubleshoot this issue. What type of files are you trying to upload?
+              </div>
+              <div class="bg-gray-50 p-2 rounded">
+                <span class="font-medium text-gray-700">User:</span> PDF files, around 10MB each
+              </div>
+              <div class="bg-blue-50 p-2 rounded">
+                <span class="font-medium text-blue-700">AI:</span> The file size might be causing the issue. Our app supports files up to 5MB. I'm escalating this to our support team for further assistance.
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Session 3 -->
+          <div class="border border-gray-200 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <span class="text-sm font-medium text-purple-600">M</span>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">mobile_user</div>
+                  <div class="text-xs text-gray-500">Dec 15, 2024 - 12:20 PM</div>
+                </div>
+              </div>
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                Resolved
+              </span>
+            </div>
+            <div class="space-y-2 text-sm">
+              <div class="bg-gray-50 p-2 rounded">
+                <span class="font-medium text-gray-700">User:</span> Can I use the app offline?
+              </div>
+              <div class="bg-blue-50 p-2 rounded">
+                <span class="font-medium text-blue-700">AI:</span> Yes! Our app has offline capabilities. You can view previously loaded content and some features work without internet. However, for real-time updates and new content, you'll need an internet connection.
+              </div>
+              <div class="bg-gray-50 p-2 rounded">
+                <span class="font-medium text-gray-700">User:</span> Perfect, thank you!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket Details Modal -->
+      <div id="ticket-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+          <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+              <h3 id="modal-title" class="text-lg font-medium text-gray-900">Ticket #567 - App not loading properly</h3>
+              <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <div id="modal-content" class="space-y-4">
+              <!-- Ticket Info -->
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span class="text-gray-600">Customer:</span>
+                    <p class="text-gray-900">John Doe (john@example.com)</p>
+                  </div>
+                  <div>
+                    <span class="text-gray-600">Priority:</span>
+                    <p class="text-gray-900">High</p>
+                  </div>
+                  <div>
+                    <span class="text-gray-600">Status:</span>
+                    <p class="text-gray-900">In Progress</p>
+                  </div>
+                  <div>
+                    <span class="text-gray-600">Created:</span>
+                    <p class="text-gray-900">Dec 15, 2024 - 2:30 PM</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Issue Description -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Issue Description</label>
+                <div class="bg-gray-50 p-3 rounded text-sm text-gray-900">
+                  The app keeps showing a loading screen and never loads the main content. I've tried refreshing multiple times and restarting the app, but the issue persists. This started happening after the latest update.
+                </div>
+              </div>
+              
+              <!-- Status Update -->
+              <div>
+                <label for="ticket-status" class="block text-sm font-medium text-gray-700">Update Status</label>
+                <select id="ticket-status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                  <option value="open" selected>Open</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+              
+              <!-- Response -->
+              <div>
+                <label for="ticket-response" class="block text-sm font-medium text-gray-700">Add Response</label>
+                <textarea
+                  id="ticket-response"
+                  rows="4"
+                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  placeholder="Type your response to the customer..."
+                ></textarea>
+              </div>
+              
+              <div class="flex justify-end space-x-3 pt-4">
+                <button onclick="closeTicketModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                  Cancel
+                </button>
+                <button onclick="updateTicket()" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700">
+                  Update Ticket
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </AdminGuard>
+</AdminLayout>
+
+<script>
+  import { adminDataStore } from '../../lib/admin-data';
+  import { sharedDataStore } from '../../lib/shared-data-store';
+
+  let currentTickets = [];
+  let filteredTickets = [];
+
+  // Initialize support page
+  function initializeSupportPage() {
+    loadTickets();
+    setupEventListeners();
+  }
+
+  // Load all support tickets
+  function loadTickets() {
+    try {
+      console.log('Loading tickets in admin support page...');
+      currentTickets = adminDataStore.getSupportTickets();
+      filteredTickets = [...currentTickets];
+      
+      console.log('Tickets loaded from adminDataStore:', currentTickets);
+      console.log('Tickets from sharedDataStore directly:', sharedDataStore.getSupportTickets());
+      
+      renderTickets();
+      updateTicketsCount();
+      
+      // Debug logging
+      console.log('Tickets loaded from adminDataStore:', currentTickets);
+    } catch (error) {
+      console.error('Error loading tickets:', error);
+    }
+  }
+
+  // Render tickets in table
+  function renderTickets() {
+    const tbody = document.getElementById('tickets-tbody');
+    const emptyState = document.getElementById('empty-tickets');
+    
+    if (!tbody || !emptyState) return;
+
+    if (filteredTickets.length === 0) {
+      tbody.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+    tbody.innerHTML = filteredTickets.map(ticket => `
+      <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${ticket.ticketNumber}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+              <span class="text-sm font-medium text-primary-600">${ticket.customerName.charAt(0)}</span>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-900">${ticket.customerName}</div>
+              <div class="text-sm text-gray-500">${ticket.customerEmail}</div>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${ticket.subject}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(ticket.priority)}">
+            ${ticket.priority}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(ticket.status)}">
+            ${ticket.status.replace('_', ' ')}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          ${formatTimeAgo(ticket.createdAt)}
+        </td>
+                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+           <div class="flex items-center space-x-2">
+             <button onclick="viewTicket('${ticket.id}')" class="text-primary-600 hover:text-primary-900">View & Reply</button>
+             <button onclick="assignTicket('${ticket.id}')" class="text-green-600 hover:text-green-900">Assign</button>
+           </div>
+         </td>
+      </tr>
+    `).join('');
+  }
+
+  // Update tickets count
+  function updateTicketsCount() {
+    const countElement = document.getElementById('tickets-count');
+    if (countElement) {
+      countElement.textContent = `Showing ${filteredTickets.length} of ${currentTickets.length} tickets`;
+    }
+  }
+
+  // Get priority color
+  function getPriorityColor(priority) {
+    const colors = {
+      'low': 'bg-green-100 text-green-800',
+      'medium': 'bg-yellow-100 text-yellow-800',
+      'high': 'bg-orange-100 text-orange-800',
+      'urgent': 'bg-red-100 text-red-800'
+    };
+    return colors[priority] || 'bg-gray-100 text-gray-800';
+  }
+
+  // Get status color
+  function getStatusColor(status) {
+    const colors = {
+      'open': 'bg-blue-100 text-blue-800',
+      'in_progress': 'bg-yellow-100 text-yellow-800',
+      'resolved': 'bg-green-100 text-green-800',
+      'closed': 'bg-gray-100 text-gray-800'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  }
+
+  // Format time ago
+  function formatTimeAgo(dateString) {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    
+    return date.toLocaleDateString();
+  }
+
+  // Ticket management functions
+  function viewTicket(ticketId) {
+    const ticket = currentTickets.find(t => t.id === ticketId);
+    if (!ticket) return;
+
+    document.getElementById('ticket-modal').classList.remove('hidden');
+    
+    // Populate modal with ticket details
+    const modalTitle = document.getElementById('modal-title');
+    const modalContent = document.getElementById('modal-content');
+    
+    if (modalTitle && modalContent) {
+      modalTitle.textContent = `Ticket ${ticket.ticketNumber}`;
+             modalContent.innerHTML = `
+         <div class="space-y-4">
+           <!-- Customer Information -->
+           <div>
+             <label class="block text-sm font-medium text-gray-700 mb-2">Customer</label>
+             <div class="bg-gray-50 p-3 rounded text-sm text-gray-900">
+               ${ticket.customerName} (${ticket.customerEmail})
+             </div>
+           </div>
+           
+           <!-- Subject -->
+           <div>
+             <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+             <div class="bg-gray-50 p-3 rounded text-sm text-gray-900">
+               ${ticket.subject}
+             </div>
+           </div>
+           
+           <!-- Issue Description -->
+           <div>
+             <label class="block text-sm font-medium text-gray-700 mb-2">Issue Description</label>
+             <div class="bg-gray-50 p-3 rounded text-sm text-gray-900">
+               ${ticket.description}
+             </div>
+           </div>
+           
+           <!-- Admin Replies Section -->
+           <div>
+             <label class="block text-sm font-medium text-gray-700 mb-2">Admin Replies</label>
+             <div id="admin-replies" class="bg-gray-50 p-3 rounded text-sm text-gray-900 max-h-32 overflow-y-auto">
+               ${ticket.adminReplies && ticket.adminReplies.length > 0 ? 
+                 ticket.adminReplies.map(reply => `
+                   <div class="mb-2 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+                     <div class="font-medium text-blue-800">Admin Reply:</div>
+                     <div class="text-blue-700">${reply.message}</div>
+                     <div class="text-xs text-blue-600 mt-1">${new Date(reply.timestamp).toLocaleString()}</div>
+                   </div>
+                 `).join('') : 
+                 '<div class="text-gray-500">No admin replies yet</div>'
+               }
+             </div>
+           </div>
+           
+           <!-- Status Update -->
+           <div>
+             <label for="ticket-status" class="block text-sm font-medium text-gray-700">Update Status</label>
+             <select id="ticket-status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+               <option value="open" ${ticket.status === 'open' ? 'selected' : ''}>Open</option>
+               <option value="in_progress" ${ticket.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+               <option value="resolved" ${ticket.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+               <option value="closed" ${ticket.status === 'closed' ? 'selected' : ''}>Closed</option>
+             </select>
+           </div>
+           
+           <!-- Admin Response -->
+           <div>
+             <label for="ticket-response" class="block text-sm font-medium text-gray-700">Add Admin Reply</label>
+             <textarea
+               id="ticket-response"
+               rows="4"
+               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+               placeholder="Type your reply to the customer..."
+             ></textarea>
+           </div>
+           
+           <!-- Action Buttons -->
+           <div class="flex justify-end space-x-3 pt-4">
+             <button onclick="closeTicketModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+               Cancel
+             </button>
+             <button onclick="updateTicket('${ticket.id}')" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700">
+               Send Reply & Update
+             </button>
+           </div>
+         </div>
+       `;
+    }
+  }
+  
+  function closeTicketModal() {
+    document.getElementById('ticket-modal').classList.add('hidden');
+  }
+  
+  function assignTicket(ticketId) {
+    if (confirm('Assign this ticket to yourself?')) {
+      // Implementation for assigning ticket
+      console.log('Assigning ticket:', ticketId);
+      alert('Ticket assigned successfully!');
+    }
+  }
+  
+  function reopenTicket(ticketId) {
+    if (confirm('Reopen this ticket?')) {
+      try {
+        const success = adminDataStore.updateTicket(ticketId, { status: 'open' });
+        if (success) {
+          loadTickets();
+          alert('Ticket reopened successfully!');
+        } else {
+          alert('Failed to reopen ticket');
+        }
+      } catch (error) {
+        console.error('Error reopening ticket:', error);
+        alert('Failed to reopen ticket');
+      }
+    }
+  }
+  
+           function updateTicket(ticketId) {
+      const status = document.getElementById('ticket-status').value;
+      const response = document.getElementById('ticket-response').value;
+      
+      if (!response.trim()) {
+        alert('Please add a reply before updating the ticket');
+        return;
+      }
+      
+      try {
+        // Find the ticket to get its details
+        const ticket = currentTickets.find(t => t.id === ticketId);
+        if (!ticket) {
+          alert('Ticket not found');
+          return;
+        }
+        
+        // Create admin reply object
+        const adminReply = {
+          message: response,
+          timestamp: new Date().toISOString(),
+          adminName: 'Admin' // You can get this from the current admin user
+        };
+        
+        // Update ticket with status and admin reply
+        const success = adminDataStore.updateTicket(ticketId, { 
+          status: status,
+          adminReply: adminReply
+        });
+        
+        if (success) {
+          loadTickets();
+          
+          // Show success message with more details
+          const successMessage = `✅ Reply sent successfully!\n\nTicket #${ticket.ticketNumber} has been updated.\nStatus: ${status}\nCustomer: ${ticket.customerName}\n\nAn email notification has been sent to ${ticket.customerEmail}`;
+          alert(successMessage);
+          
+          closeTicketModal();
+          
+          // Show success toast
+          showSuccessToast(`Reply sent to ${ticket.customerName} for ticket #${ticket.ticketNumber}`);
+        } else {
+          alert('Failed to update ticket');
+        }
+      } catch (error) {
+        console.error('Error updating ticket:', error);
+        alert('Failed to update ticket');
+      }
+    }
+
+
+
+  // Setup event listeners
+  function setupEventListeners() {
+    // Refresh button
+    document.getElementById('refresh-tickets')?.addEventListener('click', loadTickets);
+    
+
+
+    // Modal close button
+    document.getElementById('close-modal')?.addEventListener('click', closeTicketModal);
+
+    // Close modal when clicking outside
+    document.getElementById('ticket-modal')?.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        closeTicketModal();
+      }
+    });
+  }
+
+  // Initialize page when DOM loads
+  document.addEventListener('DOMContentLoaded', initializeSupportPage);
+
+  // Show success toast notification
+  function showSuccessToast(message) {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+    toast.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-5 h-8 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => {
+      toast.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      toast.classList.add('translate-x-full');
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
+    }, 5000);
+  }
+
+  // Make functions globally available for onclick handlers
+  (window as any).viewTicket = viewTicket;
+  (window as any).closeTicketModal = closeTicketModal;
+  (window as any).assignTicket = assignTicket;
+  (window as any).reopenTicket = reopenTicket;
+  (window as any).updateTicket = updateTicket;
+
+</script>

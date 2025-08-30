@@ -112,10 +112,16 @@ import AuthGuard from '../components/AuthGuard.astro';
                 <span id="user-company" class="font-medium">Loading...</span>
               </div>
             </div>
-            <div class="mt-4">
+            <div class="mt-4 space-y-2">
               <a href="/profile" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
                 Edit Profile →
               </a>
+              <button 
+                id="refresh-data-btn" 
+                class="block text-sm text-gray-500 hover:text-gray-700 underline"
+              >
+                Refresh Data
+              </button>
             </div>
           </div>
         </div>
@@ -142,76 +148,70 @@ import AuthGuard from '../components/AuthGuard.astro';
 </Layout>
 
 <script>
-  import { simpleAuth } from '../lib/simple-auth';
-
-  // Function to update user information on the dashboard
+  console.log('Dashboard loaded - using global auth manager');
+  
+  // Function to update user info using the global auth manager
   function updateUserInfo() {
-    const currentUser = simpleAuth.getCurrentUser();
+    console.log('Updating user info using global auth manager');
     
-    if (currentUser) {
-      // Update welcome message
-      const userWelcome = document.getElementById('user-welcome');
-      if (userWelcome) {
-        userWelcome.textContent = currentUser.fullName || currentUser.email;
-      }
-      
-      // Update account info
-      const userFullName = document.getElementById('user-full-name');
-      if (userFullName) {
-        userFullName.textContent = currentUser.fullName || 'Not set';
-      }
-      
-      const userEmail = document.getElementById('user-email');
-      if (userEmail) {
-        userEmail.textContent = currentUser.email;
-      }
-      
-      const userPhone = document.getElementById('user-phone');
-      if (userPhone) {
-        userPhone.textContent = currentUser.phone || 'Not set';
-      }
-      
-      const userCompany = document.getElementById('user-company');
-      if (userCompany) {
-        userCompany.textContent = currentUser.companyName || 'Not set';
-      }
+    const authManager = window.globalAuthManager || window.simpleAuthManager;
+    if (!authManager) {
+      console.log('Global auth manager not available yet, retrying...');
+      setTimeout(updateUserInfo, 100);
+      return;
     }
+
+    // Update dashboard using the global auth manager
+    authManager.updateDashboard();
+    
+    console.log('✅ Dashboard updated using global auth manager');
   }
 
   // Update user info when page loads
-  document.addEventListener('DOMContentLoaded', updateUserInfo);
-
-  // Also update when the script loads (in case DOMContentLoaded already fired)
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', updateUserInfo);
-  } else {
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('Dashboard DOM loaded - initializing with global auth manager');
+    
+    // Wait for global auth manager to be ready
+    setTimeout(() => {
+      updateUserInfo();
+    }, 200);
+  });
+  
+  // Listen for auth state changes
+  window.addEventListener('user-logged-in', () => {
+    console.log('User logged in event received in dashboard');
     updateUserInfo();
-  }
+  });
 
-  // Add logout functionality
+  window.addEventListener('user-logged-out', () => {
+    console.log('User logged out event received in dashboard');
+    updateUserInfo();
+  });
+  
+  // Add logout functionality using the global auth manager
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn?.addEventListener('click', async () => {
-    try {
-      // Sign out
-      await simpleAuth.signOut();
-      
-      // Dispatch auth state change event
-      window.dispatchEvent(new CustomEvent('auth-state-changed'));
-      
-      // Show success message
-      if (typeof window.showToast === 'function') {
-        window.showToast('Successfully signed out!', 'success');
-      }
-      
-      // Redirect to login page after a short delay
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 1000);
-    } catch (error) {
-      console.error('Logout error:', error);
-      if (typeof window.showToast === 'function') {
-        window.showToast('Error signing out. Please try again.', 'error');
-      }
+  logoutBtn?.addEventListener('click', () => {
+    console.log('Logout clicked - using global auth manager');
+    const authManager = window.globalAuthManager || window.simpleAuthManager;
+    if (authManager) {
+      authManager.logout();
+    } else {
+      window.location.href = '/';
     }
   });
+  
+  // Add refresh data functionality
+  const refreshDataBtn = document.getElementById('refresh-data-btn');
+  refreshDataBtn?.addEventListener('click', () => {
+    console.log('Refresh data button clicked - updating display');
+    updateUserInfo();
+    
+    if (typeof window.showToast === 'function') {
+      window.showToast('Data refreshed successfully!', 'success');
+    } else {
+      alert('Data refreshed successfully!');
+    }
+  });
+  
+  console.log('✅ Dashboard script initialized with global auth manager');
 </script>

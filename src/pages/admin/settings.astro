@@ -1,0 +1,307 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import AdminGuard from '../../components/AdminGuard.astro';
+---
+
+<AdminLayout title="Admin Settings - DevExpress">
+  <AdminGuard>
+    <div class="space-y-6">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Admin Settings</h1>
+        <p class="text-gray-600 mt-2">Manage your admin panel preferences and system settings</p>
+      </div>
+
+      <!-- Settings Sections -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- General Settings -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">General Settings</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Admin Panel Theme</label>
+              <select id="theme-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <option value="light">Light Theme</option>
+                <option value="dark">Dark Theme</option>
+                <option value="auto">Auto (System)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Language</label>
+              <select id="language-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="es">Spanish</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Time Zone</label>
+              <select id="timezone-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <option value="UTC">UTC</option>
+                <option value="IST">India Standard Time (IST)</option>
+                <option value="EST">Eastern Standard Time (EST)</option>
+                <option value="PST">Pacific Standard Time (PST)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Notification Settings</h3>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-sm font-medium text-gray-700">Email Notifications</label>
+                <p class="text-sm text-gray-500">Receive email alerts for important events</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="email-notifications" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-sm font-medium text-gray-700">Order Updates</label>
+                <p class="text-sm text-gray-500">Get notified when order status changes</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="order-notifications" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-sm font-medium text-gray-700">Support Tickets</label>
+                <p class="text-sm text-gray-500">Alert for new support tickets</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="ticket-notifications" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Management -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Data Management</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="text-md font-medium text-gray-700 mb-3">Export Data</h4>
+            <div class="space-y-2">
+              <button id="export-users" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                Export Users
+              </button>
+              <button id="export-orders" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                Export Orders
+              </button>
+              <button id="export-revenue" class="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors">
+                Export Revenue
+              </button>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-md font-medium text-gray-700 mb-3">System Actions</h4>
+            <div class="space-y-2">
+              <button id="reset-data" class="w-full px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors">
+                Reset to Mock Data
+              </button>
+              <button id="clear-cache" class="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                Clear Cache
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <div class="flex justify-end">
+        <button id="save-settings" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+          Save Settings
+        </button>
+      </div>
+    </div>
+  </AdminGuard>
+</AdminLayout>
+
+<script>
+  import { adminDataStore } from '../../lib/admin-data';
+
+  // Initialize settings page
+  function initializeSettings() {
+    loadCurrentSettings();
+    setupEventListeners();
+  }
+
+  // Load current settings from localStorage
+  function loadCurrentSettings() {
+    try {
+      const settings = JSON.parse(localStorage.getItem('admin-settings') || '{}');
+      
+      // Set form values
+      if (settings.theme) document.getElementById('theme-select').value = settings.theme;
+      if (settings.language) document.getElementById('language-select').value = settings.language;
+      if (settings.timezone) document.getElementById('timezone-select').value = settings.timezone;
+      if (settings.emailNotifications !== undefined) document.getElementById('email-notifications').checked = settings.emailNotifications;
+      if (settings.orderNotifications !== undefined) document.getElementById('order-notifications').checked = settings.orderNotifications;
+      if (settings.ticketNotifications !== undefined) document.getElementById('ticket-notifications').checked = settings.ticketNotifications;
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
+  }
+
+  // Save settings to localStorage
+  function saveSettings() {
+    try {
+      const settings = {
+        theme: document.getElementById('theme-select').value,
+        language: document.getElementById('language-select').value,
+        timezone: document.getElementById('timezone-select').value,
+        emailNotifications: document.getElementById('email-notifications').checked,
+        orderNotifications: document.getElementById('order-notifications').checked,
+        ticketNotifications: document.getElementById('ticket-notifications').checked
+      };
+      
+      localStorage.setItem('admin-settings', JSON.stringify(settings));
+      
+      // Show success message
+      showToast('Settings saved successfully!', 'success');
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      showToast('Error saving settings', 'error');
+    }
+  }
+
+  // Setup event listeners
+  function setupEventListeners() {
+    // Save settings button
+    document.getElementById('save-settings').addEventListener('click', saveSettings);
+    
+    // Export buttons
+    document.getElementById('export-users').addEventListener('click', () => exportData('users'));
+    document.getElementById('export-orders').addEventListener('click', () => exportData('orders'));
+    document.getElementById('export-revenue').addEventListener('click', () => exportData('revenue'));
+    
+    // System action buttons
+    document.getElementById('reset-data').addEventListener('click', resetToMockData);
+    document.getElementById('clear-cache').addEventListener('click', clearCache);
+  }
+
+  // Export data functions
+  function exportData(type) {
+    try {
+      let data, filename, content;
+      
+      switch (type) {
+        case 'users':
+          data = adminDataStore.getUsers();
+          filename = 'users-export.csv';
+          content = exportToCSV(data, ['ID', 'Email', 'Full Name', 'Role', 'Status', 'Created At']);
+          break;
+        case 'orders':
+          data = adminDataStore.getOrders();
+          filename = 'orders-export.csv';
+          content = exportToCSV(data, ['Order ID', 'Customer', 'Service', 'Status', 'Amount', 'Date']);
+          break;
+        case 'revenue':
+          data = adminDataStore.getRevenue();
+          filename = 'revenue-export.csv';
+          content = exportToCSV(data, ['ID', 'Order ID', 'Customer', 'Amount', 'Status', 'Date']);
+          break;
+      }
+      
+      if (content) {
+        downloadCSV(content, filename);
+        showToast(`${type} exported successfully!`, 'success');
+      }
+    } catch (error) {
+      console.error(`Error exporting ${type}:`, error);
+      showToast(`Error exporting ${type}`, 'error');
+    }
+  }
+
+  // Export to CSV helper
+  function exportToCSV(data, headers) {
+    if (!data || data.length === 0) return null;
+    
+    const csvRows = [headers];
+    
+    data.forEach(item => {
+      const values = headers.map(header => {
+        const key = header.toLowerCase().replace(/\s+/g, '');
+        return item[key] || item[header] || '';
+      });
+      csvRows.push(values);
+    });
+    
+    return csvRows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+  }
+
+  // Download CSV file
+  function downloadCSV(content, filename) {
+    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // Reset to mock data
+  function resetToMockData() {
+    if (confirm('Are you sure you want to reset all data to mock data? This action cannot be undone.')) {
+      try {
+        adminDataStore.resetToMockData();
+        showToast('Data reset to mock data successfully!', 'success');
+      } catch (error) {
+        console.error('Error resetting data:', error);
+        showToast('Error resetting data', 'error');
+      }
+    }
+  }
+
+  // Clear cache
+  function clearCache() {
+    try {
+      // Clear admin-specific cache
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('admin-')) {
+          keysToRemove.push(key);
+        }
+      }
+      
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      showToast('Cache cleared successfully!', 'success');
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+      showToast('Error clearing cache', 'error');
+    }
+  }
+
+  // Show toast notification
+  function showToast(message, type = 'info') {
+    // Create a simple toast notification
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 px-6 py-3 rounded-md text-white z-50 ${
+      type === 'success' ? 'bg-green-600' : 
+      type === 'error' ? 'bg-red-600' : 'bg-blue-600'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
+
+  // Initialize when DOM loads
+  document.addEventListener('DOMContentLoaded', initializeSettings);
+</script>

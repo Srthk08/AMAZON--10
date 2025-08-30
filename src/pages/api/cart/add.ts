@@ -1,35 +1,18 @@
 import type { APIRoute } from 'astro';
-import { supabase, addToCart } from '../../../lib/supabase';
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
-    // Get authentication tokens from cookies
-    const accessToken = cookies.get('sb-access-token');
-    const refreshToken = cookies.get('sb-refresh-token');
+    // Parse request body
+    const body = await request.json();
+    const { productId, planId, quantity = 1, customRequirements = {}, userSession } = body;
 
-    if (!accessToken || !refreshToken) {
+    // Check if user session is provided (from our global auth manager)
+    if (!userSession || !userSession.user) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
       });
     }
-
-    // Set session
-    const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-      access_token: accessToken.value,
-      refresh_token: refreshToken.value,
-    });
-
-    if (sessionError || !sessionData.user) {
-      return new Response(JSON.stringify({ error: 'Invalid session' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Parse request body
-    const body = await request.json();
-    const { productId, planId, quantity = 1, customRequirements = {} } = body;
 
     if (!productId || !planId) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
@@ -38,15 +21,24 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       });
     }
 
-    // Add to cart
-    const result = await addToCart(
-      sessionData.user.id,
+    // For now, we'll store cart data in localStorage on the client side
+    // This is a temporary solution until we integrate with Supabase properly
+    const cartItem = {
+      id: Date.now().toString(),
       productId,
       planId,
-      customRequirements
-    );
+      quantity,
+      customRequirements,
+      userId: userSession.user.id,
+      addedAt: new Date().toISOString()
+    };
 
-    return new Response(JSON.stringify({ success: true, data: result }), {
+    // Return success with cart item data
+    return new Response(JSON.stringify({ 
+      success: true, 
+      data: cartItem,
+      message: 'Item added to cart successfully'
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });

@@ -1,0 +1,530 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import AdminGuard from '../../components/AdminGuard.astro';
+---
+
+<AdminLayout title="Orders Management - DevExpress">
+  <AdminGuard>
+    <div class="space-y-6">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Orders Management</h1>
+        <p class="text-gray-600 mt-2">View and manage all customer orders</p>
+      </div>
+
+      <!-- Search and Filters -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Search -->
+          <div class="md:col-span-2">
+            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Orders</label>
+            <div class="relative">
+              <input
+                type="text"
+                id="search"
+                placeholder="Search by order ID, customer name, or email..."
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              />
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select id="status-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <!-- Date Filter -->
+          <div>
+            <label for="date-filter" class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+            <select id="date-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              <option value="">All Time</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="quarter">This Quarter</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-medium text-gray-900">All Orders</h3>
+            <div class="flex items-center space-x-3">
+                             <span id="orders-count" class="text-sm text-gray-500">No orders</span>
+              <button id="export-btn" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+                Export CSV
+              </button>
+              <button id="test-orders" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                Test Orders
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody" class="bg-white divide-y divide-gray-200">
+              <!-- Orders will be populated here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Order Details Modal -->
+      <div id="order-modal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl">
+              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 id="modal-title" class="text-lg font-medium text-gray-900">Order Details</h3>
+                  <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+                
+                <div id="modal-content" class="space-y-6">
+                  <!-- Order details will be populated here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </AdminGuard>
+</AdminLayout>
+
+<script>
+  import { adminDataStore } from '../../lib/admin-data';
+
+  let currentOrders: any[] = [];
+  let filteredOrders: any[] = [];
+
+  // Initialize orders page
+  function initializeOrdersPage() {
+    loadOrders();
+    setupEventListeners();
+  }
+
+  // Load all orders
+  function loadOrders() {
+    try {
+      currentOrders = adminDataStore.getOrders();
+      filteredOrders = [...currentOrders];
+      renderOrders();
+      updateOrdersCount();
+      
+      // Debug logging
+      console.log('Orders loaded from adminDataStore:', currentOrders);
+      console.log('Orders from sharedDataStore:', adminDataStore.getOrders());
+    } catch (error) {
+      console.error('Error loading orders:', error);
+    }
+  }
+
+  // Render orders in table
+  function renderOrders() {
+    const tbody = document.getElementById('orders-tbody');
+    if (!tbody) return;
+
+    if (filteredOrders.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+            <div class="flex flex-col items-center">
+              <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+              </svg>
+              <p class="text-lg font-medium text-gray-900 mb-2">No orders found</p>
+              <p class="text-gray-500">Try adjusting your search or filters</p>
+            </div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = filteredOrders.map(order => `
+      <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${order.orderNumber}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+              <span class="text-sm font-medium text-primary-600">${order.customerName.charAt(0)}</span>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-900">${order.customerName}</div>
+              <div class="text-sm text-gray-500">${order.customerEmail}</div>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="text-sm text-gray-900">${order.serviceName}</div>
+          <div class="text-sm text-gray-500 capitalize">${order.serviceType}</div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}">
+            ${order.status.replace('_', ' ')}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          ₹${order.amount.toLocaleString()}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          ${new Date(order.createdAt).toLocaleDateString()}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <div class="flex space-x-2">
+            <button 
+              onclick="viewOrder('${order.id}')"
+              class="text-primary-600 hover:text-primary-900"
+            >
+              View
+            </button>
+            <button 
+              onclick="updateOrderStatus('${order.id}')"
+              class="text-green-600 hover:text-green-900"
+            >
+              Update
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Update orders count
+  function updateOrdersCount() {
+    const countElement = document.getElementById('orders-count');
+    if (countElement) {
+      countElement.textContent = `Showing ${filteredOrders.length} of ${currentOrders.length} orders`;
+    }
+  }
+
+  // Get status color
+  function getStatusColor(status: string) {
+    const colors = {
+      'pending': 'bg-yellow-100 text-yellow-800',
+      'confirmed': 'bg-blue-100 text-blue-800',
+      'in_progress': 'bg-purple-100 text-purple-800',
+      'completed': 'bg-green-100 text-green-800',
+      'cancelled': 'bg-red-100 text-red-800'
+    };
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  }
+
+  // Search and filter orders
+  function filterOrders() {
+    const searchQuery = (document.getElementById('search') as HTMLInputElement).value.toLowerCase();
+    const statusFilter = (document.getElementById('status-filter') as HTMLSelectElement).value;
+    const dateFilter = (document.getElementById('date-filter') as HTMLSelectElement).value;
+
+    filteredOrders = currentOrders.filter(order => {
+      // Search filter
+      const matchesSearch = 
+        order.orderNumber.toLowerCase().includes(searchQuery) ||
+        order.customerName.toLowerCase().includes(searchQuery) ||
+        order.customerEmail.toLowerCase().includes(searchQuery) ||
+        order.serviceName.toLowerCase().includes(searchQuery);
+
+      // Status filter
+      const matchesStatus = !statusFilter || order.status === statusFilter;
+
+      // Date filter
+      const matchesDate = !dateFilter || filterByDate(order.createdAt, dateFilter);
+
+      return matchesSearch && matchesStatus && matchesDate;
+    });
+
+    renderOrders();
+    updateOrdersCount();
+  }
+
+  // Filter by date
+  function filterByDate(dateString: string, dateRange: string): boolean {
+    const orderDate = new Date(dateString);
+    const now = new Date();
+
+    switch (dateRange) {
+      case 'today':
+        return orderDate.toDateString() === now.toDateString();
+      case 'week':
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return orderDate >= weekAgo;
+      case 'month':
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return orderDate >= monthAgo;
+      case 'quarter':
+        const quarterAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        return orderDate >= quarterAgo;
+      default:
+        return true;
+    }
+  }
+
+  // View order details
+  function viewOrder(orderId: string) {
+    const order = adminDataStore.getOrderById(orderId);
+    if (!order) return;
+
+    const modal = document.getElementById('order-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalContent = document.getElementById('modal-content');
+
+    if (modal && modalTitle && modalContent) {
+      modalTitle.textContent = `Order ${order.orderNumber}`;
+      
+      modalContent.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Order Information -->
+          <div class="space-y-4">
+            <h4 class="text-md font-medium text-gray-900">Order Information</h4>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Order Number:</span>
+                <span class="text-sm font-medium text-gray-900">${order.orderNumber}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Status:</span>
+                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}">
+                  ${order.status.replace('_', ' ')}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Payment Status:</span>
+                <span class="text-sm font-medium text-gray-900">${order.paymentStatus}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Amount:</span>
+                <span class="text-sm font-medium text-gray-900">₹${order.amount.toLocaleString()}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Created:</span>
+                <span class="text-sm text-gray-900">${new Date(order.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Information -->
+          <div class="space-y-4">
+            <h4 class="text-md font-medium text-gray-900">Customer Information</h4>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Name:</span>
+                <span class="text-sm font-medium text-gray-900">${order.customerName}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Email:</span>
+                <span class="text-sm font-medium text-gray-900">${order.customerEmail}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Details -->
+        <div class="space-y-4">
+          <h4 class="text-md font-medium text-gray-900">Service Details</h4>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-500">Service:</span>
+              <span class="text-sm font-medium text-gray-900">${order.serviceName}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-500">Type:</span>
+              <span class="text-sm font-medium text-gray-900 capitalize">${order.serviceType}</span>
+            </div>
+            ${order.notes ? `
+              <div class="mt-3">
+                <span class="text-sm text-gray-500 block mb-1">Notes:</span>
+                <p class="text-sm text-gray-900 bg-gray-50 p-3 rounded-md">${order.notes}</p>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- Files -->
+        ${order.files && order.files.length > 0 ? `
+          <div class="space-y-4">
+            <h4 class="text-md font-medium text-gray-900">Attached Files</h4>
+            <div class="space-y-2">
+              ${order.files.map(file => `
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  <span class="text-sm text-gray-900">${file}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Timeline -->
+        <div class="space-y-4">
+          <h4 class="text-md font-medium text-gray-900">Order Timeline</h4>
+          <div class="space-y-3">
+            ${order.timeline.map(item => `
+              <div class="flex items-start space-x-3">
+                <div class="w-2 h-2 bg-primary-600 rounded-full mt-2"></div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-900">${item.status}</p>
+                  <p class="text-sm text-gray-600">${item.message}</p>
+                  <p class="text-xs text-gray-500 mt-1">
+                    ${new Date(item.timestamp).toLocaleString()} by ${item.updatedBy}
+                  </p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+    }
+  }
+
+  // Update order status
+  function updateOrderStatus(orderId: string) {
+    const order = adminDataStore.getOrderById(orderId);
+    if (!order) return;
+
+    const newStatus = prompt(
+      `Current status: ${order.status}\n\nEnter new status:\n- pending\n- confirmed\n- in_progress\n- completed\n- cancelled`,
+      order.status
+    );
+
+    if (newStatus && newStatus !== order.status) {
+      try {
+        const updatedOrder = adminDataStore.updateOrder(orderId, { status: newStatus });
+        if (updatedOrder) {
+          // Add timeline entry
+          adminDataStore.addOrderTimeline(orderId, {
+            status: 'Status Updated',
+            message: `Order status changed from ${order.status} to ${newStatus}`,
+            timestamp: new Date().toISOString(),
+            updatedBy: 'Admin'
+          });
+
+          // Refresh the page
+          loadOrders();
+          alert('Order status updated successfully!');
+        }
+      } catch (error) {
+        alert('Failed to update order status');
+        console.error('Error updating order status:', error);
+      }
+    }
+  }
+
+  // Test orders function
+  function testOrders() {
+    console.log('Testing orders in admin orders page...');
+    
+    try {
+      // Test adminDataStore
+      const adminOrders = adminDataStore.getOrders();
+      console.log('Orders from adminDataStore:', adminOrders);
+      
+      // Test sharedDataStore directly
+      const sharedOrders = sharedDataStore.getOrders();
+      console.log('Orders from sharedDataStore:', sharedOrders);
+      
+      // Test localStorage
+      const localStorageOrders = localStorage.getItem('shared-orders');
+      console.log('Orders from localStorage:', localStorageOrders);
+      
+      if (localStorageOrders) {
+        const parsedOrders = JSON.parse(localStorageOrders);
+        console.log('Parsed orders from localStorage:', parsedOrders);
+      }
+      
+      alert(`AdminDataStore: ${adminOrders.length} orders\nSharedDataStore: ${sharedOrders.length} orders\nlocalStorage: ${localStorageOrders ? 'Found' : 'Not found'}`);
+      
+    } catch (error) {
+      console.error('Error testing orders:', error);
+      alert('Error testing orders: ' + error.message);
+    }
+  }
+
+  // Export orders to CSV
+  function exportOrders() {
+    try {
+      const csvContent = adminDataStore.exportOrdersToCSV();
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `orders-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert('Failed to export orders');
+      console.error('Error exporting orders:', error);
+    }
+  }
+
+  // Setup event listeners
+  function setupEventListeners() {
+    // Search and filter inputs
+    document.getElementById('search')?.addEventListener('input', filterOrders);
+    document.getElementById('status-filter')?.addEventListener('change', filterOrders);
+    document.getElementById('date-filter')?.addEventListener('change', filterOrders);
+
+    // Export button
+    document.getElementById('export-btn')?.addEventListener('click', exportOrders);
+    
+    // Test button
+    document.getElementById('test-orders')?.addEventListener('click', testOrders);
+
+    // Modal close button
+    document.getElementById('close-modal')?.addEventListener('click', () => {
+      document.getElementById('order-modal')?.classList.add('hidden');
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('order-modal')?.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        (e.currentTarget as HTMLElement).classList.add('hidden');
+      }
+    });
+  }
+
+  // Initialize page when DOM loads
+  document.addEventListener('DOMContentLoaded', initializeOrdersPage);
+
+  // Make functions globally available for onclick handlers
+  (window as any).viewOrder = viewOrder;
+  (window as any).updateOrderStatus = updateOrderStatus;
+  (window as any).testOrders = testOrders;
+</script>

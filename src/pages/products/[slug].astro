@@ -1,34 +1,18 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getProductBySlug, getProducts } from '../../lib/supabase';
+import { getProductBySlug, getProducts, getProductPlans } from '../../lib/products-data';
 
 export async function getStaticPaths() {
-  let products = [];
-  try {
-    products = await getProducts();
-  } catch (error) {
-    console.error('Error loading products for static paths:', error);
-    products = [];
-  }
+  const products = getProducts();
   
   return products.map((product) => ({
     params: { slug: product.slug },
+    props: { product, productPlans: getProductPlans(product.id) }
   }));
 }
 
+const { product, productPlans } = Astro.props;
 const { slug } = Astro.params;
-
-if (!slug) {
-  return Astro.redirect('/products');
-}
-
-let product = null;
-try {
-  product = await getProductBySlug(slug);
-} catch (error) {
-  console.error('Error loading product:', error);
-  product = null;
-}
 
 if (!product) {
   return Astro.redirect('/products');
@@ -123,68 +107,7 @@ const style = categoryStyles[product.category];
     </div>
   </section>
 
-  <!-- Pricing Plans -->
-  <section class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-900 mb-4">Choose Your Plan</h2>
-        <p class="text-xl text-gray-600">Select the perfect plan for your needs. All plans include 24-hour delivery.</p>
-      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {product.product_plans.map((plan, index) => (
-          <div class={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 ${plan.is_popular ? 'ring-2 ring-primary-500 relative' : ''}`}>
-            {plan.is_popular && (
-              <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span class="bg-primary-500 text-white px-4 py-1 rounded-full text-sm font-medium">Most Popular</span>
-              </div>
-            )}
-            
-            <div class="p-8">
-              <h3 class="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-              <p class="text-gray-600 mb-6">{plan.description}</p>
-              
-              <div class="mb-6">
-                <span class="text-4xl font-bold text-gray-900">₹{plan.price.toLocaleString()}</span>
-                <span class="text-gray-600 ml-2">one-time</span>
-              </div>
-
-              <div class="mb-8">
-                <div class="flex items-center text-sm text-gray-600 mb-2">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  Delivered in {plan.delivery_days} day{plan.delivery_days > 1 ? 's' : ''}
-                </div>
-              </div>
-
-              <ul class="space-y-3 mb-8">
-                {plan.features.map((feature) => (
-                  <li class="flex items-start">
-                    <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span class="text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <button 
-                class={`w-full py-3 px-6 rounded-lg font-semibold transition-all ${
-                  plan.is_popular 
-                    ? 'bg-primary-600 hover:bg-primary-700 text-white' 
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-                }`}
-                onclick={`addToCart('${product.id}', '${plan.id}', '${plan.name}')`}
-              >
-                Add to Cart
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
 
   <!-- Process Section -->
   <section class="py-16">
@@ -226,6 +149,54 @@ const style = categoryStyles[product.category];
           <h3 class="text-lg font-semibold text-gray-900 mb-2">Delivery</h3>
           <p class="text-gray-600 text-sm">Complete solution delivered with documentation and support</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Plans Section -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Choose Your Plan</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {productPlans.map((plan) => (
+          <div class={`bg-white rounded-xl shadow-lg p-8 ${plan.is_popular ? 'ring-2 ring-primary-500 relative' : ''}`}>
+            {plan.is_popular && (
+              <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span class="bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium">Most Popular</span>
+              </div>
+            )}
+            
+            <div class="text-center mb-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+              <p class="text-gray-600 text-sm mb-4">{plan.description}</p>
+              <div class="text-3xl font-bold text-primary-600">₹{plan.price.toLocaleString()}</div>
+              <div class="text-sm text-gray-500">Delivery in {plan.delivery_days} day{plan.delivery_days > 1 ? 's' : ''}</div>
+            </div>
+            
+            <ul class="space-y-3 mb-8">
+              {plan.features.map((feature) => (
+                <li class="flex items-center">
+                  <svg class="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="text-gray-700">{feature}</span>
+                </li>
+              ))}
+            </ul>
+            
+            <button 
+              onclick={`redirectToCart('${product.id}', ${plan.price})`}
+              class={`w-full py-3 px-6 rounded-lg font-medium transition-all ${
+                plan.is_popular 
+                  ? 'bg-primary-600 hover:bg-primary-700 text-white' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+              }`}
+            >
+              Choose {plan.name}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -285,10 +256,10 @@ const style = categoryStyles[product.category];
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <button 
           id="add-to-cart-btn"
-          onclick={`addToCart('${product.id}', '${product.product_plans[0]?.id}', '${product.product_plans[0]?.name}')`}
+          onclick={`redirectToCart('${product.id}', '${productPlans[0]?.price}')`}
           class="bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-colors"
         >
-          Add to Cart - ₹{product.product_plans[0]?.price.toLocaleString()}
+          Add to Cart - ₹{productPlans[0]?.price.toLocaleString()}
         </button>
         <a href="/contact" class="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-3 rounded-lg font-semibold transition-all">
           Contact Us
@@ -330,68 +301,89 @@ const style = categoryStyles[product.category];
     });
   });
 
-  // Add to cart functionality
-  window.addToCart = async (productId: string, planId: string, planName: string) => {
-    try {
-      const response = await fetch('/api/cart/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId,
-          planId,
-          quantity: 1
-        })
-      });
-
-      if (response.ok) {
-        // Show success message
-        const toast = document.createElement('div');
-        toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
-        toast.textContent = `${planName} added to cart!`;
-        document.body.appendChild(toast);
-
-        // Remove toast after 3 seconds
-        setTimeout(() => {
-          toast.remove();
-        }, 3000);
-
-        // Update cart count
-        window.dispatchEvent(new CustomEvent('cartUpdated'));
-        
-        // Hide login prompt if it was shown
-        const loginPrompt = document.getElementById('login-prompt');
-        if (loginPrompt) {
-          loginPrompt.classList.add('hidden');
-        }
-      } else if (response.status === 401) {
-        // Show login prompt for unauthenticated users
-        const loginPrompt = document.getElementById('login-prompt');
-        if (loginPrompt) {
-          loginPrompt.classList.remove('hidden');
-          
-          // Scroll to the prompt
-          loginPrompt.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      } else {
-        throw new Error('Failed to add to cart');
-      }
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      
-      // Show error message
-      const toast = document.createElement('div');
-      toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
-      toast.textContent = 'Error adding to cart. Please try again.';
-      document.body.appendChild(toast);
-
-      // Remove toast after 3 seconds
-      setTimeout(() => {
-        toast.remove();
-      }, 3000);
+  // Redirect to cart functionality
+  window.redirectToCart = function(productId: string, price: number) {
+    // Check if user is authenticated using global auth manager
+    const authManager = window.globalAuthManager || window.simpleAuthManager;
+    
+    if (authManager && authManager.isUserLoggedIn()) {
+      // User is authenticated, redirect to cart
+      console.log('✅ User authenticated, redirecting to cart');
+      window.location.href = `/cart?product=${productId}&price=${price}`;
+    } else {
+      // User is not authenticated, redirect to login with return URL
+      console.log('❌ User not authenticated, redirecting to login');
+      window.location.href = `/login?redirect=/cart?product=${productId}&price=${price}`;
     }
   };
+
+  // Check authentication status on page load
+  function checkAuthenticationStatus() {
+    console.log('Checking authentication status...');
+    
+    // Wait for global auth manager to be ready
+    const checkAuth = () => {
+      const authManager = window.globalAuthManager || window.simpleAuthManager;
+      
+      if (authManager) {
+        console.log('✅ Auth manager found, checking status...');
+        
+        if (authManager.isUserLoggedIn()) {
+          console.log('✅ User is authenticated, hiding login prompt');
+          
+          // User is authenticated, hide login prompt
+          const loginPrompt = document.getElementById('login-prompt');
+          if (loginPrompt) {
+            loginPrompt.classList.add('hidden');
+            console.log('Login prompt hidden');
+          }
+          
+          // Show authenticated user options
+          const addToCartBtn = document.getElementById('add-to-cart-btn');
+          if (addToCartBtn) {
+            addToCartBtn.classList.remove('hidden');
+            console.log('Add to cart button shown');
+          }
+        } else {
+          console.log('❌ User is not authenticated, showing login prompt');
+          
+          // User is not authenticated, show login prompt
+          const loginPrompt = document.getElementById('login-prompt');
+          if (loginPrompt) {
+            loginPrompt.classList.remove('hidden');
+            console.log('Login prompt shown');
+          }
+          
+          // Hide authenticated user options
+          const addToCartBtn = document.getElementById('add-to-cart-btn');
+          if (addToCartBtn) {
+            addToCartBtn.classList.add('hidden');
+            console.log('Add to cart button hidden');
+          }
+        }
+      } else {
+        // Auth manager not ready yet, retry after a short delay
+        console.log('⏳ Auth manager not ready, retrying...');
+        setTimeout(checkAuth, 100);
+      }
+    };
+    
+    checkAuth();
+  }
+
+  // Check authentication when page loads
+  document.addEventListener('DOMContentLoaded', checkAuthenticationStatus);
+
+  // Listen for authentication state changes
+  window.addEventListener('user-logged-in', (e) => {
+    console.log('✅ User logged in event received, updating UI...');
+    checkAuthenticationStatus();
+  });
+
+  window.addEventListener('user-logged-out', () => {
+    console.log('❌ User logged out event received, updating UI...');
+    checkAuthenticationStatus();
+  });
 
   // Animation on scroll
   const observer = new IntersectionObserver((entries) => {
