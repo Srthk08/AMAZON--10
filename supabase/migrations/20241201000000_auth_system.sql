@@ -145,10 +145,10 @@ CREATE POLICY "Admins can view all activity" ON user_activity_log FOR SELECT TO 
 -- RLS Policies for contact_submissions
 CREATE POLICY "Anyone can submit contact forms" ON contact_submissions FOR INSERT TO anon WITH CHECK (true);
 CREATE POLICY "Admins can view all submissions" ON contact_submissions FOR SELECT TO authenticated USING (
-  EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'admin')
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
 );
 CREATE POLICY "Admins can update submissions" ON contact_submissions FOR UPDATE TO authenticated USING (
-  EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'admin')
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
 );
 
 -- Functions for password reset functionality

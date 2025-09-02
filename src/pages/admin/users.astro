@@ -1,10 +1,8 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import AdminGuard from '../../components/AdminGuard.astro';
 ---
 
 <AdminLayout title="User Management - DevExpress">
-  <AdminGuard>
     <div class="space-y-6">
       <!-- Page Header -->
       <div class="mb-8">
@@ -86,7 +84,9 @@ import AdminGuard from '../../components/AdminGuard.astro';
               </tr>
             </thead>
             <tbody id="users-tbody" class="bg-white divide-y divide-gray-200">
-              <!-- Users will be populated here -->
+              <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Loading users...</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -259,14 +259,13 @@ import AdminGuard from '../../components/AdminGuard.astro';
         </div>
       </div>
     </div>
-  </AdminGuard>
 </AdminLayout>
 
 <script>
-  import { adminDataStore } from '../../lib/admin-data';
+  import { supabase } from '../../lib/supabase';
 
-  let currentUsers: any[] = [];
-  let filteredUsers: any[] = [];
+  let currentUsers = [];
+  let filteredUsers = [];
   let isEditing = false;
 
   // Initialize users page
@@ -275,11 +274,26 @@ import AdminGuard from '../../components/AdminGuard.astro';
     setupEventListeners();
   }
 
-  // Load all users
-  function loadUsers() {
+  // Load all users from Supabase
+  async function loadUsers() {
     try {
-      currentUsers = adminDataStore.getUsers();
+      console.log('🔄 Loading ALL users from Supabase...');
+      
+      const { data: users, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading users:', error);
+        return;
+      }
+
+      currentUsers = users || [];
       filteredUsers = [...currentUsers];
+      
+      console.log('✅ Loaded users from Supabase:', currentUsers);
+      
       renderUsers();
       updateUsersCount();
     } catch (error) {
@@ -314,10 +328,10 @@ import AdminGuard from '../../components/AdminGuard.astro';
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="flex items-center">
             <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
-              <span class="text-sm font-medium text-primary-600">${user.fullName.charAt(0)}</span>
+              <span class="text-sm font-medium text-primary-600">${user.full_name ? user.full_name.charAt(0) : 'U'}</span>
             </div>
             <div>
-              <div class="text-sm font-medium text-gray-900">${user.fullName}</div>
+              <div class="text-sm font-medium text-gray-900">${user.full_name || 'No Name'}</div>
               <div class="text-sm text-gray-500">${user.email}</div>
               ${user.companyName ? `<div class="text-xs text-gray-400">${user.companyName}</div>` : ''}
             </div>
@@ -439,16 +453,27 @@ import AdminGuard from '../../components/AdminGuard.astro';
   }
 
   // View user details
-  function viewUser(userId: string) {
-    const user = adminDataStore.getUserById(userId);
-    if (!user) return;
+  async function viewUser(userId) {
+    try {
+      console.log('Viewing user details for:', userId);
+      
+      const { data: user, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    const modal = document.getElementById('user-details-modal');
-    const modalTitle = document.getElementById('details-modal-title');
-    const modalContent = document.getElementById('user-details-content');
+      if (error) {
+        console.error('Error loading user details:', error);
+        return;
+      }
 
-    if (modal && modalTitle && modalContent) {
-      modalTitle.textContent = `User Details - ${user.fullName}`;
+      const modal = document.getElementById('user-details-modal');
+      const modalTitle = document.getElementById('details-modal-title');
+      const modalContent = document.getElementById('user-details-content');
+
+      if (modal && modalTitle && modalContent) {
+      modalTitle.textContent = `User Details - ${user.full_name || 'No Name'}`;
       
       modalContent.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -458,7 +483,7 @@ import AdminGuard from '../../components/AdminGuard.astro';
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Full Name:</span>
-                <span class="text-sm font-medium text-gray-900">${user.fullName}</span>
+                <span class="text-sm font-medium text-gray-900">${user.full_name || 'Not provided'}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Email:</span>
@@ -520,6 +545,9 @@ import AdminGuard from '../../components/AdminGuard.astro';
       `;
 
       modal.classList.remove('hidden');
+    }
+    } catch (error) {
+      console.error('Error viewing user details:', error);
     }
   }
 

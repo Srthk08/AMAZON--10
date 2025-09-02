@@ -1,10 +1,8 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import AdminGuard from '../../components/AdminGuard.astro';
 ---
 
 <AdminLayout title="Support & Help Center - DevExpress">
-  <AdminGuard>
     <div class="space-y-6">
       <!-- Page Header -->
       <div class="mb-8">
@@ -43,7 +41,9 @@ import AdminGuard from '../../components/AdminGuard.astro';
               </tr>
             </thead>
             <tbody id="tickets-tbody" class="bg-white divide-y divide-gray-200">
-              <!-- Tickets will be populated here -->
+              <tr>
+                <td colspan="7" class="px-6 py-4 text-center text-gray-500">Loading tickets...</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -273,12 +273,10 @@ import AdminGuard from '../../components/AdminGuard.astro';
         </div>
       </div>
     </div>
-  </AdminGuard>
 </AdminLayout>
 
 <script>
-  import { adminDataStore } from '../../lib/admin-data';
-  import { sharedDataStore } from '../../lib/shared-data-store';
+  import { supabase } from '../../lib/supabase';
 
   let currentTickets = [];
   let filteredTickets = [];
@@ -290,20 +288,30 @@ import AdminGuard from '../../components/AdminGuard.astro';
   }
 
   // Load all support tickets
-  function loadTickets() {
+  async function loadTickets() {
     try {
-      console.log('Loading tickets in admin support page...');
-      currentTickets = adminDataStore.getSupportTickets();
+      console.log('Loading tickets from Supabase...');
+      
+      const { data: tickets, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading tickets:', error);
+        return;
+      }
+
+      currentTickets = tickets || [];
       filteredTickets = [...currentTickets];
       
-      console.log('Tickets loaded from adminDataStore:', currentTickets);
-      console.log('Tickets from sharedDataStore directly:', sharedDataStore.getSupportTickets());
+      console.log('Tickets loaded from Supabase:', currentTickets);
       
       renderTickets();
       updateTicketsCount();
       
       // Debug logging
-      console.log('Tickets loaded from adminDataStore:', currentTickets);
+      console.log('Tickets loaded from Supabase:', currentTickets);
     } catch (error) {
       console.error('Error loading tickets:', error);
     }

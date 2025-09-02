@@ -1,5 +1,6 @@
 
 ---
+import Layout from './Layout.astro';
 import Toast from '../components/Toast.astro';
 
 export interface Props {
@@ -10,113 +11,11 @@ export interface Props {
 const { title, description } = Astro.props;
 ---
 
-<!DOCTYPE html>
-<html lang="en" class="h-full">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description || "Admin Panel - DevExpress"} />
-    <title>{title}</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-
-    <!-- Tailwind CSS -->
-    <script is:inline src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Alpine.js for interactivity -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <!-- Custom Tailwind Config -->
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: {
-                50: '#eff6ff',
-                100: '#dbeafe',
-                200: '#bfdbfe',
-                300: '#93c5fd',
-                400: '#60a5fa',
-                500: '#3b82f6',
-                600: '#2563eb',
-                700: '#1d4ed8',
-                800: '#1e40af',
-                900: '#1e3a8a',
-                950: '#172554',
-              },
-              secondary: {
-                50: '#faf5ff',
-                100: '#f3e8ff',
-                200: '#e9d5ff',
-                300: '#d8b4fe',
-                400: '#c084fc',
-                500: '#a855f7',
-                600: '#9333ea',
-                700: '#7c3aed',
-                800: '#6b21a8',
-                900: '#581c87',
-                950: '#3b0764',
-              },
-              accent: {
-                50: '#fefce8',
-                100: '#fef9c3',
-                200: '#fef08a',
-                300: '#fde047',
-                400: '#facc15',
-                500: '#eab308',
-                600: '#ca8a04',
-                700: '#a16207',
-                800: '#854d0e',
-                900: '#713f12',
-                950: '#422006',
-              }
-            },
-            fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.5s ease-in-out',
-              'slide-up': 'slideUp 0.3s ease-out',
-              'bounce-in': 'bounceIn 0.6s ease-out',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              },
-              slideUp: {
-                '0%': { transform: 'translateY(10px)', opacity: '0' },
-                '100%': { transform: 'translateY(0)', opacity: '1' },
-              },
-              bounceIn: {
-                '0%': { transform: 'scale(0.3)', opacity: '0' },
-                '50%': { transform: 'scale(1.05)' },
-                '70%': { transform: 'scale(0.9)' },
-                '100%': { transform: 'scale(1)', opacity: '1' },
-              }
-            }
-          }
-        }
-      }
-    </script>
-
+<Layout title={title} description={description}>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-      /* Smooth transitions for all interactive elements */
-      * {
-        transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        transition-duration: 150ms;
-      }
-      
       /* Admin logo styling */
       .admin-logo {
         background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
@@ -167,26 +66,34 @@ const { title, description } = Astro.props;
         box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
       }
     </style>
-  </head>
-  <body class="h-full bg-gray-50">
-    <!-- Main Admin Layout -->
-    <div class="h-full" x-data="{ currentPage: 'dashboard', mobileMenuOpen: false }" x-init="
+    
+  <!-- AdminGuard - Protects admin routes -->
+  <div id="admin-guard" class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-gray-600">Checking admin access...</p>
+    </div>
+  </div>
+  
+  <!-- Main Admin Layout (only shown after AdminGuard approves) -->
+  <div id="admin-layout" class="h-full hidden" x-data="{ currentPage: 'dashboard', mobileMenuOpen: false }" x-init="
       // Initialize currentPage based on current URL
       const path = window.location.pathname;
-      if (path.includes('/admin/orders')) currentPage = 'orders';
-      else if (path.includes('/admin/users')) currentPage = 'users';
-      else if (path.includes('/admin/billing')) currentPage = 'billing';
-      else if (path.includes('/admin/support')) currentPage = 'support';
-      else if (path.includes('/admin/settings')) currentPage = 'settings';
-      else if (path.includes('/admin/profile')) currentPage = 'profile';
-      else if (path.includes('/admin/test')) currentPage = 'test';
-      else currentPage = 'dashboard';
+    if (path.includes('/admin/orders')) { currentPage = 'orders'; }
+    else if (path.includes('/admin/users')) { currentPage = 'users'; }
+    else if (path.includes('/admin/billing')) { currentPage = 'billing'; }
+    else if (path.includes('/admin/support')) { currentPage = 'support'; }
+    else if (path.includes('/admin/data')) { currentPage = 'data'; }
+    else if (path.includes('/admin/settings')) { currentPage = 'settings'; }
+    else if (path.includes('/admin/profile')) { currentPage = 'profile'; }
+    else if (path.includes('/admin/test')) { currentPage = 'test'; }
+    else { currentPage = 'dashboard'; }
       
       console.log('AdminLayout initialized with currentPage:', currentPage);
     ">
       
       <!-- Top Navigation Bar -->
-      <div class="bg-white shadow-sm border-b border-gray-200">
+    <div class="bg-white shadow-sm border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex items-center justify-between h-16">
             <!-- Logo and Brand -->
@@ -202,7 +109,7 @@ const { title, description } = Astro.props;
             <!-- Desktop Navigation -->
             <div class="hidden lg:flex items-center space-x-1">
               <!-- Dashboard -->
-              <a href="/admin" class="nav-item" :class="currentPage === 'dashboard' ? 'nav-active' : ''">
+              <a href="/admin/data" class="nav-item" :class="currentPage === 'dashboard' ? 'nav-active' : ''">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
                 </svg>
@@ -241,6 +148,14 @@ const { title, description } = Astro.props;
                 <span>Support</span>
               </a>
 
+              <!-- All Data -->
+              <a href="/admin/data" class="nav-item" :class="currentPage === 'data' ? 'nav-active' : ''">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <span>All Data</span>
+              </a>
+
               <!-- Back to Site -->
               <a href="/" class="nav-item">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,17 +165,17 @@ const { title, description } = Astro.props;
               </a>
             </div>
 
-            <!-- Mobile Menu Button -->
-            <div class="lg:hidden">
-              <button 
-                @click="mobileMenuOpen = !mobileMenuOpen"
-                class="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-              >
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-              </button>
-            </div>
+                         <!-- Mobile Menu Button -->
+             <div class="lg:hidden">
+               <button 
+              @click="mobileMenuOpen = !mobileMenuOpen"
+                 class="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+               >
+                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                 </svg>
+               </button>
+             </div>
 
             <!-- Profile Dropdown -->
             <div class="flex items-center space-x-4">
@@ -270,9 +185,9 @@ const { title, description } = Astro.props;
                   class="flex items-center space-x-3 p-2 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                 >
                   <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
-                    <span id="admin-avatar" class="text-white font-medium text-sm">A</span>
+                  <span id="admin-avatar" class="text-white font-medium text-sm">A</span>
                   </div>
-                  <span id="admin-name" class="hidden md:block text-gray-700 font-medium">Admin</span>
+                <span id="admin-name" class="hidden md:block text-gray-700 font-medium">Admin</span>
                   <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                   </svg>
@@ -292,25 +207,25 @@ const { title, description } = Astro.props;
                   <a href="/admin/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">Profile</a>
                   <a href="/admin/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">Settings</a>
                   <hr class="my-2 border-gray-200">
-                  <button onclick="handleAdminSignOut()" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200">Sign out</button>
+                <button onclick="handleAdminSignOut()" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200">Sign out</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Mobile Navigation Menu -->
-        <div 
-          x-show="mobileMenuOpen"
-          x-transition:enter="transition ease-out duration-200"
-          x-transition:enter-start="opacity-0 -translate-y-1"
-          x-transition:enter-end="opacity-100 translate-y-0"
-          x-transition:leave="transition ease-in duration-150"
-          x-transition:leave-start="opacity-100 translate-y-0"
-          x-transition:leave-end="opacity-0 -translate-y-1"
-          @click.away="mobileMenuOpen = false"
-          class="lg:hidden bg-white border-t border-gray-200 relative z-40"
-        >
+                 <!-- Mobile Navigation Menu -->
+         <div 
+           x-show="mobileMenuOpen"
+           x-transition:enter="transition ease-out duration-200"
+           x-transition:enter-start="opacity-0 -translate-y-1"
+           x-transition:enter-end="opacity-100 translate-y-0"
+           x-transition:leave="transition ease-in duration-150"
+           x-transition:leave-start="opacity-100 translate-y-0"
+           x-transition:leave-end="opacity-0 -translate-y-1"
+           @click.away="mobileMenuOpen = false"
+           class="lg:hidden bg-white border-t border-gray-200 relative z-40"
+         >
           <div class="px-2 pt-2 pb-3 space-y-1">
             <a href="/admin" class="mobile-nav-item" :class="currentPage === 'dashboard' ? 'mobile-nav-active' : ''">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,6 +258,13 @@ const { title, description } = Astro.props;
               <span>Support</span>
             </a>
             
+            <a href="/admin/data" class="mobile-nav-item">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+              <span>All Data</span>
+            </a>
+            
             <a href="/" class="mobile-nav-item">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -370,29 +292,204 @@ const { title, description } = Astro.props;
     <Toast />
     
     <script>
-      // Simple admin sign out function
-      async function handleAdminSignOut() {
-        try {
-          console.log('Admin signing out...');
-          
-          // Clear all cached data
-          sessionStorage.clear();
-          localStorage.removeItem('supabase-auth-session');
-          
-          // Redirect to home page
-          window.location.href = '/';
-          
-        } catch (error) {
-          console.error('Error during admin sign out:', error);
-          // Force redirect even if logout fails
-          window.location.href = '/';
+    // Supabase configuration
+    const SUPABASE_URL = 'https://lmrrdcaavwwletcjcpqv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ';
+    
+    let supabase = null;
+    
+    // Wait for Supabase to load
+    function waitForSupabase() {
+      return new Promise((resolve) => {
+        if (window.supabase) {
+          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          resolve(supabase);
+        } else {
+          setTimeout(() => waitForSupabase().then(resolve), 100);
         }
+      });
+    }
+    
+    // AdminGuard - Check if user has admin role
+    async function checkAdminAccess() {
+      try {
+        console.log('🔒 AdminGuard: Checking admin access...');
+        
+        // Wait for Supabase to be available
+        if (!supabase) {
+          await waitForSupabase();
+        }
+        
+        // Get current user from Supabase
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError) {
+          console.error('❌ AdminGuard: Error getting user:', userError);
+          showAccessDenied('Authentication error. Please login again.');
+          return;
+        }
+        
+        if (!user) {
+          console.log('❌ AdminGuard: No user logged in');
+          showAccessDenied('Please login to access admin panel');
+          return;
+        }
+        
+        console.log('✅ AdminGuard: User found:', user.email);
+        
+        // Get user profile to check role
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileError) {
+          console.error('❌ AdminGuard: Error getting profile:', profileError);
+          showAccessDenied('Error checking user permissions');
+          return;
+        }
+        
+        if (profile.role !== 'admin') {
+          console.log('❌ AdminGuard: User does not have admin role. Role:', profile.role);
+          showAccessDenied('Access denied. Admin privileges required.');
+          return;
+        }
+        
+        console.log('✅ AdminGuard: Admin access granted for user:', user.email);
+        
+        // Show admin content
+        showAdminContent();
+        
+      } catch (error) {
+        console.error('❌ AdminGuard: Error checking admin access:', error);
+        showAccessDenied('Error checking admin access. Please try again.');
       }
+    }
+    
+    function showAccessDenied(message) {
+      const guardElement = document.getElementById('admin-guard');
+      if (guardElement) {
+        guardElement.innerHTML = `
+          <div class="text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+              <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Access Denied</h3>
+            <p class="text-gray-600 mb-6">${message}</p>
+            <div class="space-x-3">
+              <a href="/login" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                Go to Login
+              </a>
+              <a href="/" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                Back to Home
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    function showAdminContent() {
+      const guardElement = document.getElementById('admin-guard');
+      if (guardElement) {
+        // Hide the guard and show the actual admin content
+        guardElement.style.display = 'none';
+        
+        // Show admin layout
+        const adminLayout = document.getElementById('admin-layout');
+        if (adminLayout) {
+          adminLayout.classList.remove('hidden');
+          
+          // Update admin info in header
+          updateAdminInfo();
+        }
+        
+        // Dispatch event that admin content is ready
+        window.dispatchEvent(new CustomEvent('admin-access-granted'));
+      }
+    }
+    
+    // Update admin info in header
+    async function updateAdminInfo() {
+      try {
+        // Ensure Supabase is available
+        if (!supabase) {
+          await waitForSupabase();
+        }
+        
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // Get user profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', user.id)
+            .single();
+          
+          // Update admin name
+          const adminName = document.getElementById('admin-name');
+          if (adminName) {
+            adminName.textContent = profile?.full_name || user.user_metadata?.full_name || user.email || 'Admin';
+          }
+          
+          // Update admin avatar
+          const adminAvatar = document.getElementById('admin-avatar');
+          if (adminAvatar) {
+            const name = profile?.full_name || user.user_metadata?.full_name || user.email || 'A';
+            adminAvatar.textContent = name.charAt(0).toUpperCase();
+          }
+        }
+      } catch (error) {
+        console.warn('Could not update admin info:', error);
+      }
+    }
+    
+    // Simple admin sign out function
+    async function handleAdminSignOut() {
+      try {
+        console.log('Admin signing out...');
+        
+        // Ensure Supabase is available
+        if (!supabase) {
+          await waitForSupabase();
+        }
+        
+        // Sign out from Supabase
+        await supabase.auth.signOut();
+        
+        // Clear all cached data
+        sessionStorage.clear();
+        localStorage.removeItem('supabase-auth-session');
+        
+        // Redirect to home page
+        window.location.href = '/';
+        
+        } catch (error) {
+        console.error('Error during admin sign out:', error);
+        // Force redirect even if logout fails
+        window.location.href = '/';
+      }
+    }
 
-      // Make function globally available
-      window.handleAdminSignOut = handleAdminSignOut;
-      
-      console.log('AdminLayout loaded successfully');
+    // Make function globally available
+    window.handleAdminSignOut = handleAdminSignOut;
+    
+    // Start checking admin access when page loads
+    document.addEventListener('DOMContentLoaded', checkAdminAccess);
+    
+    // Also check when auth state changes
+    window.addEventListener('auth-state-changed', checkAdminAccess);
+    
+    // Check immediately if already loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkAdminAccess);
+    } else {
+      checkAdminAccess();
+    }
+    
+    console.log('AdminLayout loaded successfully');
     </script>
-  </body>
-</html>
+</Layout>

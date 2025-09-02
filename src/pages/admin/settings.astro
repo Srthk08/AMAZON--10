@@ -1,10 +1,8 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro';
-import AdminGuard from '../../components/AdminGuard.astro';
+import StandaloneAdminLayout from '../../layouts/StandaloneAdminLayout.astro';
 ---
 
-<AdminLayout title="Admin Settings - DevExpress">
-  <AdminGuard>
+<StandaloneAdminLayout title="Admin Settings - DevExpress">
     <div class="space-y-6">
       <!-- Page Header -->
       <div class="mb-8">
@@ -123,17 +121,21 @@ import AdminGuard from '../../components/AdminGuard.astro';
         </button>
       </div>
     </div>
-  </AdminGuard>
-</AdminLayout>
+</StandaloneAdminLayout>
 
 <script>
-  import { adminDataStore } from '../../lib/admin-data';
+  // Supabase configuration
+  const SUPABASE_URL = 'https://lmrrdcaavwwletcjcpqv.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ';
+  
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // Initialize settings page
-  function initializeSettings() {
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('🔄 Loading admin settings...');
     loadCurrentSettings();
     setupEventListeners();
-  }
+  });
 
   // Load current settings from localStorage
   function loadCurrentSettings() {
@@ -147,6 +149,8 @@ import AdminGuard from '../../components/AdminGuard.astro';
       if (settings.emailNotifications !== undefined) document.getElementById('email-notifications').checked = settings.emailNotifications;
       if (settings.orderNotifications !== undefined) document.getElementById('order-notifications').checked = settings.orderNotifications;
       if (settings.ticketNotifications !== undefined) document.getElementById('ticket-notifications').checked = settings.ticketNotifications;
+      
+      console.log('✅ Settings loaded from localStorage');
     } catch (error) {
       console.error('Error loading settings:', error);
     }
@@ -168,6 +172,7 @@ import AdminGuard from '../../components/AdminGuard.astro';
       
       // Show success message
       showToast('Settings saved successfully!', 'success');
+      console.log('✅ Settings saved:', settings);
     } catch (error) {
       console.error('Error saving settings:', error);
       showToast('Error saving settings', 'error');
@@ -190,31 +195,38 @@ import AdminGuard from '../../components/AdminGuard.astro';
   }
 
   // Export data functions
-  function exportData(type) {
+  async function exportData(type) {
     try {
+      console.log(`🔄 Exporting ${type} data...`);
       let data, filename, content;
       
       switch (type) {
         case 'users':
-          data = adminDataStore.getUsers();
+          const { data: usersData } = await supabase.from('user_profiles').select('*');
+          data = usersData || [];
           filename = 'users-export.csv';
-          content = exportToCSV(data, ['ID', 'Email', 'Full Name', 'Role', 'Status', 'Created At']);
+          content = exportToCSV(data, ['id', 'email', 'full_name', 'role', 'status', 'created_at']);
           break;
         case 'orders':
-          data = adminDataStore.getOrders();
+          const { data: cartsData } = await supabase.from('cart_customizations').select('*');
+          data = cartsData || [];
           filename = 'orders-export.csv';
-          content = exportToCSV(data, ['Order ID', 'Customer', 'Service', 'Status', 'Amount', 'Date']);
+          content = exportToCSV(data, ['id', 'user_email', 'project_name', 'app_name', 'total_amount', 'created_at']);
           break;
         case 'revenue':
-          data = adminDataStore.getRevenue();
+          const { data: revenueData } = await supabase.from('cart_customizations').select('*');
+          data = revenueData || [];
           filename = 'revenue-export.csv';
-          content = exportToCSV(data, ['ID', 'Order ID', 'Customer', 'Amount', 'Status', 'Date']);
+          content = exportToCSV(data, ['id', 'user_email', 'project_name', 'total_amount', 'created_at']);
           break;
       }
       
       if (content) {
         downloadCSV(content, filename);
         showToast(`${type} exported successfully!`, 'success');
+        console.log(`✅ ${type} exported successfully`);
+      } else {
+        showToast(`No ${type} data to export`, 'warning');
       }
     } catch (error) {
       console.error(`Error exporting ${type}:`, error);
@@ -230,8 +242,7 @@ import AdminGuard from '../../components/AdminGuard.astro';
     
     data.forEach(item => {
       const values = headers.map(header => {
-        const key = header.toLowerCase().replace(/\s+/g, '');
-        return item[key] || item[header] || '';
+        return item[header] || '';
       });
       csvRows.push(values);
     });
@@ -254,13 +265,15 @@ import AdminGuard from '../../components/AdminGuard.astro';
 
   // Reset to mock data
   function resetToMockData() {
-    if (confirm('Are you sure you want to reset all data to mock data? This action cannot be undone.')) {
+    if (confirm('Are you sure you want to clear all cached data? This will not affect the database but will clear local storage.')) {
       try {
-        adminDataStore.resetToMockData();
-        showToast('Data reset to mock data successfully!', 'success');
+        // Clear all localStorage data
+        localStorage.clear();
+        showToast('Local data cleared successfully!', 'success');
+        console.log('✅ Local data cleared');
       } catch (error) {
-        console.error('Error resetting data:', error);
-        showToast('Error resetting data', 'error');
+        console.error('Error clearing data:', error);
+        showToast('Error clearing data', 'error');
       }
     }
   }
@@ -279,6 +292,7 @@ import AdminGuard from '../../components/AdminGuard.astro';
       
       keysToRemove.forEach(key => localStorage.removeItem(key));
       showToast('Cache cleared successfully!', 'success');
+      console.log('✅ Cache cleared');
     } catch (error) {
       console.error('Error clearing cache:', error);
       showToast('Error clearing cache', 'error');
@@ -291,7 +305,8 @@ import AdminGuard from '../../components/AdminGuard.astro';
     const toast = document.createElement('div');
     toast.className = `fixed top-4 right-4 px-6 py-3 rounded-md text-white z-50 ${
       type === 'success' ? 'bg-green-600' : 
-      type === 'error' ? 'bg-red-600' : 'bg-blue-600'
+      type === 'error' ? 'bg-red-600' : 
+      type === 'warning' ? 'bg-yellow-600' : 'bg-blue-600'
     }`;
     toast.textContent = message;
     
@@ -301,7 +316,4 @@ import AdminGuard from '../../components/AdminGuard.astro';
       toast.remove();
     }, 3000);
   }
-
-  // Initialize when DOM loads
-  document.addEventListener('DOMContentLoaded', initializeSettings);
 </script>

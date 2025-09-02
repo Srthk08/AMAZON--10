@@ -280,7 +280,7 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  import { simpleAuth } from '../lib/simple-auth';
+  import { supabase } from '../lib/supabase';
 
   const form = document.getElementById('contact-form') as HTMLFormElement;
   const successMessage = document.getElementById('success-message');
@@ -288,25 +288,38 @@ import Layout from '../layouts/Layout.astro';
   const errorText = document.getElementById('error-text');
 
   // Pre-fill form if user is logged in
-  function prefillForm() {
-    const currentUser = simpleAuth.getCurrentUser();
-    if (currentUser) {
-      const firstNameInput = document.getElementById('first_name') as HTMLInputElement;
-      const lastNameInput = document.getElementById('last_name') as HTMLInputElement;
-      const emailInput = document.getElementById('email') as HTMLInputElement;
-      const phoneInput = document.getElementById('phone') as HTMLInputElement;
-      const companyInput = document.getElementById('company') as HTMLInputElement;
+  async function prefillForm() {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Get user profile from profiles table
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
 
-      if (firstNameInput && currentUser.fullName) {
-        const names = currentUser.fullName.split(' ');
-        firstNameInput.value = names[0] || '';
-        if (lastNameInput && names.length > 1) {
-          lastNameInput.value = names.slice(1).join(' ');
+        if (profile) {
+          const firstNameInput = document.getElementById('first_name') as HTMLInputElement;
+          const lastNameInput = document.getElementById('last_name') as HTMLInputElement;
+          const emailInput = document.getElementById('email') as HTMLInputElement;
+          const phoneInput = document.getElementById('phone') as HTMLInputElement;
+          const companyInput = document.getElementById('company') as HTMLInputElement;
+
+          if (firstNameInput && profile.full_name) {
+            const names = profile.full_name.split(' ');
+            firstNameInput.value = names[0] || '';
+            if (lastNameInput && names.length > 1) {
+              lastNameInput.value = names.slice(1).join(' ');
+            }
+          }
+          if (emailInput) emailInput.value = user.email || '';
+          if (phoneInput) phoneInput.value = profile.phone || '';
+          if (companyInput) companyInput.value = profile.company_name || '';
         }
       }
-      if (emailInput) emailInput.value = currentUser.email || '';
-      if (phoneInput) phoneInput.value = currentUser.phone || '';
-      if (companyInput) companyInput.value = currentUser.companyName || '';
+    } catch (error) {
+      console.error('Error pre-filling form:', error);
     }
   }
 
@@ -333,24 +346,42 @@ import Layout from '../layouts/Layout.astro';
       const formData = new FormData(form);
       const data = Object.fromEntries(formData);
       
-      // Add user ID if logged in
-      const currentUser = simpleAuth.getCurrentUser();
-      if (currentUser) {
-        data.userId = currentUser.id;
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+             // Prepare data for Supabase
+       const contactData = {
+         user_id: user?.id || null,
+         first_name: data.first_name as string,
+         last_name: data.last_name as string,
+         email: data.email as string,
+         phone: data.phone as string || null,
+         company_name: data.company as string || null,
+         project_type: data.project_type as string,
+         message: data.message as string
+       };
+       
+       console.log('📝 Sending contact data:', contactData);
+       
+       // Save to Supabase
+       const { data: savedMessage, error } = await supabase
+         .from('contact_submissions')
+         .insert([contactData])
+         .select();
+      
+      if (error) {
+        console.error('❌ Error saving contact message:', error);
+        throw new Error('Failed to save your message. Please try again.');
       }
       
-      // Add timestamp
-      data.createdAt = new Date().toISOString();
-      
-      // Save to Supabase (or localStorage for now)
-      await saveContactMessage(data);
+      console.log('✅ Contact message saved successfully:', savedMessage);
       
       // Show success message
       successMessage?.classList.remove('hidden');
       form.reset();
       
       // Re-prefill form if user is logged in
-      prefillForm();
+      await prefillForm();
       
     } catch (error: any) {
       console.error('Contact form error:', error);
@@ -366,29 +397,6 @@ import Layout from '../layouts/Layout.astro';
       submitButton.innerHTML = originalText;
     }
   });
-
-  // Save contact message to Supabase
-  async function saveContactMessage(data: any) {
-    try {
-      // In a real implementation, this would save to Supabase
-      // For now, we'll save to localStorage
-      const messages = JSON.parse(localStorage.getItem('contact-messages') || '[]');
-      messages.push({
-        id: Date.now().toString(),
-        ...data
-      });
-      localStorage.setItem('contact-messages', JSON.stringify(messages));
-      
-      console.log('Contact message saved:', data);
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-    } catch (error) {
-      console.error('Error saving contact message:', error);
-      throw new Error('Failed to save your message. Please try again.');
-    }
-  }
 
   // Pre-fill form when page loads
   document.addEventListener('DOMContentLoaded', prefillForm);

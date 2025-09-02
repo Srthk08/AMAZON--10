@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS contact_submissions (
   message text NOT NULL,
   status text DEFAULT 'new' CHECK (status IN ('new', 'in_progress', 'responded', 'closed')),
   priority text DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
-  assigned_to uuid REFERENCES user_profiles(id),
+  assigned_to uuid REFERENCES profiles(id),
   response text,
   responded_at timestamptz,
   ip_address inet,
@@ -240,10 +240,10 @@ CREATE POLICY "Users can manage own preferences" ON user_preferences FOR ALL TO 
 -- RLS Policies for contact_submissions
 CREATE POLICY "Anyone can submit contact forms" ON contact_submissions FOR INSERT TO anon WITH CHECK (true);
 CREATE POLICY "Admins can view all submissions" ON contact_submissions FOR SELECT TO authenticated USING (
-  EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role IN ('admin', 'moderator'))
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'moderator'))
 );
 CREATE POLICY "Admins can update submissions" ON contact_submissions FOR UPDATE TO authenticated USING (
-  EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role IN ('admin', 'moderator'))
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'moderator'))
 );
 
 -- Enhanced Functions for authentication and user management

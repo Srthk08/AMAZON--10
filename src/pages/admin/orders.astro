@@ -1,10 +1,8 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import AdminGuard from '../../components/AdminGuard.astro';
 ---
 
 <AdminLayout title="Orders Management - DevExpress">
-  <AdminGuard>
     <div class="space-y-6">
       <!-- Page Header -->
       <div class="mb-8">
@@ -91,7 +89,9 @@ import AdminGuard from '../../components/AdminGuard.astro';
               </tr>
             </thead>
             <tbody id="orders-tbody" class="bg-white divide-y divide-gray-200">
-              <!-- Orders will be populated here -->
+              <tr>
+                <td colspan="7" class="px-6 py-4 text-center text-gray-500">Loading orders...</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -122,14 +122,13 @@ import AdminGuard from '../../components/AdminGuard.astro';
         </div>
       </div>
     </div>
-  </AdminGuard>
 </AdminLayout>
 
 <script>
-  import { adminDataStore } from '../../lib/admin-data';
+  import { supabase } from '../../lib/supabase';
 
-  let currentOrders: any[] = [];
-  let filteredOrders: any[] = [];
+  let currentOrders = [];
+  let filteredOrders = [];
 
   // Initialize orders page
   function initializeOrdersPage() {
@@ -138,16 +137,27 @@ import AdminGuard from '../../components/AdminGuard.astro';
   }
 
   // Load all orders
-  function loadOrders() {
+  async function loadOrders() {
     try {
-      currentOrders = adminDataStore.getOrders();
+      console.log('Loading orders from Supabase...');
+      
+      const { data: orders, error } = await supabase
+        .from('cart_customizations')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading orders:', error);
+        return;
+      }
+
+      currentOrders = orders || [];
       filteredOrders = [...currentOrders];
       renderOrders();
       updateOrdersCount();
       
       // Debug logging
-      console.log('Orders loaded from adminDataStore:', currentOrders);
-      console.log('Orders from sharedDataStore:', adminDataStore.getOrders());
+      console.log('Orders loaded from Supabase:', currentOrders);
     } catch (error) {
       console.error('Error loading orders:', error);
     }

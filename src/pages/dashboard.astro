@@ -149,7 +149,7 @@ import AuthGuard from '../components/AuthGuard.astro';
 
 <script>
   console.log('Dashboard loaded - using global auth manager');
-  
+
   // Function to update user info using the global auth manager
   function updateUserInfo() {
     console.log('Updating user info using global auth manager');
@@ -160,7 +160,7 @@ import AuthGuard from '../components/AuthGuard.astro';
       setTimeout(updateUserInfo, 100);
       return;
     }
-
+    
     // Update dashboard using the global auth manager
     authManager.updateDashboard();
     
@@ -173,7 +173,7 @@ import AuthGuard from '../components/AuthGuard.astro';
     
     // Wait for global auth manager to be ready
     setTimeout(() => {
-      updateUserInfo();
+    updateUserInfo();
     }, 200);
   });
   
@@ -182,7 +182,7 @@ import AuthGuard from '../components/AuthGuard.astro';
     console.log('User logged in event received in dashboard');
     updateUserInfo();
   });
-
+  
   window.addEventListener('user-logged-out', () => {
     console.log('User logged out event received in dashboard');
     updateUserInfo();
@@ -206,10 +206,10 @@ import AuthGuard from '../components/AuthGuard.astro';
     console.log('Refresh data button clicked - updating display');
     updateUserInfo();
     
-    if (typeof window.showToast === 'function') {
-      window.showToast('Data refreshed successfully!', 'success');
-    } else {
-      alert('Data refreshed successfully!');
+      if (typeof window.showToast === 'function') {
+        window.showToast('Data refreshed successfully!', 'success');
+      } else {
+        alert('Data refreshed successfully!');
     }
   });
   

@@ -13,61 +13,42 @@ import AuthGuard from '../components/AuthGuard.astro';
           <p class="text-xl text-gray-600">Get help with your orders, technical issues, or general questions</p>
         </div>
 
-                          <!-- Notifications Banner -->
-         <div id="notifications-banner" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-           <div class="flex items-center justify-between">
-             <div class="flex items-center">
-               <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-               </svg>
-               <span class="text-blue-800 font-medium">You have new updates on your support tickets!</span>
-             </div>
-             <button onclick="openNotificationsModal()" class="text-blue-600 hover:text-blue-800 font-medium">
-               View All
-             </button>
-           </div>
-         </div>
-
-         <!-- Support Options -->
-          <div class="flex justify-center mb-12">
-            <!-- Create Support Ticket -->
-            <div class="bg-white rounded-xl shadow-lg p-8 max-w-md">
-              <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <h3 class="text-xl font-semibold text-gray-900 mb-4 text-center">Create Support Ticket</h3>
-              <p class="text-gray-600 mb-6 text-center">Submit a new support ticket for technical issues, billing questions, or feature requests</p>
-              <button 
-                onclick="openTicketModal()"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
-              >
-                Create Ticket
-              </button>
+        <!-- Support Options -->
+        <div class="flex justify-center mb-12">
+          <!-- Create Support Ticket -->
+          <div class="bg-white rounded-xl shadow-lg p-8 max-w-md">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
             </div>
-            
-            <!-- View My Tickets -->
-            <div class="bg-white rounded-xl shadow-lg p-8 max-w-md ml-8">
-              <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 relative">
-                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <!-- Notification Badge -->
-                <div id="ticket-notification-badge" class="hidden absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                  0
-                </div>
-              </div>
-              <h3 class="text-xl font-semibold text-gray-900 mb-4 text-center">View My Tickets</h3>
-              <p class="text-gray-600 mb-6 text-center">Check the status of your support tickets and view admin replies</p>
-              <button 
-                onclick="openMyTicketsModal()"
-                class="w-full bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
-              >
-                View Tickets
-              </button>
-            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4 text-center">Create Support Ticket</h3>
+            <p class="text-gray-600 mb-6 text-center">Submit a new support ticket for technical issues, billing questions, or feature requests</p>
+            <button 
+              onclick="openTicketModal()"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              Create Ticket
+            </button>
           </div>
+          
+          <!-- View My Tickets -->
+          <div class="bg-white rounded-xl shadow-lg p-8 max-w-md ml-8">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4 text-center">View My Tickets</h3>
+            <p class="text-gray-600 mb-6 text-center">Check the status of your support tickets and view admin replies</p>
+            <button 
+              onclick="openMyTicketsModal()"
+              class="w-full bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              View Tickets
+            </button>
+          </div>
+        </div>
 
         <!-- FAQ Section -->
         <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
@@ -132,67 +113,36 @@ import AuthGuard from '../components/AuthGuard.astro';
       </div>
     </div>
 
-         <!-- Notifications Modal -->
-     <div id="notificationsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
-       <div class="flex items-center justify-center min-h-screen p-4">
-         <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-           <div class="flex items-center justify-between p-6 border-b border-gray-200">
-             <h3 class="text-xl font-semibold text-gray-900">Support Ticket Notifications</h3>
-             <button onclick="closeNotificationsModal()" class="text-gray-400 hover:text-gray-600">
-               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-               </svg>
-             </button>
-           </div>
-           
-           <div class="p-6">
-             <div id="notifications-list" class="space-y-4">
-               <!-- Notifications will be loaded here -->
-             </div>
-             
-             <div id="no-notifications" class="hidden text-center py-8">
-               <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                 </svg>
-               </div>
-               <p class="text-gray-500">No notifications found</p>
-             </div>
-           </div>
-         </div>
-       </div>
-     </div>
-
-     <!-- My Tickets Modal -->
-     <div id="myTicketsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
-       <div class="flex items-center justify-center min-h-screen p-4">
-         <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-           <div class="flex items-center justify-between p-6 border-b border-gray-200">
-             <h3 class="text-xl font-semibold text-gray-900">My Support Tickets</h3>
-             <button onclick="closeMyTicketsModal()" class="text-gray-400 hover:text-gray-600">
-               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-               </svg>
-             </button>
-           </div>
-           
-           <div class="p-6">
-             <div id="my-tickets-list" class="space-y-4">
-               <!-- Tickets will be loaded here -->
-             </div>
-             
-             <div id="no-tickets" class="hidden text-center py-8">
-               <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                 </svg>
-               </div>
-               <p class="text-gray-500">No support tickets found</p>
-             </div>
-           </div>
-         </div>
-       </div>
-     </div>
+    <!-- My Tickets Modal -->
+    <div id="myTicketsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between p-6 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-900">My Support Tickets</h3>
+            <button onclick="closeMyTicketsModal()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="p-6">
+            <div id="my-tickets-list" class="space-y-4">
+              <!-- Tickets will be loaded here -->
+            </div>
+            
+            <div id="no-tickets" class="hidden text-center py-8">
+              <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <p class="text-gray-500">No support tickets found</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Support Ticket Modal -->
     <div id="ticketModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
@@ -218,6 +168,17 @@ import AuthGuard from '../components/AuthGuard.astro';
                 required
                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Brief description of your issue"
+              >
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+              <input 
+                type="email" 
+                id="ticketEmail" 
+                required
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="your.email@example.com"
               >
             </div>
 
@@ -272,6 +233,7 @@ import AuthGuard from '../components/AuthGuard.astro';
               </button>
               <button 
                 type="submit"
+                id="submitTicketBtn"
                 class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Submit Ticket
@@ -281,28 +243,37 @@ import AuthGuard from '../components/AuthGuard.astro';
         </div>
       </div>
     </div>
-
-    
   </AuthGuard>
 </Layout>
 
 <script>
-  import { sharedDataStore } from '../lib/shared-data-store';
+  import { supabase } from '../lib/supabase';
 
   // Modal functions
   function openTicketModal() {
-    console.log('Opening ticket modal...');
     const modal = document.getElementById('ticketModal');
     if (modal) {
       modal.classList.remove('hidden');
-      console.log('Ticket modal opened successfully');
-    } else {
-      console.error('Ticket modal element not found');
+      prefillTicketForm();
+    }
+  }
+
+  // Pre-fill ticket form with user data
+  async function prefillTicketForm() {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const emailInput = document.getElementById('ticketEmail');
+        if (emailInput) {
+          emailInput.value = user.email || '';
+        }
+      }
+    } catch (error) {
+      console.error('Error pre-filling form:', error);
     }
   }
 
   function closeTicketModal() {
-    console.log('Closing ticket modal...');
     const modal = document.getElementById('ticketModal');
     const form = document.getElementById('ticketForm');
     if (modal) {
@@ -310,49 +281,48 @@ import AuthGuard from '../components/AuthGuard.astro';
       if (form) {
         form.reset();
       }
-      console.log('Ticket modal closed successfully');
-    } else {
-      console.error('Ticket modal element not found');
     }
   }
 
   // My Tickets Modal functions
-  function openMyTicketsModal() {
-    console.log('Opening my tickets modal...');
+  async function openMyTicketsModal() {
     const modal = document.getElementById('myTicketsModal');
     if (modal) {
       modal.classList.remove('hidden');
-      loadMyTickets();
-      console.log('My tickets modal opened successfully');
-    } else {
-      console.error('My tickets modal element not found');
+      await loadMyTickets();
     }
   }
 
   function closeMyTicketsModal() {
-    console.log('Closing my tickets modal...');
     const modal = document.getElementById('myTicketsModal');
     if (modal) {
       modal.classList.add('hidden');
-      console.log('My tickets modal closed successfully');
-    } else {
-      console.error('My tickets modal element not found');
     }
   }
 
-  function loadMyTickets() {
-    const currentUser = JSON.parse(localStorage.getItem('simple-auth-user') || '{}');
-    if (!currentUser.email) {
-      alert('Please login to view your tickets');
-      return;
-    }
-
+  async function loadMyTickets() {
     try {
-      const myTickets = sharedDataStore.getTicketsByUser(currentUser.email);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('Please login to view your tickets');
+        return;
+      }
+
+      const { data: tickets, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        alert('Error loading tickets: ' + error.message);
+        return;
+      }
+
       const ticketsList = document.getElementById('my-tickets-list');
       const noTickets = document.getElementById('no-tickets');
 
-      if (myTickets.length === 0) {
+      if (!tickets || tickets.length === 0) {
         ticketsList.classList.add('hidden');
         noTickets.classList.remove('hidden');
         return;
@@ -361,43 +331,30 @@ import AuthGuard from '../components/AuthGuard.astro';
       noTickets.classList.add('hidden');
       ticketsList.classList.remove('hidden');
 
-      ticketsList.innerHTML = myTickets.map(ticket => `
-        <div class="border border-gray-200 rounded-lg p-4">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center space-x-3">
-              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(ticket.priority)}">
-                ${ticket.priority}
-              </span>
-              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(ticket.status)}">
-                ${ticket.status.replace('_', ' ')}
-              </span>
+      ticketsList.innerHTML = tickets.map(ticket => {
+        return `
+          <div class="border border-gray-200 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-3">
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(ticket.priority)}">
+                  ${ticket.priority}
+                </span>
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(ticket.status)}">
+                  ${ticket.status.replace('_', ' ')}
+                </span>
+              </div>
+              <span class="text-sm text-gray-500">${new Date(ticket.created_at).toLocaleDateString()}</span>
             </div>
-            <span class="text-sm text-gray-500">${new Date(ticket.createdAt).toLocaleDateString()}</span>
+            
+            <h4 class="font-semibold text-gray-900 mb-2">${ticket.subject}</h4>
+            <p class="text-gray-600 text-sm mb-2">${ticket.description}</p>
+            <p class="text-gray-500 text-xs mb-3">Email: ${ticket.user_email || 'Not provided'}</p>
+            <p class="text-gray-400 text-xs mb-3">Ticket #: ${ticket.ticket_number}</p>
           </div>
-          
-          <h4 class="font-semibold text-gray-900 mb-2">${ticket.subject}</h4>
-          <p class="text-gray-600 text-sm mb-3">${ticket.description}</p>
-          
-          ${ticket.adminReplies && ticket.adminReplies.length > 0 ? `
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
-              <h5 class="font-medium text-blue-800 mb-2">Admin Reply:</h5>
-              ${ticket.adminReplies.map(reply => `
-                <div class="mb-2">
-                  <p class="text-blue-700 text-sm">${reply.message}</p>
-                  <p class="text-blue-600 text-xs">${new Date(reply.timestamp).toLocaleString()}</p>
-                </div>
-              `).join('')}
-            </div>
-          ` : `
-            <div class="bg-gray-50 p-3 rounded">
-              <p class="text-gray-600 text-sm">No admin reply yet. We'll respond within 2-4 hours.</p>
-            </div>
-          `}
-        </div>
-      `).join('');
+        `;
+      }).join('');
     } catch (error) {
-      console.error('Error loading tickets:', error);
-      alert('Error loading tickets. Please try again.');
+      alert('Error loading tickets: ' + error.message);
     }
   }
 
@@ -421,216 +378,128 @@ import AuthGuard from '../components/AuthGuard.astro';
     return colors[status] || 'bg-gray-100 text-gray-800';
   }
 
-  
-
-  
-
-  // Handle ticket form submission
-  document.getElementById('ticketForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    console.log('Ticket form submitted...');
+  // Set up form event listeners
+  function setupFormEventListeners() {
+    const ticketForm = document.getElementById('ticketForm');
+    const submitButton = document.getElementById('submitTicketBtn');
     
-    const currentUser = JSON.parse(localStorage.getItem('simple-auth-user') || '{}');
-    if (!currentUser.email) {
-      alert('Please login to create a support ticket');
-      return;
-    }
-
-    const ticketData = {
-      userId: currentUser.email,
-      customerName: currentUser.fullName || 'User',
-      customerEmail: currentUser.email,
-      subject: document.getElementById('ticketSubject').value,
-      description: document.getElementById('ticketDescription').value,
-      priority: document.getElementById('ticketPriority').value,
-      category: document.getElementById('ticketCategory').value,
-      status: 'open'
-    };
-
-    console.log('Creating ticket with data:', ticketData);
-
-    try {
-      const ticket = sharedDataStore.createSupportTicket(ticketData);
-      console.log('Ticket created successfully:', ticket);
-      
-      // Verify ticket was saved
-      const allTickets = sharedDataStore.getSupportTickets();
-      console.log('All tickets in shared store:', allTickets);
-      
-      alert(`Support ticket created successfully! Ticket #${ticket.ticketNumber}`);
-      closeTicketModal();
-      
-      // Refresh the page to show the new ticket
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-    } catch (error) {
-      console.error('Error creating ticket:', error);
-      alert('Error creating support ticket. Please try again.');
-    }
-  });
-
-
-
-  // Close modals when clicking outside
-  document.getElementById('ticketModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeTicketModal();
-    }
-  });
-
-  
-
-  // Notifications Modal functions
-  function openNotificationsModal() {
-    console.log('Opening notifications modal...');
-    const modal = document.getElementById('notificationsModal');
-    if (modal) {
-      modal.classList.remove('hidden');
-      loadNotifications();
-      console.log('Notifications modal opened successfully');
-    } else {
-      console.error('Notifications modal element not found');
-    }
-  }
-
-  function closeNotificationsModal() {
-    console.log('Closing notifications modal...');
-    const modal = document.getElementById('notificationsModal');
-    if (modal) {
-      modal.classList.add('hidden');
-      console.log('Notifications modal closed successfully');
-    } else {
-      console.error('Notifications modal element not found');
-    }
-  }
-
-  function loadNotifications() {
-    const currentUser = JSON.parse(localStorage.getItem('simple-auth-user') || '{}');
-    if (!currentUser.email) {
-      alert('Please login to view notifications');
-      return;
-    }
-
-    try {
-      const notifications = sharedDataStore.getUserNotifications(currentUser.email);
-      const notificationsList = document.getElementById('notifications-list');
-      const noNotifications = document.getElementById('no-notifications');
-
-      if (notifications.length === 0) {
-        notificationsList.classList.add('hidden');
-        noNotifications.classList.remove('hidden');
-        return;
-      }
-
-      noNotifications.classList.add('hidden');
-      notificationsList.classList.remove('hidden');
-
-      notificationsList.innerHTML = notifications.map(notification => `
-        <div class="border border-gray-200 rounded-lg p-4 ${notification.read ? 'bg-gray-50' : 'bg-blue-50'}">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center space-x-3">
-              ${!notification.read ? '<div class="w-2 h-2 bg-blue-500 rounded-full"></div>' : ''}
-              <span class="text-sm text-gray-500">${new Date(notification.timestamp).toLocaleString()}</span>
-            </div>
-            <span class="text-xs text-gray-400">Ticket #${notification.ticketId}</span>
-          </div>
-          
-          <h4 class="font-semibold text-gray-900 mb-2">${notification.subject}</h4>
-          <div class="text-gray-700 text-sm whitespace-pre-line">${notification.message}</div>
-          
-          <div class="mt-3 flex justify-end">
-            <button 
-              onclick="markNotificationAsRead('${notification.timestamp}')"
-              class="text-sm text-blue-600 hover:text-blue-800"
-            >
-              ${notification.read ? 'Marked as Read' : 'Mark as Read'}
-            </button>
-          </div>
-        </div>
-      `).join('');
-    } catch (error) {
-      console.error('Error loading notifications:', error);
-      alert('Error loading notifications. Please try again.');
-    }
-  }
-
-  function markNotificationAsRead(notificationId) {
-    try {
-      sharedDataStore.markNotificationAsRead(notificationId);
-      loadNotifications();
-      updateNotificationBadge();
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-    }
-  }
-
-  // Update notification badge
-  function updateNotificationBadge() {
-    const currentUser = JSON.parse(localStorage.getItem('simple-auth-user') || '{}');
-    if (!currentUser.email) return;
-
-    try {
-      const notifications = sharedDataStore.getUserNotifications(currentUser.email);
-      const unreadCount = notifications.filter(n => !n.read).length;
-      const badge = document.getElementById('ticket-notification-badge');
-      const banner = document.getElementById('notifications-banner');
-
-      if (badge) {
-        if (unreadCount > 0) {
-          badge.classList.remove('hidden');
-          badge.textContent = unreadCount > 9 ? '9+' : unreadCount.toString();
-        } else {
-          badge.classList.add('hidden');
+    if (ticketForm && submitButton) {
+      ticketForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const subject = document.getElementById('ticketSubject').value;
+        const email = document.getElementById('ticketEmail').value;
+        const category = document.getElementById('ticketCategory').value;
+        const priority = document.getElementById('ticketPriority').value;
+        const description = document.getElementById('ticketDescription').value;
+        
+        // Validate form
+        if (!subject || !email || !category || !priority || !description) {
+          alert('Please fill in all required fields');
+          return;
         }
-      }
-
-      if (banner) {
-        if (unreadCount > 0) {
-          banner.classList.remove('hidden');
-        } else {
-          banner.classList.add('hidden');
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          alert('Please enter a valid email address');
+          return;
         }
-      }
-    } catch (error) {
-      console.error('Error updating notification badge:', error);
+        
+        // Show loading state
+        const originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = 'Creating Ticket...';
+        
+        try {
+          // Get current user
+          const { data: { user }, error: authError } = await supabase.auth.getUser();
+          
+          if (authError || !user) {
+            alert('Please login to create a support ticket');
+            return;
+          }
+          
+          // Prepare ticket data
+          const ticketData = {
+            user_id: user.id,
+            user_email: email,
+            subject: subject,
+            description: description,
+            priority: priority,
+            category: category,
+            status: 'open'
+          };
+          
+          // Create ticket
+          const { data: ticket, error } = await supabase
+            .from('support_tickets')
+            .insert([ticketData])
+            .select()
+            .single();
+          
+          if (error) {
+            alert('Error creating ticket: ' + error.message);
+            return;
+          }
+          
+          alert(`Ticket created successfully! Ticket #${ticket.ticket_number}`);
+          
+          // Close modal and show success
+          closeTicketModal();
+          showSuccessMessage(`Ticket #${ticket.ticket_number} created successfully!`);
+          
+        } catch (error) {
+          alert('An unexpected error occurred. Please try again.\n\nError: ' + error.message);
+        } finally {
+          // Always reset button
+          submitButton.disabled = false;
+          submitButton.textContent = originalText;
+        }
+      });
     }
-  }
-
-  // Real-time updates - check for new notifications every 30 seconds
-  function startRealTimeUpdates() {
-    setInterval(() => {
-      updateNotificationBadge();
-    }, 30000); // Check every 30 seconds
-  }
-
-  // Request browser notification permission
-  function requestNotificationPermission() {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          console.log('Browser notifications enabled');
+    
+    // Close modal when clicking outside
+    const ticketModal = document.getElementById('ticketModal');
+    if (ticketModal) {
+      ticketModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeTicketModal();
         }
       });
     }
   }
 
-  // Initialize page
-  function initializeSupportPage() {
-    requestNotificationPermission();
-    updateNotificationBadge();
-    startRealTimeUpdates();
+  // Show success message on page
+  function showSuccessMessage(message) {
+    const successDiv = document.createElement('div');
+    successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50';
+    successDiv.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    document.body.appendChild(successDiv);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      if (successDiv.parentNode) {
+        successDiv.parentNode.removeChild(successDiv);
+      }
+    }, 3000);
   }
 
-     // Make functions globally available for onclick handlers
-   (window as any).openTicketModal = openTicketModal;
-   (window as any).closeTicketModal = closeTicketModal;
-   (window as any).openMyTicketsModal = openMyTicketsModal;
-   (window as any).closeMyTicketsModal = closeMyTicketsModal;
-   (window as any).openNotificationsModal = openNotificationsModal;
-   (window as any).closeNotificationsModal = closeNotificationsModal;
-   (window as any).markNotificationAsRead = markNotificationAsRead;
+  // Make functions globally available for onclick handlers
+  (window as any).openTicketModal = openTicketModal;
+  (window as any).closeTicketModal = closeTicketModal;
+  (window as any).openMyTicketsModal = openMyTicketsModal;
+  (window as any).closeMyTicketsModal = closeMyTicketsModal;
 
-   // Initialize page when DOM loads
-   document.addEventListener('DOMContentLoaded', initializeSupportPage);
+  // Initialize page when DOM loads
+  document.addEventListener('DOMContentLoaded', setupFormEventListeners);
 </script>

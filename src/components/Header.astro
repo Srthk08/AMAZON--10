@@ -106,7 +106,7 @@
             </a>
             <!-- Admin Panel Link - Only visible for admin users -->
             <div id="admin-panel-link" class="hidden">
-              <a href="/admin" class="flex items-center px-6 py-4 text-base text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-all duration-200">
+              <a href="/admin/data" class="flex items-center px-6 py-4 text-base text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-all duration-200">
                 <svg class="w-6 h-6 mr-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
@@ -221,7 +221,7 @@
             </a>
             <!-- Admin Panel Link - Only visible for admin users -->
             <div id="mobile-admin-panel-link" class="hidden">
-              <a href="/admin" class="flex items-center px-6 py-4 text-lg font-medium text-white text-opacity-90 hover:text-white hover:bg-white hover:bg-opacity-20 rounded-xl transition-all duration-300">
+              <a href="/admin/data" class="flex items-center px-6 py-4 text-lg font-medium text-white text-opacity-90 hover:text-white hover:bg-white hover:bg-opacity-20 rounded-xl transition-all duration-300">
                 <svg class="w-6 h-6 mr-4 text-white text-opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
@@ -261,9 +261,9 @@
       if (!authManager) {
         console.log('Global auth manager not available yet');
         return;
-      }
+    }
 
-      // Update UI based on authentication state
+    // Update UI based on authentication state
       authManager.updateHeader();
       
       console.log('✅ Header updated using global auth manager');
@@ -348,7 +348,7 @@
       if (authManager) {
         authManager.logout();
       } else {
-        window.location.href = '/';
+      window.location.href = '/';
       }
     } catch (error) {
       console.error('Sign out error:', error);
@@ -428,7 +428,7 @@
     
     // Set initial UI state using global auth manager
     setInitialUIState();
-    
+
     // Initialize UI components
     initUserDropdown();
     initMobileMenu();
@@ -439,7 +439,7 @@
   // Listen for auth state changes from the global auth manager
   window.addEventListener('user-logged-in', () => {
     console.log('User logged in event received in header');
-    updateHeader();
+      updateHeader();
   });
 
   window.addEventListener('user-logged-out', () => {

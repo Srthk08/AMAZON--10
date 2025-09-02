@@ -4,8 +4,48 @@ import AuthGuard from '../components/AuthGuard.astro';
 import { sharedDataStore } from '../lib/shared-data-store';
 ---
 
+<style>
+  /* Product type badge styles */
+  .product-type-badge {
+    transition: all 0.3s ease;
+  }
+  
+  .product-type-badge:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Ensure proper spacing for buttons */
+  .cart-actions button {
+    min-width: 120px;
+  }
+  
+  /* Ensure cuisine type field is properly hidden for non-restaurant products */
+  #restaurant-cuisine-fields.hidden {
+    display: none !important;
+  }
+  
+  /* Button sizing for different screen sizes */
+  @media (min-width: 640px) {
+    .sm\:w-48 {
+      width: 12rem; /* 192px */
+    }
+  }
+  
+  /* Ensure buttons have proper padding on laptop screens */
+  @media (min-width: 1024px) {
+    .lg\:py-3 {
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+    .lg\:px-6 {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+</style>
+
 <Layout title="Shopping Cart">
-  <AuthGuard>
+
   <div class="min-h-screen bg-gray-50 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Page Header -->
@@ -14,8 +54,9 @@ import { sharedDataStore } from '../lib/shared-data-store';
         <p class="text-xl text-gray-600">Customize your project and proceed to checkout</p>
       </div>
 
-        <!-- Cart Content - Now always visible since AuthGuard handles authentication -->
+                <!-- Cart Content - Now always visible since AuthGuard handles authentication -->
         <div id="cart-content">
+      
         <!-- Empty Cart Message -->
         <div id="empty-cart" class="text-center py-16">
           <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -42,6 +83,16 @@ import { sharedDataStore } from '../lib/shared-data-store';
                     <h3 class="text-2xl font-bold text-gray-900 product-name mb-2">Product Name</h3>
                     <p class="text-gray-600 product-description text-lg mb-4">Product description</p>
                     <p class="text-3xl font-bold text-primary-600 product-price">₹0</p>
+                    
+                    <!-- Product Type Badge -->
+                    <div class="mt-4">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium product-type-badge bg-blue-100 text-blue-800">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="product-type-text">Product Type</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -53,6 +104,13 @@ import { sharedDataStore } from '../lib/shared-data-store';
                   <label class="block text-lg font-semibold text-gray-700 mb-3">Custom Product Name</label>
                   <input type="text" class="product-name-input w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your custom product name">
                   <p class="text-sm text-gray-500 mt-2">Give your product a unique name</p>
+                </div>
+
+                <!-- Restaurant Name Input (shown only for restaurant products) -->
+                <div id="restaurant-name-customization" class="hidden">
+                  <label class="block text-lg font-semibold text-gray-700 mb-3">Restaurant Name</label>
+                  <input type="text" class="restaurant-name-input w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your restaurant name">
+                  <p class="text-sm text-gray-500 mt-2">Enter the name of your restaurant</p>
                 </div>
 
                 <!-- Logo Upload -->
@@ -111,12 +169,13 @@ import { sharedDataStore } from '../lib/shared-data-store';
         <!-- Action Buttons -->
         <div id="cart-actions" class="hidden mt-8 space-y-4">
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <button id="delete-selected" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
+            <button id="delete-selected" class="px-4 py-2 sm:px-6 sm:py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm sm:text-base">
               Delete Project
             </button>
-            <button id="proceed-to-requirements" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
-              Next: Project Requirements
+            <button id="proceed-to-requirements" class="px-4 py-2 sm:px-6 sm:py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm sm:text-base">
+              Submit & Review Details
             </button>
+
           </div>
         </div>
 
@@ -141,17 +200,34 @@ import { sharedDataStore } from '../lib/shared-data-store';
                 <input type="text" name="contactPerson" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Your full name">
               </div>
               
-              <!-- Dynamic Project Type Fields -->
-              <div id="restaurant-fields">
+                          <!-- App Name Field (for all products) -->
+            <div id="app-name-fields">
+              <label class="block text-lg font-semibold text-gray-700 mb-3">
+                App Name <span class="text-red-500">*</span>
+              </label>
+              <input type="text" name="appName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your app name">
+            </div>
+
+            <!-- Product Description Field (for all products) -->
+            <div id="product-description-fields">
+              <label class="block text-lg font-semibold text-gray-700 mb-3">
+                Product Description <span class="text-red-500">*</span>
+              </label>
+              <textarea name="productDescription" rows="3" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Describe your product requirements and features"></textarea>
+            </div>
+
+                        <!-- Restaurant Specific Fields (hidden by default) -->
+            <div id="restaurant-fields" class="hidden">
                 <label class="block text-lg font-semibold text-gray-700 mb-3">
                   Restaurant Name <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="restaurantName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter restaurant name">
               </div>
               
-              <div id="restaurant-cuisine-fields">
+            <!-- Cuisine Type Field (ONLY for restaurant products) -->
+            <div id="restaurant-cuisine-fields" class="hidden">
                 <label class="block text-lg font-semibold text-gray-700 mb-3">
-                  Cuisine Type
+                Cuisine Type <span class="text-red-500">*</span>
                 </label>
                 <select name="cuisineType" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg">
                   <option value="">Select cuisine type</option>
@@ -165,29 +241,12 @@ import { sharedDataStore } from '../lib/shared-data-store';
                   <option value="desserts">Desserts</option>
                   <option value="other">Other</option>
                 </select>
-              </div>
-
-              <!-- TV App Fields (hidden by default) -->
-              <div id="tv-app-fields" class="hidden">
-                <label class="block text-lg font-semibold text-gray-700 mb-3">
-                  App Name <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="appName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your app name">
-              </div>
-
-              <!-- Mobile App Fields (hidden by default) -->
-              <div id="mobile-app-fields" class="hidden">
-                <label class="block text-lg font-semibold text-gray-700 mb-3">
-                  App Name <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="appName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your mobile app name">
-              </div>
             </div>
 
             <!-- Dynamic Upload Section -->
             <div id="logo-upload-section">
               <label class="block text-lg font-semibold text-gray-700 mb-3">
-                <span id="upload-label">Restaurant Logo</span>
+                <span id="upload-label">App Icon</span>
               </label>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
                 <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -195,7 +254,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                   </svg>
                 </div>
-                <p class="text-lg font-medium text-gray-700 mb-2" id="upload-text">Upload logo or drag and drop</p>
+                <p class="text-lg font-medium text-gray-700 mb-2" id="upload-text">Upload app icon or drag and drop</p>
                 <p class="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
                 <input type="file" name="restaurantLogo" accept="image/*" class="hidden" id="logo-upload">
                 <button type="button" onclick="document.getElementById('logo-upload').click()" class="mt-4 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all transform hover:scale-105">
@@ -228,7 +287,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
             <!-- Dynamic Menu/App Photos Section -->
             <div id="photos-upload-section">
               <label class="block text-lg font-semibold text-gray-700 mb-3">
-                <span id="photos-label">Menu Photos (Optional)</span>
+                <span id="photos-label">App Screenshots (Optional)</span>
               </label>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
                 <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -236,7 +295,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 0 002 2z"></path>
                   </svg>
                 </div>
-                <p class="text-lg font-medium text-gray-700 mb-2" id="photos-text">Upload menu photos or drag and drop</p>
+                <p class="text-lg font-medium text-gray-700 mb-2" id="photos-text">Upload app screenshots or drag and drop</p>
                 <p class="text-sm text-gray-500">Multiple images allowed</p>
                 <input type="file" name="menuPhotos" accept="image/*" multiple class="hidden" id="menu-upload">
                 <button type="button" onclick="document.getElementById('menu-upload').click()" class="mt-4 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all transform hover:scale-105">
@@ -295,20 +354,20 @@ import { sharedDataStore } from '../lib/shared-data-store';
             </div>
 
             <!-- Requirements Form Actions -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-              <button type="button" id="back-to-cart" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+            <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+              <button type="button" id="back-to-cart" class="flex-1 sm:flex-none sm:w-32 bg-gray-500 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
                 Back to Cart
               </button>
-              <button type="button" id="proceed-to-payment" class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-                Proceed to Payment
+              <button type="button" id="submit-requirements" class="flex-1 sm:flex-none sm:w-40 bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
+                Submit & Proceed to Payment
               </button>
             </div>
           </form>
         </div>
 
         <!-- Order Review Section -->
-        <div id="order-review" class="hidden bg-white rounded-xl shadow-lg p-8 mt-8">
-          <h3 class="text-2xl font-bold text-gray-900 mb-6">Review Your Order</h3>
+        <div id="order-review" class="hidden bg-white rounded-xl shadow-lg p-8 mt-8" style="display: none;">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Review Your Project Details</h3>
           
           <div class="space-y-6">
             <!-- Project Summary -->
@@ -323,6 +382,10 @@ import { sharedDataStore } from '../lib/shared-data-store';
                   <p class="text-sm text-gray-600">Contact Person:</p>
                   <p class="font-medium" id="review-contact-person">-</p>
                 </div>
+                <div>
+                  <p class="text-sm text-gray-600">App Name:</p>
+                  <p class="font-medium" id="review-app-name">-</p>
+                </div>
                 <div id="review-restaurant-info" class="hidden">
                   <p class="text-sm text-gray-600">Restaurant Name:</p>
                   <p class="font-medium" id="review-restaurant-name">-</p>
@@ -330,10 +393,6 @@ import { sharedDataStore } from '../lib/shared-data-store';
                 <div id="review-cuisine-info" class="hidden">
                   <p class="text-sm text-gray-600">Cuisine Type:</p>
                   <p class="font-medium" id="review-cuisine-type">-</p>
-                </div>
-                <div id="review-app-info" class="hidden">
-                  <p class="text-sm text-gray-600">App Name:</p>
-                  <p class="font-medium" id="review-app-name">-</p>
                 </div>
               </div>
             </div>
@@ -362,6 +421,28 @@ import { sharedDataStore } from '../lib/shared-data-store';
               </div>
             </div>
 
+            <!-- Contact Information -->
+            <div class="bg-gray-50 rounded-lg p-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Contact Information</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p class="text-sm text-gray-600">Email:</p>
+                  <p class="font-medium" id="review-email">-</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-600">Phone:</p>
+                  <p class="font-medium" id="review-phone">-</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Requirements -->
+            <div class="bg-gray-50 rounded-lg p-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Additional Requirements</h4>
+              <p class="text-sm text-gray-600">Special Features & Requirements:</p>
+              <p class="font-medium mt-2" id="review-additional-requirements">-</p>
+            </div>
+
             <!-- Total Amount -->
             <div class="bg-primary-50 rounded-lg p-6">
               <div class="flex justify-between items-center">
@@ -371,12 +452,9 @@ import { sharedDataStore } from '../lib/shared-data-store';
             </div>
 
             <!-- Review Actions -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-              <button type="button" id="back-to-requirements" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+            <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+              <button type="button" id="back-to-requirements" class="flex-1 sm:flex-none sm:w-32 bg-gray-500 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
                 Back to Requirements
-              </button>
-              <button type="button" id="proceed-to-payment" class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-                Proceed to Payment
               </button>
             </div>
           </div>
@@ -384,7 +462,46 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
         <!-- Payment Section -->
         <div id="payment-section" class="hidden bg-white rounded-xl shadow-lg p-8 mt-8">
-          <h3 class="text-2xl font-bold text-gray-900 mb-6">Payment Options</h3>
+          <div id="payment-loading" class="text-center py-8 hidden">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading payment details...</p>
+          </div>
+          
+          <div id="payment-content">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">Complete Your Order & Payment</h3>
+          
+          <!-- Order Summary -->
+          <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h4 class="text-lg font-semibold text-gray-800 mb-4">Order Summary</h4>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Project Name:</span>
+                <span class="font-medium" id="payment-project-name">-</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Contact Person:</span>
+                <span class="font-medium" id="payment-contact-person">-</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">App Name:</span>
+                <span class="font-medium" id="payment-app-name">-</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Email:</span>
+                <span class="font-medium" id="payment-email">-</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Phone:</span>
+                <span class="font-medium" id="payment-phone">-</span>
+              </div>
+              <div class="border-t pt-3 mt-3">
+                <div class="flex justify-between text-lg font-bold">
+                  <span>Total Amount:</span>
+                  <span class="text-green-600">₹<span id="payment-total-amount">0</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
           
           <div class="space-y-6">
             <!-- Payment Methods -->
@@ -472,22 +589,93 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
             <!-- Final Payment Button -->
             <div class="pt-6 border-t border-gray-200">
-              <button id="final-payment" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl text-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+              <button id="final-payment" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl text-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
                 Pay ₹<span id="final-amount">0</span> & Complete Order
               </button>
               <p class="text-sm text-gray-500 text-center mt-3">Your payment is secured with SSL encryption</p>
             </div>
           </div>
+          </div> <!-- End payment-content -->
         </div>
       </div>
     </div>
   </div>
-  </AuthGuard>
+
 </Layout>
 
 <script>
-  import AuthGuard from '../components/AuthGuard.astro';
+  console.log('🚀 Cart page script loaded');
+  
+  // Import required modules
   import { sharedDataStore } from '../lib/shared-data-store';
+  import { supabase } from '../lib/supabase';
+  
+  // Test if basic DOM elements exist
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 DOM Content Loaded - Cart page initialization starting...');
+    
+    const testElements = [
+      'empty-cart',
+      'cart-items', 
+      'cart-actions',
+      'project-requirements',
+      'cart-content'
+    ];
+    
+    testElements.forEach(id => {
+      const element = document.getElementById(id);
+      console.log(`🔍 Element ${id}:`, !!element);
+    });
+    
+    try {
+      console.log('🔍 Creating Cart instance...');
+      const cart = new Cart();
+      console.log('✅ Cart created, items count:', cart.items.length);
+      
+      // Add a test product if cart is empty
+      if (cart.items.length === 0) {
+        console.log('🧪 Adding test product to empty cart...');
+        cart.addItem({
+          id: 'restaurant-menu',
+          name: 'Restaurant Menu System',
+          description: 'Digital menu system with QR code ordering, real-time updates, and analytics dashboard.',
+          price: 25000
+        });
+        console.log('✅ Test product added, new items count:', cart.items.length);
+      }
+      
+      // Force cart content to be visible
+      const cartContent = document.getElementById('cart-content');
+      if (cartContent) {
+        cartContent.style.display = 'block';
+        cartContent.style.visibility = 'visible';
+        console.log('✅ Forced cart content to be visible');
+      }
+      
+      // Set up event listeners after DOM is ready
+      
+      // Submit Requirements button (from requirements form)
+      const submitBtn = document.getElementById('submit-requirements');
+      
+      submitBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        cart.submitRequirements();
+      });
+
+      // Prevent form submission
+      const requirementsForm = document.getElementById('requirements-form');
+      requirementsForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      });
+      
+    } catch (error) {
+      console.error('❌ Error initializing cart:', error);
+      alert('Error initializing cart: ' + error.message);
+    }
+  });
 
   // Cart functionality
   class Cart {
@@ -499,6 +687,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
       this.items = [];
       this.requirements = {};
       this.currentSharedOrderId = null;
+      this.debouncedSaveToSupabase = this.debounce(this.saveCartToSupabase.bind(this), 1000);
       this.init();
     }
 
@@ -598,25 +787,36 @@ import { sharedDataStore } from '../lib/shared-data-store';
       }
     }
 
-    renderCart() {
+        renderCart() {
+      console.log('🎨 renderCart called with items:', this.items.length);
+      
       const emptyCart = document.getElementById('empty-cart');
       const cartItems = document.getElementById('cart-items');
       const cartActions = document.getElementById('cart-actions');
       const projectRequirements = document.getElementById('project-requirements');
       const cartContent = document.getElementById('cart-content');
 
+      console.log('🔍 DOM elements found:', {
+        emptyCart: !!emptyCart,
+        cartItems: !!cartItems,
+        cartActions: !!cartActions,
+        projectRequirements: !!projectRequirements,
+        cartContent: !!cartContent
+      });
+
       if (this.items.length === 0) {
+        console.log('📭 Showing empty cart');
         emptyCart?.classList.remove('hidden');
         cartItems?.classList.add('hidden');
         cartActions?.classList.add('hidden');
         projectRequirements?.classList.add('hidden');
-        return;
+      } else {
+        console.log('📦 Showing cart with items');
+        emptyCart?.classList.add('hidden');
+        cartItems?.classList.remove('hidden');
+        cartActions?.classList.remove('hidden');
+        projectRequirements?.classList.add('hidden');
       }
-
-      emptyCart?.classList.add('hidden');
-      cartItems?.classList.remove('hidden');
-      cartActions?.classList.remove('hidden');
-      projectRequirements?.classList.add('hidden');
 
       this.renderCartItems();
       this.updateSummary();
@@ -647,10 +847,42 @@ import { sharedDataStore } from '../lib/shared-data-store';
       clone.querySelector('.product-description').textContent = item.description;
       clone.querySelector('.product-price').textContent = `₹${item.price}`;
 
+      // Set product type badge
+      const productTypeText = clone.querySelector('.product-type-text');
+      const productTypeBadge = clone.querySelector('.product-type-badge');
+      
+      if (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website') {
+        productTypeText.textContent = 'Restaurant Solution';
+        productTypeBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium product-type-badge bg-green-100 text-green-800';
+      } else if (item.id === 'android-tv' || item.id === 'android-tv-app') {
+        productTypeText.textContent = 'Android TV App';
+        productTypeBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium product-type-badge bg-purple-100 text-purple-800';
+      } else if (item.id === 'mobile-streaming' || item.id === 'streaming-mobile-app') {
+        productTypeText.textContent = 'Mobile Streaming App';
+        productTypeBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium product-type-badge bg-orange-100 text-orange-800';
+      } else {
+        productTypeText.textContent = 'Custom Product';
+        productTypeBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium product-type-badge bg-blue-100 text-blue-800';
+      }
+
+      // Show/hide restaurant name field based on product type
+      const restaurantNameField = clone.querySelector('#restaurant-name-customization');
+      if (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website') {
+        restaurantNameField?.classList.remove('hidden');
+      } else {
+        restaurantNameField?.classList.add('hidden');
+      }
+
       // Set custom name if exists
       const nameInput = clone.querySelector('.product-name-input');
       if (nameInput && item.customName) {
         nameInput.value = item.customName;
+      }
+
+      // Set restaurant name if exists
+      const restaurantNameInput = clone.querySelector('.restaurant-name-input');
+      if (restaurantNameInput && item.restaurantName) {
+        restaurantNameInput.value = item.restaurantName;
       }
 
       // Set selected color
@@ -680,6 +912,16 @@ import { sharedDataStore } from '../lib/shared-data-store';
       const nameInput = itemElement.querySelector('.product-name-input');
       nameInput?.addEventListener('input', (e) => {
         this.updateItem(item.id, { customName: e.target.value });
+        // Removed auto-save to prevent duplicate entries
+        // this.debouncedSaveToSupabase();
+      });
+
+      // Restaurant name input
+      const restaurantNameInput = itemElement.querySelector('.restaurant-name-input');
+      restaurantNameInput?.addEventListener('input', (e) => {
+        this.updateItem(item.id, { restaurantName: e.target.value });
+        // Removed auto-save to prevent duplicate entries
+        // this.debouncedSaveToSupabase();
       });
 
       // Logo upload
@@ -695,6 +937,8 @@ import { sharedDataStore } from '../lib/shared-data-store';
           reader.onload = (e) => {
             logoPreview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-lg">`;
             this.updateItem(item.id, { logo: e.target.result });
+            // Removed auto-save to prevent duplicate entries
+            // this.debouncedSaveToSupabase();
           };
           reader.readAsDataURL(file);
         }
@@ -707,6 +951,8 @@ import { sharedDataStore } from '../lib/shared-data-store';
           colorOptions.forEach(opt => opt.classList.remove('border-2', 'border-gray-900'));
           option.classList.add('border-2', 'border-gray-900');
           this.updateItem(item.id, { color: option.dataset.color });
+          // Removed auto-save to prevent duplicate entries
+          // this.debouncedSaveToSupabase();
         });
       });
 
@@ -718,6 +964,8 @@ import { sharedDataStore } from '../lib/shared-data-store';
             .filter(cb => cb.checked)
             .map(cb => cb.dataset.feature);
           this.updateItem(item.id, { features });
+          // Removed auto-save to prevent duplicate entries
+          // this.debouncedSaveToSupabase();
         });
       });
     }
@@ -750,19 +998,19 @@ import { sharedDataStore } from '../lib/shared-data-store';
         this.deleteSelectedProject();
       });
 
-      // Proceed to requirements button
+      // Submit & Review Details button (from cart)
       document.getElementById('proceed-to-requirements')?.addEventListener('click', () => {
         this.showProjectRequirements();
       });
 
+
+
+      // Submit Requirements button (from requirements form)
+      // Event listener moved to DOMContentLoaded
+
       // Back to cart button
       document.getElementById('back-to-cart')?.addEventListener('click', () => {
         this.backToCart();
-      });
-
-      // Proceed to payment button (from requirements)
-      document.getElementById('proceed-to-payment')?.addEventListener('click', () => {
-        this.showOrderReview();
       });
 
       // Back to requirements button
@@ -805,7 +1053,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
       }
     }
 
-    showProjectRequirements() {
+    async     showProjectRequirements() {
       // Hide cart actions and show requirements form
       const cartActions = document.getElementById('cart-actions');
       const projectRequirements = document.getElementById('project-requirements');
@@ -819,18 +1067,260 @@ import { sharedDataStore } from '../lib/shared-data-store';
       // Show appropriate fields based on project type
       this.showProjectTypeFields();
       
+      // Removed initial save to prevent duplicate entries
+      // this.saveCartToSupabase();
+      
       // Scroll to requirements form
       projectRequirements?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async submitRequirements() {
+      console.log('🚀 submitRequirements function called!');
+      
+      const submitBtn = document.getElementById('submit-requirements');
+      const originalText = submitBtn.innerHTML;
+      
+      try {
+        console.log('🚀 Starting submitRequirements...');
+        
+        // Validate requirements form
+        const form = document.getElementById('requirements-form');
+        if (!(form as HTMLFormElement).checkValidity()) {
+          console.log('❌ Form validation failed');
+          (form as HTMLFormElement).reportValidity();
+          return;
+        }
+
+        console.log('✅ Form validation passed');
+
+        // Show loading state
+        submitBtn.innerHTML = `
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Saving & Processing...
+        `;
+        submitBtn.disabled = true;
+
+        // Collect form data
+        this.requirements = {
+          projectName: (form.querySelector('[name="projectName"]') as HTMLInputElement)?.value || '',
+          contactPerson: (form.querySelector('[name="contactPerson"]') as HTMLInputElement)?.value || '',
+          restaurantName: (form.querySelector('[name="restaurantName"]') as HTMLInputElement)?.value || '',
+          cuisineType: (form.querySelector('[name="cuisineType"]') as HTMLSelectElement)?.value || '',
+          appName: (form.querySelector('[name="appName"]') as HTMLInputElement)?.value || '',
+          productDescription: (form.querySelector('[name="productDescription"]') as HTMLTextAreaElement)?.value || '',
+          email: (form.querySelector('[name="email"]') as HTMLInputElement)?.value || '',
+          phone: (form.querySelector('[name="phone"]') as HTMLInputElement)?.value || '',
+          additionalRequirements: (form.querySelector('[name="additionalRequirements"]') as HTMLTextAreaElement)?.value || ''
+        };
+
+        console.log('📝 Collected form data:', this.requirements);
+
+        // Try to save to Supabase with timeout
+        let savedData = null;
+        try {
+          console.log('🔍 Attempting to save to Supabase...');
+          savedData = await Promise.race([
+            this.saveCartToSupabase(),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Database timeout')), 10000)
+            )
+          ]);
+        } catch (dbError) {
+          console.warn('⚠️ Database save failed, but continuing:', dbError);
+          // Continue without database save - we'll show a warning
+        }
+
+        if (savedData) {
+          console.log('✅ Cart data saved successfully:', savedData);
+          // Update cart item with saved data
+          if (this.items.length > 0) {
+            this.items[0].savedData = savedData;
+            this.saveCart();
+          }
+        } else {
+          console.log('⚠️ No database save, but continuing with local data');
+        }
+
+        // Show success message
+        submitBtn.innerHTML = `
+          <svg class="w-4 h-4 text-white inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          Success! Redirecting...
+        `;
+        
+        // Update review page with collected data
+        this.updateOrderReview();
+
+        // Hide requirements form and show payment directly
+        const projectRequirements = document.getElementById('project-requirements');
+        const paymentSection = document.getElementById('payment-section');
+        
+        console.log('🔄 Showing payment page directly...');
+        console.log('🔍 Project requirements element:', !!projectRequirements);
+        console.log('🔍 Payment section element:', !!paymentSection);
+        
+        // Test if payment section is in DOM
+        if (paymentSection) {
+          console.log('🔍 Payment section parent:', paymentSection.parentElement);
+          console.log('🔍 Payment section offsetHeight:', paymentSection.offsetHeight);
+          console.log('🔍 Payment section offsetWidth:', paymentSection.offsetWidth);
+          console.log('🔍 Payment section computed style display:', window.getComputedStyle(paymentSection).display);
+        }
+        
+        if (projectRequirements) {
+          projectRequirements.classList.add('hidden');
+          projectRequirements.style.display = 'none';
+          console.log('✅ Hidden project requirements');
+        }
+        
+        if (paymentSection) {
+          // Remove hidden class and force visibility
+          paymentSection.classList.remove('hidden');
+          paymentSection.style.setProperty('display', 'block', 'important');
+          paymentSection.style.setProperty('visibility', 'visible', 'important');
+          paymentSection.style.setProperty('opacity', '1', 'important');
+          paymentSection.style.setProperty('position', 'relative', 'important');
+          paymentSection.style.setProperty('z-index', '999', 'important');
+          paymentSection.style.setProperty('height', 'auto', 'important');
+          paymentSection.style.setProperty('width', '100%', 'important');
+          paymentSection.style.setProperty('background-color', '#ffffff', 'important');
+          console.log('✅ Showed payment section with forced visibility');
+          
+          // Show loading state first
+          const paymentLoading = document.getElementById('payment-loading');
+          const paymentContent = document.getElementById('payment-content');
+          
+          if (paymentLoading) {
+            paymentLoading.classList.remove('hidden');
+            paymentLoading.style.display = 'block';
+          }
+          if (paymentContent) {
+            paymentContent.style.display = 'none';
+          }
+          
+          // Update payment summary with user data
+          this.updatePaymentSummary();
+          
+          // Hide loading and show content after a short delay
+          setTimeout(() => {
+            if (paymentLoading) {
+              paymentLoading.classList.add('hidden');
+              paymentLoading.style.display = 'none';
+            }
+            if (paymentContent) {
+              paymentContent.style.display = 'block';
+            }
+            
+            // Scroll to payment section
+            paymentSection.scrollIntoView({ behavior: 'smooth' });
+            console.log('✅ Scrolled to payment page');
+          }, 500);
+          
+        } else {
+          console.error('❌ Payment section element not found!');
+          alert('Error: Payment page not found. Please refresh the page and try again.');
+        }
+        
+        // Reset button after 2 seconds
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }, 2000);
+
+      } catch (error) {
+        console.error('❌ Error in submitRequirements:', error);
+        
+        // Show error message but still proceed
+        submitBtn.innerHTML = `
+          <svg class="w-4 h-4 text-white inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          Error
+        `;
+        
+        // Show warning but continue
+        alert('Warning: Could not save to database, but you can still proceed with your order. Please contact support if this persists.');
+        
+        // Still proceed to payment page even if database save failed
+        this.updateOrderReview();
+        
+        const projectRequirements = document.getElementById('project-requirements');
+        const paymentSection = document.getElementById('payment-section');
+        
+        if (projectRequirements) {
+          projectRequirements.classList.add('hidden');
+          projectRequirements.style.display = 'none';
+        }
+        
+        if (paymentSection) {
+          // Remove hidden class and force visibility
+          paymentSection.classList.remove('hidden');
+          paymentSection.style.setProperty('display', 'block', 'important');
+          paymentSection.style.setProperty('visibility', 'visible', 'important');
+          paymentSection.style.setProperty('opacity', '1', 'important');
+          paymentSection.style.setProperty('position', 'relative', 'important');
+          paymentSection.style.setProperty('z-index', '999', 'important');
+          paymentSection.style.setProperty('height', 'auto', 'important');
+          paymentSection.style.setProperty('width', '100%', 'important');
+          paymentSection.style.setProperty('background-color', '#ffffff', 'important');
+          
+          // Show loading state first
+          const paymentLoading = document.getElementById('payment-loading');
+          const paymentContent = document.getElementById('payment-content');
+          
+          if (paymentLoading) {
+            paymentLoading.classList.remove('hidden');
+            paymentLoading.style.display = 'block';
+          }
+          if (paymentContent) {
+            paymentContent.style.display = 'none';
+          }
+          
+          this.updatePaymentSummary();
+          
+          // Hide loading and show content after a short delay
+          setTimeout(() => {
+            if (paymentLoading) {
+              paymentLoading.classList.add('hidden');
+              paymentLoading.style.display = 'none';
+            }
+            if (paymentContent) {
+              paymentContent.style.display = 'block';
+            }
+            
+            paymentSection.scrollIntoView({ behavior: 'smooth' });
+          }, 500);
+        }
+        
+        // Reset button after 3 seconds
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }, 3000);
+      }
     }
 
     showProjectTypeFields() {
       if (this.items.length === 0) return;
       
       const item = this.items[0];
+      console.log('🔍 Debug - Product ID:', item.id);
+      
+      const appNameFields = document.getElementById('app-name-fields');
+      const productDescriptionFields = document.getElementById('product-description-fields');
       const restaurantFields = document.getElementById('restaurant-fields');
       const restaurantCuisineFields = document.getElementById('restaurant-cuisine-fields');
-      const tvAppFields = document.getElementById('tv-app-fields');
-      const mobileAppFields = document.getElementById('mobile-app-fields');
+
+      console.log('🔍 Debug - Field elements found:', {
+        appNameFields: !!appNameFields,
+        productDescriptionFields: !!productDescriptionFields,
+        restaurantFields: !!restaurantFields,
+        restaurantCuisineFields: !!restaurantCuisineFields
+      });
 
       // Update upload labels and text based on project type
       const uploadLabel = document.getElementById('upload-label');
@@ -838,48 +1328,83 @@ import { sharedDataStore } from '../lib/shared-data-store';
       const photosLabel = document.getElementById('photos-label');
       const photosText = document.getElementById('photos-text');
 
-      // Hide all fields first
+      // Show app name and product description fields for all products
+      appNameFields?.classList.remove('hidden');
+      productDescriptionFields?.classList.remove('hidden');
+      
+      // Hide restaurant fields by default
       restaurantFields?.classList.add('hidden');
       restaurantCuisineFields?.classList.add('hidden');
-      tvAppFields?.classList.add('hidden');
-      mobileAppFields?.classList.add('hidden');
 
       // Show appropriate fields based on project type
-      if (item.id === 'restaurant-menu') {
-        restaurantFields?.classList.remove('hidden');
-        restaurantCuisineFields?.classList.remove('hidden');
+      if (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website') {
+        console.log('🍕 Showing restaurant fields for restaurant product:', item.id);
+        
+        // Show restaurant-specific fields
+        if (restaurantFields) {
+          restaurantFields.classList.remove('hidden');
+          restaurantFields.style.display = 'block';
+        }
+        
+        // Show cuisine type ONLY for restaurant products
+        if (restaurantCuisineFields) {
+          restaurantCuisineFields.classList.remove('hidden');
+          restaurantCuisineFields.style.display = 'block';
+        }
+        
+        console.log('🔍 Debug - Restaurant fields visibility:', {
+          restaurantFieldsHidden: restaurantFields?.classList.contains('hidden'),
+          restaurantCuisineFieldsHidden: restaurantCuisineFields?.classList.contains('hidden'),
+          restaurantFieldsDisplay: restaurantFields?.style.display,
+          restaurantCuisineFieldsDisplay: restaurantCuisineFields?.style.display
+        });
+        
         // Make restaurant fields required
         const restaurantNameInput = document.querySelector('input[name="restaurantName"]');
+        const cuisineTypeSelect = document.querySelector('select[name="cuisineType"]');
         if (restaurantNameInput) restaurantNameInput.required = true;
+        if (cuisineTypeSelect) cuisineTypeSelect.required = true;
         
         // Update upload labels for restaurant
         if (uploadLabel) uploadLabel.textContent = 'Restaurant Logo';
         if (uploadText) uploadText.textContent = 'Upload logo or drag and drop';
         if (photosLabel) photosLabel.textContent = 'Menu Photos (Optional)';
         if (photosText) photosText.textContent = 'Upload menu photos or drag and drop';
-      } else if (item.id === 'android-tv') {
-        tvAppFields?.classList.remove('hidden');
-        // Make app name required
-        const appNameInput = document.querySelector('input[name="appName"]');
-        if (appNameInput) appNameInput.required = true;
+      } else {
+        console.log('📱 Showing non-restaurant fields for product:', item.id);
         
-        // Update upload labels for TV app
+        // Ensure cuisine type is HIDDEN for non-restaurant products
+        if (restaurantCuisineFields) {
+          restaurantCuisineFields.classList.add('hidden');
+          restaurantCuisineFields.style.display = 'none';
+          console.log('🚫 Cuisine type field hidden for non-restaurant product');
+        }
+        
+        // Update upload labels based on product type
+        if (item.id === 'android-tv' || item.id === 'android-tv-app') {
+          console.log('📺 Showing TV app fields');
         if (uploadLabel) uploadLabel.textContent = 'App Icon';
         if (uploadText) uploadText.textContent = 'Upload app icon or drag and drop';
         if (photosLabel) photosLabel.textContent = 'App Screenshots (Optional)';
         if (photosText) photosText.textContent = 'Upload app screenshots or drag and drop';
-      } else if (item.id === 'mobile-streaming') {
-        mobileAppFields?.classList.remove('hidden');
-        // Make app name required
-        const appNameInput = document.querySelector('input[name="appName"]');
-        if (appNameInput) appNameInput.required = true;
-        
-        // Update upload labels for mobile app
+        } else if (item.id === 'mobile-streaming' || item.id === 'streaming-mobile-app') {
+          console.log('📱 Showing mobile app fields');
+          if (uploadLabel) uploadLabel.textContent = 'App Icon';
+          if (uploadText) uploadText.textContent = 'Upload app icon or drag and drop';
+          if (photosLabel) photosLabel.textContent = 'App Screenshots (Optional)';
+          if (photosText) photosText.textContent = 'Upload app screenshots or drag and drop';
+        } else {
+          // Default for other products
         if (uploadLabel) uploadLabel.textContent = 'App Icon';
         if (uploadText) uploadText.textContent = 'Upload app icon or drag and drop';
         if (photosLabel) photosLabel.textContent = 'App Screenshots (Optional)';
         if (photosText) photosText.textContent = 'Upload app screenshots or drag and drop';
       }
+      }
+
+      // Make app name required for all products
+      const appNameInput = document.querySelector('input[name="appName"]');
+      if (appNameInput) appNameInput.required = true;
     }
 
     prefillRequirementsForm() {
@@ -896,6 +1421,9 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
       // Add file upload event listeners
       this.setupFileUploads();
+      
+      // Remove auto-save listeners to prevent multiple database calls
+      // this.setupFormChangeListeners();
     }
 
     setupFileUploads() {
@@ -934,6 +1462,14 @@ import { sharedDataStore } from '../lib/shared-data-store';
       // Add drag and drop functionality
       this.setupDragAndDrop();
     }
+
+    setupFormChangeListeners() {
+      // Removed auto-save functionality to prevent duplicate database entries
+      // Form data will only be saved when user clicks "Submit & Review Details"
+      console.log('🚫 Auto-save disabled to prevent duplicate entries');
+    }
+
+
 
     setupDragAndDrop() {
       const logoSection = document.querySelector('#logo-upload-section .border-dashed');
@@ -1020,17 +1556,127 @@ import { sharedDataStore } from '../lib/shared-data-store';
     }
 
     async saveCartToSupabase() {
-      // This would integrate with your Supabase backend
-      // For now, we'll just save to localStorage
-      const orderData = {
-        userId: AuthGuard.getCurrentUser()?.id,
-        items: this.items,
-        total: this.calculateTotal(),
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      };
+      try {
+        console.log('🔍 Starting saveCartToSupabase...');
+        
+        const authManager = window.globalAuthManager || window.simpleAuthManager;
+        console.log('🔍 Auth manager found:', !!authManager);
+        
+        const currentUser = authManager?.getCurrentUser();
+        console.log('🔍 Current user:', currentUser);
+        
+        if (!currentUser || this.items.length === 0) {
+          console.log('❌ No user or items found for Supabase save');
+          console.log('❌ User:', currentUser);
+          console.log('❌ Items length:', this.items.length);
+          return null;
+        }
 
-      localStorage.setItem('pending-order', JSON.stringify(orderData));
+        const item = this.items[0];
+        console.log('🔍 Debug - Item being saved:', item);
+        console.log('🔍 Debug - Current user:', currentUser);
+        
+        // Check if Supabase is available
+        if (!supabase) {
+          console.error('❌ Supabase client not available');
+          return null;
+        }
+        
+        // Get form data from requirements form
+        const form = document.getElementById('requirements-form');
+        let formData = {};
+        
+        if (form) {
+          formData = {
+            projectName: form.querySelector('[name="projectName"]')?.value || '',
+            contactPerson: form.querySelector('[name="contactPerson"]')?.value || '',
+            restaurantName: form.querySelector('[name="restaurantName"]')?.value || '',
+            cuisineType: form.querySelector('[name="cuisineType"]')?.value || form.querySelector('[name="emergencyCuisineType"]')?.value || '',
+            appName: form.querySelector('[name="appName"]')?.value || '',
+            email: form.querySelector('[name="email"]')?.value || '',
+            phone: form.querySelector('[name="phone"]')?.value || '',
+            additionalRequirements: form.querySelector('[name="additionalRequirements"]')?.value || ''
+          };
+        }
+
+        // Get color values
+        const primaryColor = document.querySelector('input[name="primaryColor"]')?.value || '#3B82F6';
+        const secondaryColor = document.querySelector('input[name="secondaryColor"]')?.value || '#A5CF6';
+        const accentColor = document.querySelector('input[name="accentColor"]')?.value || '#F59E0B';
+        const textColor = document.querySelector('input[name="textColor"]')?.value || '#1F2937';
+
+        // Prepare cart data for Supabase
+        const cartData = {
+          user_email: currentUser.email,
+          product_id: item.id,
+          product_name: item.name,
+          product_description: item.description,
+          base_price: item.price,
+          custom_name: item.customName || '',
+          restaurant_name_customization: item.restaurantName || '',
+          selected_color: item.color || '#3B82F6',
+          selected_features: item.features || [],
+          project_name: formData.projectName || '',
+          contact_person: formData.contactPerson || '',
+          restaurant_name: formData.restaurantName || '',
+          cuisine_type: formData.cuisineType || '',
+          app_name: formData.appName || '',
+          product_description_custom: formData.productDescription || '',
+          contact_email: formData.email || currentUser.email,
+          contact_phone: formData.phone || currentUser.phone || '',
+          primary_color: primaryColor,
+          secondary_color: secondaryColor,
+          accent_color: accentColor,
+          text_color: textColor,
+          additional_requirements: formData.additionalRequirements || '',
+          cart_status: 'active',
+          is_checkout_initiated: false
+        };
+
+        console.log('🔍 Debug - Cart data being sent to Supabase:', cartData);
+
+        // Test Supabase connection first
+        console.log('🔍 Testing Supabase connection...');
+        const { data: testData, error: testError } = await supabase
+          .from('cart_customizations')
+          .select('id')
+          .limit(1);
+          
+        if (testError) {
+          console.error('❌ Supabase connection test failed:', testError);
+          return null;
+        }
+        
+        console.log('✅ Supabase connection test successful');
+
+        // Use upsert to handle both insert and update
+        console.log('🚀 Attempting to save to Supabase...');
+        const { data, error } = await supabase
+          .from('cart_customizations')
+          .upsert([cartData], {
+            onConflict: 'user_email,product_id'
+          })
+          .select();
+
+        if (error) {
+          console.error('❌ Error saving cart to Supabase:', error);
+          console.error('❌ Error details:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint
+          });
+          return null;
+        }
+
+        console.log('✅ Successfully saved to Supabase:', data);
+        return data[0];
+
+      } catch (error) {
+        console.error('❌ Error in saveCartToSupabase:', error);
+        console.error('❌ Error stack:', error.stack);
+        return null; // Return null instead of throwing
+      }
     }
 
     calculateTotal() {
@@ -1091,58 +1737,36 @@ import { sharedDataStore } from '../lib/shared-data-store';
       }
     }
 
-    showOrderReview() {
-      // Validate requirements form
-      const form = document.getElementById('requirements-form');
-      if (!(form as HTMLFormElement).checkValidity()) {
-        (form as HTMLFormElement).reportValidity();
-        return;
-      }
 
-      // Collect form data
-      this.requirements = {
-        projectName: (form.querySelector('[name="projectName"]') as HTMLInputElement)?.value || '',
-        contactPerson: (form.querySelector('[name="contactPerson"]') as HTMLInputElement)?.value || '',
-        restaurantName: (form.querySelector('[name="restaurantName"]') as HTMLInputElement)?.value || '',
-        cuisineType: (form.querySelector('[name="cuisineType"]') as HTMLInputElement)?.value || '',
-        appName: (form.querySelector('[name="appName"]') as HTMLInputElement)?.value || '',
-        email: (form.querySelector('[name="email"]') as HTMLInputElement)?.value || '',
-        phone: (form.querySelector('[name="phone"]') as HTMLInputElement)?.value || '',
-        additionalRequirements: (form.querySelector('[name="additionalRequirements"]') as HTMLTextAreaElement)?.value || ''
-      };
-
-      // Update review page with collected data
-      this.updateOrderReview();
-
-      // Hide requirements form and show review
-      const projectRequirements = document.getElementById('project-requirements');
-      const orderReview = document.getElementById('order-review');
-      
-      if (projectRequirements) projectRequirements.classList.add('hidden');
-      if (orderReview) orderReview.classList.remove('hidden');
-      
-      // Scroll to review
-      orderReview?.scrollIntoView({ behavior: 'smooth' });
-    }
 
     updateOrderReview() {
-      // Update project summary
-      document.getElementById('review-project-name').textContent = this.requirements.projectName || '-';
-      document.getElementById('review-contact-person').textContent = this.requirements.contactPerson || '-';
+      console.log('🔄 Updating order review with data:', this.requirements);
       
-      // Show/hide restaurant or app info based on project type
+      try {
+      // Update project summary
+        const projectNameEl = document.getElementById('review-project-name');
+        const contactPersonEl = document.getElementById('review-contact-person');
+        const appNameEl = document.getElementById('review-app-name');
+        
+        if (projectNameEl) projectNameEl.textContent = this.requirements.projectName || '-';
+        if (contactPersonEl) contactPersonEl.textContent = this.requirements.contactPerson || '-';
+        if (appNameEl) appNameEl.textContent = this.requirements.appName || '-';
+        
+        // Show/hide restaurant info based on project type
       const item = this.items[0];
-      if (item.id === 'restaurant-menu') {
-        document.getElementById('review-restaurant-info').classList.remove('hidden');
-        document.getElementById('review-cuisine-info').classList.remove('hidden');
-        document.getElementById('review-app-info').classList.add('hidden');
-        document.getElementById('review-restaurant-name').textContent = this.requirements.restaurantName || '-';
-        document.getElementById('review-cuisine-type').textContent = this.requirements.cuisineType || '-';
+        const restaurantInfoEl = document.getElementById('review-restaurant-info');
+        const cuisineInfoEl = document.getElementById('review-cuisine-info');
+        const restaurantNameEl = document.getElementById('review-restaurant-name');
+        const cuisineTypeEl = document.getElementById('review-cuisine-type');
+        
+        if (item && (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website')) {
+          if (restaurantInfoEl) restaurantInfoEl.classList.remove('hidden');
+          if (cuisineInfoEl) cuisineInfoEl.classList.remove('hidden');
+          if (restaurantNameEl) restaurantNameEl.textContent = this.requirements.restaurantName || '-';
+          if (cuisineTypeEl) cuisineTypeEl.textContent = this.requirements.cuisineType || '-';
       } else {
-        document.getElementById('review-restaurant-info').classList.add('hidden');
-        document.getElementById('review-cuisine-info').classList.add('hidden');
-        document.getElementById('review-app-info').classList.remove('hidden');
-        document.getElementById('review-app-name').textContent = this.requirements.appName || '-';
+          if (restaurantInfoEl) restaurantInfoEl.classList.add('hidden');
+          if (cuisineInfoEl) cuisineInfoEl.classList.add('hidden');
       }
 
       // Update colors
@@ -1151,20 +1775,62 @@ import { sharedDataStore } from '../lib/shared-data-store';
       const accentColor = document.querySelector('input[name="accentColor"]')?.value || '#F59E0B';
       const textColor = document.querySelector('input[name="textColor"]')?.value || '#1F2937';
 
-      document.getElementById('review-primary-color').style.backgroundColor = primaryColor;
-      document.getElementById('review-secondary-color').style.backgroundColor = secondaryColor;
-      document.getElementById('review-accent-color').style.backgroundColor = accentColor;
-      document.getElementById('review-text-color').style.backgroundColor = textColor;
+        const primaryColorEl = document.getElementById('review-primary-color');
+        const secondaryColorEl = document.getElementById('review-secondary-color');
+        const accentColorEl = document.getElementById('review-accent-color');
+        const textColorEl = document.getElementById('review-text-color');
+
+        if (primaryColorEl) primaryColorEl.style.backgroundColor = primaryColor;
+        if (secondaryColorEl) secondaryColorEl.style.backgroundColor = secondaryColor;
+        if (accentColorEl) accentColorEl.style.backgroundColor = accentColor;
+        if (textColorEl) textColorEl.style.backgroundColor = textColor;
 
       // Update logo and photos status
-      const logoFile = document.getElementById('logo-upload').files[0];
-      const photosFiles = document.getElementById('menu-upload').files;
-      
-      document.getElementById('review-logo-status').textContent = logoFile ? `✓ ${logoFile.name}` : 'Not uploaded';
-      document.getElementById('review-photos-status').textContent = photosFiles.length > 0 ? `✓ ${photosFiles.length} photos selected` : 'Not uploaded';
+        const logoFile = document.getElementById('logo-upload')?.files[0];
+        const photosFiles = document.getElementById('menu-upload')?.files;
+        
+        const logoStatusEl = document.getElementById('review-logo-status');
+        const photosStatusEl = document.getElementById('review-photos-status');
+        
+        if (logoStatusEl) {
+          logoStatusEl.textContent = logoFile ? `✓ ${logoFile.name}` : 'Not uploaded';
+        }
+        if (photosStatusEl) {
+          photosStatusEl.textContent = photosFiles && photosFiles.length > 0 ? `✓ ${photosFiles.length} photos selected` : 'Not uploaded';
+        }
 
       // Update total
-      document.getElementById('review-total').textContent = `₹${this.calculateTotal().toLocaleString()}`;
+         const totalEl = document.getElementById('review-total');
+         if (totalEl) {
+           const total = this.calculateTotal();
+           totalEl.textContent = `₹${total.toLocaleString()}`;
+         }
+
+         // Update final payment amount
+         const finalAmountEl = document.getElementById('final-amount');
+         if (finalAmountEl) {
+           const total = this.calculateTotal();
+           finalAmountEl.textContent = total.toLocaleString();
+         }
+
+         // Update contact information
+         const emailEl = document.getElementById('review-email');
+         const phoneEl = document.getElementById('review-phone');
+         
+         if (emailEl) emailEl.textContent = this.requirements.email || '-';
+         if (phoneEl) phoneEl.textContent = this.requirements.phone || '-';
+
+         // Update additional requirements
+         const additionalReqEl = document.getElementById('review-additional-requirements');
+         if (additionalReqEl) {
+           additionalReqEl.textContent = this.requirements.additionalRequirements || 'No additional requirements specified';
+         }
+
+         console.log('✅ Order review updated successfully');
+        
+      } catch (error) {
+        console.error('❌ Error updating order review:', error);
+      }
     }
 
     backToRequirements() {
@@ -1177,16 +1843,12 @@ import { sharedDataStore } from '../lib/shared-data-store';
       projectRequirements?.scrollIntoView({ behavior: 'smooth' });
     }
 
-    proceedToPayment() {
-      // Save cart and show payment
-      this.saveCart();
+    async proceedToPayment() {
+      // Create order with status 'pending'
+      await this.createOrder();
       
-      // Create order first (with status 'pending')
-      this.createOrder();
-      
+      // Show payment section
       this.showPaymentSection();
-      
-      // Order is already created with 'pending' status, no need to update
     }
 
     showPaymentSection() {
@@ -1197,8 +1859,75 @@ import { sharedDataStore } from '../lib/shared-data-store';
       if (projectRequirements) projectRequirements.classList.add('hidden');
       if (paymentSection) paymentSection.classList.remove('hidden');
       
+      // Update payment summary
+      this.updatePaymentSummary();
+      
       // Scroll to payment section
       paymentSection?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    updatePaymentSummary() {
+      try {
+        console.log('🔄 Updating payment summary...');
+        console.log('📝 Requirements data:', this.requirements);
+        
+        // Update project details
+        const projectNameEl = document.getElementById('payment-project-name');
+        const contactPersonEl = document.getElementById('payment-contact-person');
+        const appNameEl = document.getElementById('payment-app-name');
+        const emailEl = document.getElementById('payment-email');
+        const phoneEl = document.getElementById('payment-phone');
+        const totalAmountEl = document.getElementById('payment-total-amount');
+        
+        console.log('🔍 Payment elements found:', {
+          projectNameEl: !!projectNameEl,
+          contactPersonEl: !!contactPersonEl,
+          appNameEl: !!appNameEl,
+          emailEl: !!emailEl,
+          phoneEl: !!phoneEl,
+          totalAmountEl: !!totalAmountEl
+        });
+        
+        if (projectNameEl) {
+          projectNameEl.textContent = this.requirements.projectName || '-';
+          console.log('✅ Updated project name:', this.requirements.projectName);
+        }
+        if (contactPersonEl) {
+          contactPersonEl.textContent = this.requirements.contactPerson || '-';
+          console.log('✅ Updated contact person:', this.requirements.contactPerson);
+        }
+        if (appNameEl) {
+          appNameEl.textContent = this.requirements.appName || '-';
+          console.log('✅ Updated app name:', this.requirements.appName);
+        }
+        if (emailEl) {
+          emailEl.textContent = this.requirements.email || '-';
+          console.log('✅ Updated email:', this.requirements.email);
+        }
+        if (phoneEl) {
+          phoneEl.textContent = this.requirements.phone || '-';
+          console.log('✅ Updated phone:', this.requirements.phone);
+        }
+        
+        // Update total amount
+        if (totalAmountEl) {
+          const total = this.calculateTotal();
+          totalAmountEl.textContent = total.toLocaleString();
+          console.log('✅ Updated total amount:', total);
+        }
+        
+        // Also update the final payment button amount
+        const finalAmountEl = document.getElementById('final-amount');
+        if (finalAmountEl) {
+          const total = this.calculateTotal();
+          finalAmountEl.textContent = total.toLocaleString();
+          console.log('✅ Updated final payment amount:', total);
+        }
+        
+        console.log('✅ Payment summary updated successfully');
+      } catch (error) {
+        console.error('❌ Error updating payment summary:', error);
+      }
     }
 
     processFinalPayment() {
@@ -1386,11 +2115,11 @@ import { sharedDataStore } from '../lib/shared-data-store';
       console.log('All user orders:', userOrders);
     }
 
-    createOrder() {
+    async createOrder() {
       if (this.items.length === 0) return;
 
-        const authManager = window.globalAuthManager || window.simpleAuthManager;
-        const currentUser = authManager?.getCurrentUser();
+      const authManager = window.globalAuthManager || window.simpleAuthManager;
+      const currentUser = authManager?.getCurrentUser();
       if (!currentUser) return;
 
       const item = this.items[0];
@@ -1402,15 +2131,43 @@ import { sharedDataStore } from '../lib/shared-data-store';
       const accentColor = document.querySelector('input[name="accentColor"]')?.value || '#F59E0B';
       const textColor = document.querySelector('input[name="textColor"]')?.value || '#1F2937';
 
-      // Create order for shared data store (admin panel visibility)
+      // Get form data
+      const form = document.getElementById('requirements-form');
+      let formData = {};
+      
+              if (form) {
+          formData = {
+            projectName: form.querySelector('[name="projectName"]')?.value || '',
+            contactPerson: form.querySelector('[name="contactPerson"]')?.value || '',
+            restaurantName: form.querySelector('[name="restaurantName"]')?.value || '',
+            cuisineType: form.querySelector('[name="cuisineType"]')?.value || '',
+            appName: form.querySelector('[name="appName"]')?.value || '',
+            productDescription: form.querySelector('[name="productDescription"]')?.value || '',
+            email: form.querySelector('[name="email"]')?.value || '',
+            phone: form.querySelector('[name="phone"]')?.value || '',
+            additionalRequirements: form.querySelector('[name="additionalRequirements"]')?.value || ''
+          };
+        }
+
+      try {
+        // Save cart data to Supabase using the existing method
+        const supabaseResult = await this.saveCartToSupabase();
+        if (supabaseResult) {
+          console.log('✅ Cart customization saved to Supabase:', supabaseResult);
+          this.currentSharedOrderId = supabaseResult.id;
+        } else {
+          console.error('❌ Failed to save cart data to Supabase');
+        }
+
+        // Also save to shared data store for admin panel
       const orderData = {
         userId: currentUser.email,
         customerName: currentUser.fullName || 'User',
         customerEmail: currentUser.email,
         serviceName: item.name,
         serviceType: 'web_development',
-        status: 'pending' as const, // Explicitly type as the literal 'pending'
-        paymentStatus: 'pending' as const, // Explicitly type as the literal 'pending'
+          status: 'pending' as const,
+          paymentStatus: 'pending' as const,
         amount: total,
         currency: 'INR',
         requirements: {
@@ -1425,19 +2182,16 @@ import { sharedDataStore } from '../lib/shared-data-store';
         }
       };
 
-      // Save to shared data store for admin panel
-      try {
         const sharedOrder = sharedDataStore.createOrder(orderData);
         console.log('Order created in shared store:', sharedOrder);
-        // Store the order ID for later status updates
-        this.currentSharedOrderId = sharedOrder.id;
         
         // Debug: Check if order was actually saved
         const allOrders = sharedDataStore.getOrders();
         console.log('All orders in shared store after creation:', allOrders);
         console.log('Current shared order ID:', this.currentSharedOrderId);
+
       } catch (error) {
-        console.error('Error creating order in shared store:', error);
+        console.error('Error creating order:', error);
       }
     }
 
@@ -1462,10 +2216,57 @@ import { sharedDataStore } from '../lib/shared-data-store';
         }
       }
     }
+
+    // Utility method for debouncing
+    debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
   }
 
   // Initialize cart when page loads
   document.addEventListener('DOMContentLoaded', () => {
-    new Cart();
+    console.log('🚀 DOM Content Loaded - Starting cart initialization...');
+    
+    try {
+      const cart = new Cart();
+      console.log('✅ Cart initialized successfully');
+      
+      // Set up event listeners after DOM is ready
+      console.log('🔍 Setting up event listeners...');
+      
+      // Submit Requirements button (from requirements form)
+      const submitBtn = document.getElementById('submit-requirements');
+      console.log('🔍 Submit button found:', !!submitBtn);
+      
+      submitBtn?.addEventListener('click', (e) => {
+        console.log('🚀 Submit button clicked!');
+        e.preventDefault();
+        e.stopPropagation();
+        cart.submitRequirements();
+      });
+
+      // Prevent form submission
+      const requirementsForm = document.getElementById('requirements-form');
+      requirementsForm?.addEventListener('submit', (e) => {
+        console.log('🚫 Form submission prevented');
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      });
+      
+      console.log('✅ Event listeners set up successfully');
+      
+    } catch (error) {
+      console.error('❌ Error initializing cart:', error);
+      alert('Error initializing cart: ' + error.message);
+    }
   });
 </script>

@@ -1,0 +1,546 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description || title} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    
+    <!-- Tailwind CSS - Using official CDN with proper CORS headers -->
+    <script src="https://cdn.tailwindcss.com/3.4.0"></script>
+    
+    <!-- Fallback styles in case Tailwind doesn't load -->
+    <style>
+      /* Basic fallback styles */
+      .hidden { display: none !important; }
+      .flex { display: flex !important; }
+      .items-center { align-items: center !important; }
+      .justify-center { justify-content: center !important; }
+      .text-center { text-align: center !important; }
+      .bg-white { background-color: white !important; }
+      .bg-gray-50 { background-color: #f9fafb !important; }
+      .text-gray-600 { color: #4b5563 !important; }
+      .text-gray-900 { color: #111827 !important; }
+      .p-6 { padding: 1.5rem !important; }
+      .mb-4 { margin-bottom: 1rem !important; }
+      .rounded-lg { border-radius: 0.5rem !important; }
+      .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important; }
+      .animate-spin { animation: spin 1s linear infinite !important; }
+      .rounded-full { border-radius: 9999px !important; }
+      .h-12 { height: 3rem !important; }
+      .w-12 { width: 3rem !important; }
+      .border-b-2 { border-bottom-width: 2px !important; }
+      .border-blue-600 { border-color: #2563eb !important; }
+      .mx-auto { margin-left: auto !important; margin-right: auto !important; }
+      
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    </style>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+      /* Admin logo styling */
+      .admin-logo {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        transition: all 0.3s ease;
+      }
+      
+      .admin-logo:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e3a8a 100%);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        transform: translateY(-1px);
+      }
+
+      /* Navigation item styling */
+      .nav-item {
+        @apply flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all duration-200;
+        background: linear-gradient(135deg, transparent 0%, transparent 100%);
+      }
+
+      .nav-item:hover {
+        @apply text-blue-700;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+      }
+
+      .nav-active {
+        @apply bg-blue-50 text-blue-700 border border-blue-200;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+      }
+
+      /* Mobile navigation styling */
+      .mobile-nav-item {
+        @apply flex items-center space-x-2 px-3 py-2 text-base font-medium text-gray-700 rounded-md transition-all duration-200;
+        background: linear-gradient(135deg, transparent 0%, transparent 100%);
+      }
+
+      .mobile-nav-item:hover {
+        @apply text-blue-700;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        transform: translateX(4px);
+      }
+
+      .mobile-nav-active {
+        @apply bg-blue-50 text-blue-700;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+      }
+    </style>
+  </head>
+  <body class="h-full bg-gray-50">
+    <!-- AdminGuard - Protects admin routes -->
+    <div id="admin-guard" class="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p class="text-gray-600">Checking admin access...</p>
+      </div>
+    </div>
+    
+    <!-- Main Admin Layout (only shown after AdminGuard approves) -->
+    <div id="admin-layout" class="h-full hidden" x-data="{ currentPage: 'dashboard', mobileMenuOpen: false }" x-init="
+        const path = window.location.pathname;
+        if (path.includes('/admin/orders')) { currentPage = 'orders'; }
+        else if (path.includes('/admin/users')) { currentPage = 'users'; }
+        else if (path.includes('/admin/billing')) { currentPage = 'billing'; }
+        else if (path.includes('/admin/support')) { currentPage = 'support'; }
+        else if (path.includes('/admin/data')) { currentPage = 'data'; }
+        else if (path.includes('/admin/settings')) { currentPage = 'settings'; }
+        else if (path.includes('/admin/profile')) { currentPage = 'profile'; }
+        else if (path.includes('/admin/test')) { currentPage = 'test'; }
+        else { currentPage = 'dashboard'; }
+        console.log('StandaloneAdminLayout initialized with currentPage:', currentPage);
+      ">
+        
+        <!-- Top Navigation Bar -->
+      <div class="bg-white shadow-sm border-b border-gray-200">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+              <!-- Logo and Brand -->
+              <div class="flex items-center">
+                <div class="admin-logo w-10 h-10 rounded-lg flex items-center justify-center border-2 border-white transition-all duration-300 hover:scale-105">
+                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                  </svg>
+                </div>
+                <span class="ml-3 text-lg font-semibold text-gray-800">Admin Panel</span>
+              </div>
+
+              <!-- Desktop Navigation -->
+              <div class="hidden lg:flex items-center space-x-1">
+                <!-- Dashboard -->
+                <a href="/admin" class="nav-item" :class="currentPage === 'dashboard' ? 'nav-active' : ''">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                  </svg>
+                  <span>Dashboard</span>
+                </a>
+
+                <!-- Orders -->
+                <a href="/admin/orders" class="nav-item" :class="currentPage === 'orders' ? 'nav-active' : ''">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                  </svg>
+                  <span>Orders</span>
+                </a>
+
+                <!-- Users -->
+                <a href="/admin/users" class="nav-item" :class="currentPage === 'users' ? 'nav-active' : ''">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                  </svg>
+                  <span>Users</span>
+                </a>
+
+                <!-- Billing -->
+                <a href="/admin/billing" class="nav-item" :class="currentPage === 'billing' ? 'nav-active' : ''">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                  </svg>
+                  <span>Billing</span>
+                </a>
+
+                <!-- Support -->
+                <a href="/admin/support" class="nav-item" :class="currentPage === 'support' ? 'nav-active' : ''">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span>Support</span>
+                </a>
+
+                <!-- All Data -->
+                <a href="/admin/data" class="nav-item" :class="currentPage === 'data' ? 'nav-active' : ''">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                  <span>All Data</span>
+                </a>
+
+                <!-- Back to Site -->
+                <a href="/" class="nav-item">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                  </svg>
+                  <span>Back to Site</span>
+                </a>
+              </div>
+
+                           <!-- Mobile Menu Button -->
+               <div class="lg:hidden">
+                 <button 
+                @click="mobileMenuOpen = !mobileMenuOpen"
+                   class="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                 >
+                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                   </svg>
+                 </button>
+               </div>
+
+              <!-- Profile Dropdown -->
+              <div class="flex items-center space-x-4">
+                <div class="relative" x-data="{ open: false }">
+                  <button 
+                    @click="open = !open"
+                    class="flex items-center space-x-3 p-2 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                  >
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                    <span id="admin-avatar" class="text-white font-medium text-sm">A</span>
+                    </div>
+                  <span id="admin-name" class="hidden md:block text-gray-700 font-medium">Admin</span>
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+
+                  <div 
+                    x-show="open"
+                    x-transition:enter="transition ease-out duration-100"
+                    x-transition:enter-start="transform opacity-0 scale-95"
+                    x-transition:enter-end="transform opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75"
+                    x-transition:leave-start="transform opacity-100 scale-100"
+                    x-transition:leave-end="transform opacity-0 scale-95"
+                    @click.away="open = false"
+                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200"
+                  >
+                    <a href="/admin/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">Profile</a>
+                    <a href="/admin/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">Settings</a>
+                    <hr class="my-2 border-gray-200">
+                  <button onclick="handleAdminSignOut()" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200">Sign out</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+                   <!-- Mobile Navigation Menu -->
+           <div 
+             x-show="mobileMenuOpen"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-1"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-1"
+             @click.away="mobileMenuOpen = false"
+             class="lg:hidden bg-white border-t border-gray-200 relative z-40"
+           >
+            <div class="px-2 pt-2 pb-3 space-y-1">
+              <a href="/admin" class="mobile-nav-item" :class="currentPage === 'dashboard' ? 'mobile-nav-active' : ''">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                </svg>
+                <span>Dashboard</span>
+              </a>
+              <a href="/admin/orders" class="mobile-nav-item" :class="currentPage === 'orders' ? 'mobile-nav-active' : ''">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                <span>Orders</span>
+              </a>
+              <a href="/admin/users" class="mobile-nav-item" :class="currentPage === 'users' ? 'mobile-nav-active' : ''">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                </svg>
+                <span>Users</span>
+              </a>
+              <a href="/admin/billing" class="mobile-nav-item" :class="currentPage === 'billing' ? 'mobile-nav-active' : ''">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+                <span>Billing</span>
+              </a>
+              <a href="/admin/support" class="mobile-nav-item" :class="currentPage === 'support' ? 'mobile-nav-active' : ''">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Support</span>
+              </a>
+              
+              <a href="/admin/data" class="mobile-nav-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <span>All Data</span>
+              </a>
+              
+              <a href="/" class="mobile-nav-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                <span>Back to Site</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="min-h-screen bg-gray-50">
+          <!-- Page Title -->
+          <div class="bg-white border-b border-gray-200 px-6 py-4">
+            <h1 class="text-2xl font-bold text-gray-900">{title}</h1>
+          </div>
+
+          <!-- Page content -->
+          <main class="p-4 sm:p-6 lg:p-8 transition-all duration-300">
+            <slot />
+          </main>
+        </div>
+      </div>
+
+      <script>
+      // Supabase configuration
+      const SUPABASE_URL = 'https://lmrrdcaavwwletcjcpqv.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ';
+      
+      let supabase = null;
+      
+      // Wait for Supabase to load
+      function waitForSupabase() {
+        return new Promise((resolve) => {
+          if (window.supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            resolve(supabase);
+          } else {
+            setTimeout(() => waitForSupabase().then(resolve), 100);
+          }
+        });
+      }
+      
+      // AdminGuard - Check if user has admin role
+      async function checkAdminAccess() {
+        try {
+          console.log('🔒 AdminGuard: Checking admin access...');
+          
+          // Wait for Supabase to be available
+          if (!supabase) {
+            await waitForSupabase();
+          }
+          
+          // Get current user from Supabase
+          const { data: { user }, error: userError } = await supabase.auth.getUser();
+          
+          if (userError) {
+            console.error('❌ AdminGuard: Error getting user:', userError);
+            showAccessDenied('Authentication error. Please login again.');
+            return;
+          }
+          
+          if (!user) {
+            console.log('❌ AdminGuard: No user logged in');
+            showAccessDenied('Please login to access admin panel');
+            return;
+          }
+          
+          console.log('✅ AdminGuard: User found:', user.email);
+          
+          // Get user profile to check role
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          
+          if (profileError) {
+            console.error('❌ AdminGuard: Error getting profile:', profileError);
+            showAccessDenied('Error checking user permissions');
+            return;
+          }
+          
+          if (profile.role !== 'admin') {
+            console.log('❌ AdminGuard: User does not have admin role. Role:', profile.role);
+            showAccessDenied('Access denied. Admin privileges required.');
+            return;
+          }
+          
+          console.log('✅ AdminGuard: Admin access granted for user:', user.email);
+          
+          // Show admin content
+          showAdminContent();
+          
+        } catch (error) {
+          console.error('❌ AdminGuard: Error checking admin access:', error);
+          showAccessDenied('Error checking admin access. Please try again.');
+        }
+      }
+      
+      function showAccessDenied(message) {
+        const guardElement = document.getElementById('admin-guard');
+        if (guardElement) {
+          guardElement.innerHTML = `
+            <div class="text-center">
+              <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">Access Denied</h3>
+              <p class="text-gray-600 mb-6">${message}</p>
+              <div class="space-x-3">
+                <a href="/login" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                  Go to Login
+                </a>
+                <a href="/" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                  Back to Home
+                </a>
+              </div>
+            </div>
+          `;
+        }
+      }
+      
+      function showAdminContent() {
+        const guardElement = document.getElementById('admin-guard');
+        if (guardElement) {
+          // Hide the guard and show the actual admin content
+          guardElement.style.display = 'none';
+          
+          // Show admin layout
+          const adminLayout = document.getElementById('admin-layout');
+          if (adminLayout) {
+            adminLayout.classList.remove('hidden');
+            
+            // Update admin info in header
+            updateAdminInfo();
+          }
+          
+          // Dispatch event that admin content is ready
+          window.dispatchEvent(new CustomEvent('admin-access-granted'));
+        }
+      }
+      
+      // Update admin info in header
+      async function updateAdminInfo() {
+        try {
+          // Ensure Supabase is available
+          if (!supabase) {
+            await waitForSupabase();
+          }
+          
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            // Get user profile
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('id', user.id)
+              .single();
+            
+            // Update admin name
+            const adminName = document.getElementById('admin-name');
+            if (adminName) {
+              adminName.textContent = profile?.full_name || user.user_metadata?.full_name || user.email || 'Admin';
+            }
+            
+            // Update admin avatar
+            const adminAvatar = document.getElementById('admin-avatar');
+            if (adminAvatar) {
+              const name = profile?.full_name || user.user_metadata?.full_name || user.email || 'A';
+              adminAvatar.textContent = name.charAt(0).toUpperCase();
+            }
+          }
+        } catch (error) {
+          console.warn('Could not update admin info:', error);
+        }
+      }
+      
+      // Simple admin sign out function
+      async function handleAdminSignOut() {
+        try {
+          console.log('Admin signing out...');
+          
+          // Ensure Supabase is available
+          if (!supabase) {
+            await waitForSupabase();
+          }
+          
+          // Sign out from Supabase
+          await supabase.auth.signOut();
+          
+          // Clear all cached data
+          sessionStorage.clear();
+          localStorage.removeItem('supabase-auth-session');
+          
+          // Redirect to home page
+          window.location.href = '/';
+          
+        } catch (error) {
+          console.error('Error during admin sign out:', error);
+          // Force redirect even if logout fails
+          window.location.href = '/';
+        }
+      }
+
+      // Make function globally available
+      window.handleAdminSignOut = handleAdminSignOut;
+      
+      // Start checking admin access when page loads
+      document.addEventListener('DOMContentLoaded', checkAdminAccess);
+      
+      // Also check when auth state changes
+      window.addEventListener('auth-state-changed', checkAdminAccess);
+      
+      // Check immediately if already loaded
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkAdminAccess);
+      } else {
+        checkAdminAccess();
+      }
+      
+      console.log('StandaloneAdminLayout loaded successfully');
+      
+      // Check if Tailwind CSS loaded properly
+      setTimeout(() => {
+        const testElement = document.createElement('div');
+        testElement.className = 'hidden';
+        document.body.appendChild(testElement);
+        const computedStyle = window.getComputedStyle(testElement);
+        if (computedStyle.display !== 'none') {
+          console.warn('⚠️ Tailwind CSS may not have loaded properly. Using fallback styles.');
+        }
+        document.body.removeChild(testElement);
+      }, 1000);
+      </script>
+  </body>
+</html>
