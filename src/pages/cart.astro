@@ -632,17 +632,8 @@ import { sharedDataStore } from '../lib/shared-data-store';
       const cart = new Cart();
       console.log('✅ Cart created, items count:', cart.items.length);
       
-      // Add a test product if cart is empty
-      if (cart.items.length === 0) {
-        console.log('🧪 Adding test product to empty cart...');
-        cart.addItem({
-          id: 'restaurant-menu',
-          name: 'Restaurant Menu System',
-          description: 'Digital menu system with QR code ordering, real-time updates, and analytics dashboard.',
-          price: 25000
-        });
-        console.log('✅ Test product added, new items count:', cart.items.length);
-      }
+      // Cart is ready - no automatic items added
+      console.log('✅ Cart initialized with', cart.items.length, 'items');
       
       // Force cart content to be visible
       const cartContent = document.getElementById('cart-content');
