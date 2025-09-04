@@ -210,7 +210,19 @@ import StandaloneAdminLayout from '../../layouts/StandaloneAdminLayout.astro';
   const SUPABASE_URL = 'https://lmrrdcaavwwletcjcpqv.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ';
   
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let supabase = null;
+  
+  // Wait for Supabase to load
+  function waitForSupabase() {
+    return new Promise((resolve) => {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        resolve(supabase);
+      } else {
+        setTimeout(() => waitForSupabase().then(resolve), 100);
+      }
+    });
+  }
 
   // Initialize admin profile page
   document.addEventListener('DOMContentLoaded', async () => {
@@ -226,6 +238,11 @@ import StandaloneAdminLayout from '../../layouts/StandaloneAdminLayout.astro';
     try {
       console.log('🔄 Loading admin info...');
       
+      // Wait for Supabase to be available
+      if (!supabase) {
+        await waitForSupabase();
+      }
+      
       // Get current user from Supabase
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
@@ -235,9 +252,9 @@ import StandaloneAdminLayout from '../../layouts/StandaloneAdminLayout.astro';
       }
 
       if (user) {
-        // Get user profile from user_profiles table
+        // Get user profile from profiles table
         const { data: profile, error: profileError } = await supabase
-          .from('user_profiles')
+          .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
@@ -284,9 +301,14 @@ import StandaloneAdminLayout from '../../layouts/StandaloneAdminLayout.astro';
     try {
       console.log('🔄 Loading admin stats...');
       
+      // Wait for Supabase to be available
+      if (!supabase) {
+        await waitForSupabase();
+      }
+      
       // Get counts from different tables
       const [usersResult, contactsResult, ticketsResult, cartsResult] = await Promise.all([
-        supabase.from('user_profiles').select('*', { count: 'exact', head: true }),
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
         supabase.from('contact_submissions').select('*', { count: 'exact', head: true }),
         supabase.from('support_tickets').select('*', { count: 'exact', head: true }),
         supabase.from('cart_customizations').select('*', { count: 'exact', head: true })
@@ -316,6 +338,11 @@ import StandaloneAdminLayout from '../../layouts/StandaloneAdminLayout.astro';
 
     try {
       console.log('🔄 Loading recent activity...');
+      
+      // Wait for Supabase to be available
+      if (!supabase) {
+        await waitForSupabase();
+      }
       
       // Get recent data from different tables
       const [contactsResult, ticketsResult, cartsResult] = await Promise.all([
@@ -492,6 +519,11 @@ import StandaloneAdminLayout from '../../layouts/StandaloneAdminLayout.astro';
     const phone = document.getElementById('edit-phone').value;
 
     try {
+      // Wait for Supabase to be available
+      if (!supabase) {
+        await waitForSupabase();
+      }
+      
       // Get current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
@@ -500,9 +532,9 @@ import StandaloneAdminLayout from '../../layouts/StandaloneAdminLayout.astro';
         return;
       }
 
-      // Update profile in user_profiles table
+      // Update profile in profiles table
       const { error: updateError } = await supabase
-        .from('user_profiles')
+        .from('profiles')
         .update({
           full_name: fullName,
           phone: phone || null,

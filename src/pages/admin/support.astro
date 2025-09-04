@@ -64,11 +64,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <span class="text-sm text-gray-700">Show</span>
-              <select class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                <option>10</option>
-                <option>25</option>
-                <option>50</option>
-                <option>100</option>
+              <select id="items-per-page" class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
               </select>
               <span class="text-sm text-gray-700">entries</span>
             </div>
@@ -77,9 +77,13 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
               <button id="refresh-tickets" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 Refresh
               </button>
-              <span class="px-3 py-1 text-sm text-gray-700 bg-primary-50 border border-primary-200 rounded-md">1</span>
-              <button class="px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">2</button>
-              <button class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+              <button id="prev-page" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Previous
+              </button>
+              <div id="page-numbers" class="flex items-center space-x-1">
+                <!-- Page numbers will be generated dynamically -->
+              </div>
+              <button id="next-page" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 Next
               </button>
             </div>
@@ -87,109 +91,24 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         </div>
       </div>
 
-      <!-- AI Chat Logs -->
+      <!-- AI Chat Logs - Empty State -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-medium text-gray-900">AI Chat Logs</h3>
             <div class="flex items-center space-x-3">
-              <span class="text-sm text-gray-500">Recent conversations</span>
-              <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                View All Logs
-              </button>
+              <span class="text-sm text-gray-500">No conversations yet</span>
             </div>
           </div>
         </div>
 
-        <div class="p-6 space-y-4">
-          <!-- Chat Session 1 -->
-          <div class="border border-gray-200 rounded-lg p-4">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span class="text-sm font-medium text-blue-600">U</span>
-                </div>
-                <div>
-                  <div class="text-sm font-medium text-gray-900">user_123</div>
-                  <div class="text-xs text-gray-500">Dec 15, 2024 - 2:30 PM</div>
-                </div>
-              </div>
-              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                Resolved
-              </span>
-            </div>
-            <div class="space-y-2 text-sm">
-              <div class="bg-gray-50 p-2 rounded">
-                <span class="font-medium text-gray-700">User:</span> How do I reset my password?
-              </div>
-              <div class="bg-blue-50 p-2 rounded">
-                <span class="font-medium text-blue-700">AI:</span> To reset your password, go to the login page and click "Forgot Password". Enter your email address and you'll receive a reset link.
-              </div>
-              <div class="bg-gray-50 p-2 rounded">
-                <span class="font-medium text-gray-700">User:</span> Thanks, that worked!
-              </div>
-            </div>
-          </div>
-
-          <!-- Chat Session 2 -->
-          <div class="border border-gray-200 rounded-lg p-4">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <span class="text-sm font-medium text-green-600">S</span>
-                </div>
-                <div>
-                  <div class="text-sm font-medium text-gray-900">support_456</div>
-                  <div class="text-xs text-gray-500">Dec 15, 2024 - 1:45 PM</div>
-                </div>
-              </div>
-              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                Escalated
-              </span>
-            </div>
-            <div class="space-y-2 text-sm">
-              <div class="bg-gray-50 p-2 rounded">
-                <span class="font-medium text-gray-700">User:</span> My app keeps crashing when I try to upload files
-              </div>
-              <div class="bg-blue-50 p-2 rounded">
-                <span class="font-medium text-blue-700">AI:</span> I understand you're experiencing crashes during file uploads. Let me help you troubleshoot this issue. What type of files are you trying to upload?
-              </div>
-              <div class="bg-gray-50 p-2 rounded">
-                <span class="font-medium text-gray-700">User:</span> PDF files, around 10MB each
-              </div>
-              <div class="bg-blue-50 p-2 rounded">
-                <span class="font-medium text-blue-700">AI:</span> The file size might be causing the issue. Our app supports files up to 5MB. I'm escalating this to our support team for further assistance.
-              </div>
-            </div>
-          </div>
-
-          <!-- Chat Session 3 -->
-          <div class="border border-gray-200 rounded-lg p-4">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                  <span class="text-sm font-medium text-purple-600">M</span>
-                </div>
-                <div>
-                  <div class="text-sm font-medium text-gray-900">mobile_user</div>
-                  <div class="text-xs text-gray-500">Dec 15, 2024 - 12:20 PM</div>
-                </div>
-              </div>
-              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                Resolved
-              </span>
-            </div>
-            <div class="space-y-2 text-sm">
-              <div class="bg-gray-50 p-2 rounded">
-                <span class="font-medium text-gray-700">User:</span> Can I use the app offline?
-              </div>
-              <div class="bg-blue-50 p-2 rounded">
-                <span class="font-medium text-blue-700">AI:</span> Yes! Our app has offline capabilities. You can view previously loaded content and some features work without internet. However, for real-time updates and new content, you'll need an internet connection.
-              </div>
-              <div class="bg-gray-50 p-2 rounded">
-                <span class="font-medium text-gray-700">User:</span> Perfect, thank you!
-              </div>
-            </div>
+        <div class="p-6 text-center">
+          <div class="flex flex-col items-center">
+            <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+            <p class="text-lg font-medium text-gray-900 mb-2">No AI chat logs found</p>
+            <p class="text-gray-500">AI chat conversations will appear here when users interact with the AI assistant</p>
           </div>
         </div>
       </div>
@@ -199,7 +118,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
           <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
-              <h3 id="modal-title" class="text-lg font-medium text-gray-900">Ticket #567 - App not loading properly</h3>
+              <h3 id="modal-title" class="text-lg font-medium text-gray-900">Ticket Details</h3>
               <button id="close-modal" class="text-gray-400 hover:text-gray-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -208,65 +127,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             </div>
             
             <div id="modal-content" class="space-y-4">
-              <!-- Ticket Info -->
-              <div class="bg-gray-50 p-4 rounded-lg">
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span class="text-gray-600">Customer:</span>
-                    <p class="text-gray-900">John Doe (john@example.com)</p>
-                  </div>
-                  <div>
-                    <span class="text-gray-600">Priority:</span>
-                    <p class="text-gray-900">High</p>
-                  </div>
-                  <div>
-                    <span class="text-gray-600">Status:</span>
-                    <p class="text-gray-900">In Progress</p>
-                  </div>
-                  <div>
-                    <span class="text-gray-600">Created:</span>
-                    <p class="text-gray-900">Dec 15, 2024 - 2:30 PM</p>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Issue Description -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Issue Description</label>
-                <div class="bg-gray-50 p-3 rounded text-sm text-gray-900">
-                  The app keeps showing a loading screen and never loads the main content. I've tried refreshing multiple times and restarting the app, but the issue persists. This started happening after the latest update.
-                </div>
-              </div>
-              
-              <!-- Status Update -->
-              <div>
-                <label for="ticket-status" class="block text-sm font-medium text-gray-700">Update Status</label>
-                <select id="ticket-status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                  <option value="open" selected>Open</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="closed">Closed</option>
-                </select>
-              </div>
-              
-              <!-- Response -->
-              <div>
-                <label for="ticket-response" class="block text-sm font-medium text-gray-700">Add Response</label>
-                <textarea
-                  id="ticket-response"
-                  rows="4"
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="Type your response to the customer..."
-                ></textarea>
-              </div>
-              
-              <div class="flex justify-end space-x-3 pt-4">
-                <button onclick="closeTicketModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                  Cancel
-                </button>
-                <button onclick="updateTicket()" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700">
-                  Update Ticket
-                </button>
+              <!-- Content will be populated by JavaScript -->
+              <div class="text-center text-gray-500">
+                Loading ticket details...
               </div>
             </div>
           </div>
@@ -276,10 +139,30 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 </AdminLayout>
 
 <script>
-  import { supabase } from '../../lib/supabase';
-
+  // Supabase configuration
+  const SUPABASE_URL = 'https://lmrrdcaavwwletcjcpqv.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ';
+  
+  let supabase = null;
   let currentTickets = [];
   let filteredTickets = [];
+  
+  // Pagination variables
+  let currentPage = 1;
+  let itemsPerPage = 10;
+  let totalPages = 1;
+  
+  // Wait for Supabase to load
+  function waitForSupabase() {
+    return new Promise((resolve) => {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        resolve(supabase);
+      } else {
+        setTimeout(() => waitForSupabase().then(resolve), 100);
+      }
+    });
+  }
 
   // Initialize support page
   function initializeSupportPage() {
@@ -290,7 +173,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   // Load all support tickets
   async function loadTickets() {
     try {
-      console.log('Loading tickets from Supabase...');
+      console.log('🔄 Loading tickets from Supabase...');
+      
+      // Wait for Supabase to be available
+      if (!supabase) {
+        await waitForSupabase();
+      }
       
       const { data: tickets, error } = await supabase
         .from('support_tickets')
@@ -298,22 +186,136 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading tickets:', error);
+        console.error('❌ Error loading tickets:', error);
+        console.error('Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        
+        // Show specific error messages based on error type
+        let errorMessage = '';
+        if (error.code === 'PGRST116') {
+          errorMessage = 'Table "support_tickets" does not exist. Please run the fix-support-tickets-complete.sql script in Supabase SQL Editor.';
+        } else if (error.code === 'PGRST301') {
+          errorMessage = 'Permission denied. Please check RLS policies in Supabase.';
+        } else {
+          errorMessage = `Database Error: ${error.message}. Please run the fix-support-tickets-complete.sql script in Supabase.`;
+        }
+        
+        showTicketsError(errorMessage);
         return;
       }
 
-      currentTickets = tickets || [];
+      console.log('✅ Raw tickets from Supabase:', tickets);
+      
+      if (!tickets || tickets.length === 0) {
+        console.log('⚠️ No tickets found in database');
+        currentTickets = [];
+        filteredTickets = [];
+        renderTickets();
+        updateTicketsCount();
+        
+        // Show proper empty state
+        const tbody = document.getElementById('tickets-tbody');
+        const emptyState = document.getElementById('empty-tickets');
+        
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="px-6 py-4 text-center">
+                <div class="text-blue-600">
+                  <div class="font-medium">📋 No support tickets found</div>
+                  <div class="text-sm mt-1">Support tickets will appear here when users create them.</div>
+                  <div class="text-xs mt-2 text-gray-500">
+                    To add sample data, run the fix-support-tickets-complete.sql script in Supabase SQL Editor.
+                  </div>
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+        
+        if (emptyState) {
+          emptyState.classList.add('hidden');
+        }
+        
+        return;
+      }
+      
+      // Process tickets to ensure all fields exist
+      currentTickets = tickets.map(ticket => {
+        console.log('🔍 Processing ticket:', {
+          id: ticket.id,
+          rawTicket: ticket,
+          allKeys: Object.keys(ticket)
+        });
+        
+        // Try multiple possible field names for each property
+        const processedTicket = {
+          id: ticket.id,
+          ticketNumber: ticket.ticket_number || ticket.ticketNumber || ticket.ticket_id || ticket.id,
+          customerName: ticket.customer_name || ticket.customerName || ticket.name || ticket.user_name || ticket.userName || 'No Name',
+          customerEmail: ticket.customer_email || ticket.customerEmail || ticket.email || ticket.user_email || ticket.userEmail || 'No Email',
+          subject: ticket.subject || ticket.title || ticket.issue || 'No Subject',
+          description: ticket.description || ticket.message || ticket.content || ticket.details || 'No Description',
+          priority: ticket.priority || ticket.urgency || 'medium',
+          status: ticket.status || ticket.state || 'open',
+          createdAt: ticket.created_at || ticket.createdAt || ticket.date_created || ticket.dateCreated || new Date().toISOString(),
+          updatedAt: ticket.updated_at || ticket.updatedAt || ticket.date_updated || ticket.dateUpdated || new Date().toISOString(),
+          adminReplies: ticket.admin_replies || ticket.adminReplies || ticket.replies || ticket.responses || []
+        };
+        
+        console.log('✅ Processed ticket:', {
+          original: ticket,
+          processed: processedTicket,
+          nameSource: ticket.customer_name ? 'customer_name' : ticket.customerName ? 'customerName' : ticket.name ? 'name' : 'fallback',
+          emailSource: ticket.customer_email ? 'customer_email' : ticket.customerEmail ? 'customerEmail' : ticket.email ? 'email' : 'fallback'
+        });
+        
+        return processedTicket;
+      });
+      
       filteredTickets = [...currentTickets];
       
-      console.log('Tickets loaded from Supabase:', currentTickets);
+      // Reset pagination when loading new tickets
+      currentPage = 1;
+      
+      console.log('📊 Final processed tickets:', currentTickets);
       
       renderTickets();
       updateTicketsCount();
       
-      // Debug logging
-      console.log('Tickets loaded from Supabase:', currentTickets);
     } catch (error) {
-      console.error('Error loading tickets:', error);
+      console.error('❌ Error loading tickets:', error);
+      showTicketsError(`Connection Error: ${error.message}`);
+    }
+  }
+  
+  // Show error message in the tickets table
+  function showTicketsError(message) {
+    const tbody = document.getElementById('tickets-tbody');
+    const emptyState = document.getElementById('empty-tickets');
+    
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="px-6 py-4 text-center">
+            <div class="text-red-600">
+              <div class="font-medium">Error Loading Tickets</div>
+              <div class="text-sm mt-1">${message}</div>
+              <div class="text-xs mt-2 text-gray-500">
+                Please check the browser console for more details and run the create-support-tickets-table.sql script in Supabase.
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+    
+    if (emptyState) {
+      emptyState.classList.add('hidden');
     }
   }
 
@@ -327,21 +329,34 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     if (filteredTickets.length === 0) {
       tbody.innerHTML = '';
       emptyState.classList.remove('hidden');
+      updatePagination();
       return;
     }
 
     emptyState.classList.add('hidden');
-    tbody.innerHTML = filteredTickets.map(ticket => `
+    
+    // Calculate pagination
+    totalPages = Math.ceil(filteredTickets.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedTickets = filteredTickets.slice(startIndex, endIndex);
+    
+    console.log('Rendering tickets:', paginatedTickets); // Debug log
+    
+    tbody.innerHTML = paginatedTickets.map(ticket => {
+      console.log('Rendering ticket:', ticket.customerName, ticket.customerEmail); // Debug log
+      
+      return `
       <tr class="hover:bg-gray-50">
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${ticket.ticketNumber}</td>
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="flex items-center">
             <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
-              <span class="text-sm font-medium text-primary-600">${ticket.customerName.charAt(0)}</span>
+              <span class="text-sm font-medium text-primary-600">${(ticket.customerName || 'U').charAt(0).toUpperCase()}</span>
             </div>
             <div>
-              <div class="text-sm font-medium text-gray-900">${ticket.customerName}</div>
-              <div class="text-sm text-gray-500">${ticket.customerEmail}</div>
+              <div class="text-sm font-medium text-gray-900">${ticket.customerName || 'Unknown User'}</div>
+              <div class="text-sm text-gray-500">${ticket.customerEmail || 'No Email'}</div>
             </div>
           </div>
         </td>
@@ -366,7 +381,91 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
            </div>
          </td>
       </tr>
-    `).join('');
+      `;
+    }).join('');
+    
+    // Update pagination controls
+    updatePagination();
+  }
+
+  // Update pagination controls
+  function updatePagination() {
+    const pageNumbers = document.getElementById('page-numbers');
+    const prevButton = document.getElementById('prev-page');
+    const nextButton = document.getElementById('next-page');
+    
+    if (!pageNumbers || !prevButton || !nextButton) return;
+    
+    // Update previous button
+    prevButton.disabled = currentPage === 1;
+    prevButton.classList.toggle('opacity-50', currentPage === 1);
+    prevButton.classList.toggle('cursor-not-allowed', currentPage === 1);
+    
+    // Update next button
+    nextButton.disabled = currentPage === totalPages || totalPages === 0;
+    nextButton.classList.toggle('opacity-50', currentPage === totalPages || totalPages === 0);
+    nextButton.classList.toggle('cursor-not-allowed', currentPage === totalPages || totalPages === 0);
+    
+    // Generate page numbers
+    let pageNumbersHTML = '';
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      const isActive = i === currentPage;
+      pageNumbersHTML += `
+        <button 
+          class="px-3 py-1 text-sm border rounded-md transition-colors ${
+            isActive 
+              ? 'bg-primary-50 text-primary-700 border-primary-200' 
+              : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'
+          }"
+          onclick="goToPage(${i})"
+        >
+          ${i}
+        </button>
+      `;
+    }
+    
+    pageNumbers.innerHTML = pageNumbersHTML;
+  }
+
+  // Go to specific page
+  function goToPage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderTickets();
+  }
+
+  // Go to next page
+  function nextPage() {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTickets();
+    }
+  }
+
+  // Go to previous page
+  function prevPage() {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTickets();
+    }
+  }
+
+  // Change items per page
+  function changeItemsPerPage() {
+    const select = document.getElementById('items-per-page');
+    if (select) {
+      itemsPerPage = parseInt(select.value);
+      currentPage = 1; // Reset to first page
+      renderTickets();
+    }
   }
 
   // Update tickets count
@@ -518,16 +617,40 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     }
   }
   
-  function reopenTicket(ticketId) {
+  async function reopenTicket(ticketId) {
     if (confirm('Reopen this ticket?')) {
       try {
-        const success = adminDataStore.updateTicket(ticketId, { status: 'open' });
-        if (success) {
-          loadTickets();
-          alert('Ticket reopened successfully!');
-        } else {
-          alert('Failed to reopen ticket');
+        // Wait for Supabase to be available
+        if (!supabase) {
+          await waitForSupabase();
         }
+        
+        // Update ticket status in Supabase
+        const { error } = await supabase
+          .from('support_tickets')
+          .update({ 
+            status: 'open',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', ticketId);
+        
+        if (error) {
+          console.error('Error reopening ticket:', error);
+          alert('Failed to reopen ticket: ' + error.message);
+          return;
+        }
+        
+        // Update local array
+        const ticketIndex = currentTickets.findIndex(t => t.id === ticketId);
+        if (ticketIndex > -1) {
+          currentTickets[ticketIndex].status = 'open';
+          currentTickets[ticketIndex].updatedAt = new Date().toISOString();
+          filteredTickets = [...currentTickets];
+          renderTickets();
+          updateTicketsCount();
+        }
+        
+        alert('Ticket reopened successfully!');
       } catch (error) {
         console.error('Error reopening ticket:', error);
         alert('Failed to reopen ticket');
@@ -535,55 +658,80 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     }
   }
   
-           function updateTicket(ticketId) {
-      const status = document.getElementById('ticket-status').value;
-      const response = document.getElementById('ticket-response').value;
+  async function updateTicket(ticketId) {
+    const status = document.getElementById('ticket-status').value;
+    const response = document.getElementById('ticket-response').value;
+    
+    if (!response.trim()) {
+      alert('Please add a reply before updating the ticket');
+      return;
+    }
+    
+    try {
+      // Wait for Supabase to be available
+      if (!supabase) {
+        await waitForSupabase();
+      }
       
-      if (!response.trim()) {
-        alert('Please add a reply before updating the ticket');
+      // Find the ticket to get its details
+      const ticket = currentTickets.find(t => t.id === ticketId);
+      if (!ticket) {
+        alert('Ticket not found');
         return;
       }
       
-      try {
-        // Find the ticket to get its details
-        const ticket = currentTickets.find(t => t.id === ticketId);
-        if (!ticket) {
-          alert('Ticket not found');
-          return;
-        }
-        
-        // Create admin reply object
-        const adminReply = {
-          message: response,
-          timestamp: new Date().toISOString(),
-          adminName: 'Admin' // You can get this from the current admin user
-        };
-        
-        // Update ticket with status and admin reply
-        const success = adminDataStore.updateTicket(ticketId, { 
+      // Create admin reply object
+      const adminReply = {
+        message: response,
+        timestamp: new Date().toISOString(),
+        adminName: 'Admin' // You can get this from the current admin user
+      };
+      
+      // Get existing admin replies and add new one
+      const existingReplies = ticket.adminReplies || [];
+      const updatedReplies = [...existingReplies, adminReply];
+      
+      // Update ticket in Supabase
+      const { error } = await supabase
+        .from('support_tickets')
+        .update({ 
           status: status,
-          adminReply: adminReply
-        });
-        
-        if (success) {
-          loadTickets();
-          
-          // Show success message with more details
-          const successMessage = `✅ Reply sent successfully!\n\nTicket #${ticket.ticketNumber} has been updated.\nStatus: ${status}\nCustomer: ${ticket.customerName}\n\nAn email notification has been sent to ${ticket.customerEmail}`;
-          alert(successMessage);
-          
-          closeTicketModal();
-          
-          // Show success toast
-          showSuccessToast(`Reply sent to ${ticket.customerName} for ticket #${ticket.ticketNumber}`);
-        } else {
-          alert('Failed to update ticket');
-        }
-      } catch (error) {
+          admin_replies: updatedReplies,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', ticketId);
+      
+      if (error) {
         console.error('Error updating ticket:', error);
-        alert('Failed to update ticket');
+        alert('Failed to update ticket: ' + error.message);
+        return;
       }
+      
+      // Update local array
+      const ticketIndex = currentTickets.findIndex(t => t.id === ticketId);
+      if (ticketIndex > -1) {
+        currentTickets[ticketIndex].status = status;
+        currentTickets[ticketIndex].adminReplies = updatedReplies;
+        currentTickets[ticketIndex].updatedAt = new Date().toISOString();
+        filteredTickets = [...currentTickets];
+        renderTickets();
+        updateTicketsCount();
+      }
+      
+      // Show success message
+      const successMessage = `✅ Reply sent successfully!\n\nTicket #${ticket.ticketNumber} has been updated.\nStatus: ${status}\nCustomer: ${ticket.customerName}\n\nAn email notification has been sent to ${ticket.customerEmail}`;
+      alert(successMessage);
+      
+      closeTicketModal();
+      
+      // Show success toast
+      showSuccessToast(`Reply sent to ${ticket.customerName} for ticket #${ticket.ticketNumber}`);
+      
+    } catch (error) {
+      console.error('Error updating ticket:', error);
+      alert('Failed to update ticket');
     }
+  }
 
 
 
@@ -592,7 +740,10 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     // Refresh button
     document.getElementById('refresh-tickets')?.addEventListener('click', loadTickets);
     
-
+    // Pagination controls
+    document.getElementById('items-per-page')?.addEventListener('change', changeItemsPerPage);
+    document.getElementById('prev-page')?.addEventListener('click', prevPage);
+    document.getElementById('next-page')?.addEventListener('click', nextPage);
 
     // Modal close button
     document.getElementById('close-modal')?.addEventListener('click', closeTicketModal);
@@ -604,6 +755,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       }
     });
   }
+
+  // Make pagination functions globally available
+  window.goToPage = goToPage;
+  window.nextPage = nextPage;
+  window.prevPage = prevPage;
+  window.changeItemsPerPage = changeItemsPerPage;
 
   // Initialize page when DOM loads
   document.addEventListener('DOMContentLoaded', initializeSupportPage);

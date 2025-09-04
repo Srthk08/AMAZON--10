@@ -64,13 +64,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-medium text-gray-900">All Orders</h3>
             <div class="flex items-center space-x-3">
-                             <span id="orders-count" class="text-sm text-gray-500">No orders</span>
-              <button id="export-btn" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                Export CSV
-              </button>
-              <button id="test-orders" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                Test Orders
-              </button>
+              <span id="orders-count" class="text-sm text-gray-500">No orders</span>
             </div>
           </div>
         </div>
@@ -94,6 +88,37 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
               </tr>
             </tbody>
           </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="bg-white px-6 py-3 border-t border-gray-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-gray-700">Show</span>
+              <select id="items-per-page" class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span class="text-sm text-gray-700">entries</span>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <button id="refresh-orders" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Refresh
+              </button>
+              <button id="prev-page" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Previous
+              </button>
+              <div id="page-numbers" class="flex items-center space-x-1">
+                <!-- Page numbers will be generated dynamically -->
+              </div>
+              <button id="next-page" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -129,6 +154,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
   let currentOrders = [];
   let filteredOrders = [];
+  
+  // Pagination variables
+  let currentPage = 1;
+  let itemsPerPage = 10;
+  let totalPages = 1;
 
   // Initialize orders page
   function initializeOrdersPage() {
@@ -139,25 +169,29 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   // Load all orders
   async function loadOrders() {
     try {
-      console.log('Loading orders from Supabase...');
-      
-      const { data: orders, error } = await supabase
-        .from('cart_customizations')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // Create a single example order
+      const exampleOrder = {
+        id: 'example-order-1',
+        orderNumber: 'ORD-2024-001',
+        customerName: 'John Doe',
+        customerEmail: 'john.doe@example.com',
+        serviceName: 'Web Development',
+        serviceType: 'custom',
+        status: 'pending',
+        amount: 15000,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
 
-      if (error) {
-        console.error('Error loading orders:', error);
-        return;
-      }
-
-      currentOrders = orders || [];
+      currentOrders = [exampleOrder];
       filteredOrders = [...currentOrders];
+      
+      // Reset pagination when loading new orders
+      currentPage = 1;
+      
       renderOrders();
       updateOrdersCount();
       
-      // Debug logging
-      console.log('Orders loaded from Supabase:', currentOrders);
     } catch (error) {
       console.error('Error loading orders:', error);
     }
@@ -182,37 +216,44 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           </td>
         </tr>
       `;
+      updatePagination();
       return;
     }
 
-    tbody.innerHTML = filteredOrders.map(order => `
+    // Calculate pagination
+    totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
+
+    tbody.innerHTML = paginatedOrders.map(order => `
       <tr class="hover:bg-gray-50">
-        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${order.orderNumber}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${order.orderNumber || order.id || 'N/A'}</td>
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="flex items-center">
             <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
-              <span class="text-sm font-medium text-primary-600">${order.customerName.charAt(0)}</span>
+              <span class="text-sm font-medium text-primary-600">${(order.customerName || order.customer_name || 'U').charAt(0).toUpperCase()}</span>
             </div>
             <div>
-              <div class="text-sm font-medium text-gray-900">${order.customerName}</div>
-              <div class="text-sm text-gray-500">${order.customerEmail}</div>
+              <div class="text-sm font-medium text-gray-900">${order.customerName || order.customer_name || 'No Name'}</div>
+              <div class="text-sm text-gray-500">${order.customerEmail || order.customer_email || 'No Email'}</div>
             </div>
           </div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
-          <div class="text-sm text-gray-900">${order.serviceName}</div>
-          <div class="text-sm text-gray-500 capitalize">${order.serviceType}</div>
+          <div class="text-sm text-gray-900">${order.serviceName || order.service_name || 'No Service'}</div>
+          <div class="text-sm text-gray-500 capitalize">${order.serviceType || order.service_type || 'N/A'}</div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
           <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}">
-            ${order.status.replace('_', ' ')}
+            ${(order.status || 'pending').replace('_', ' ')}
           </span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-          ₹${order.amount.toLocaleString()}
+          ₹${(order.amount || order.total_amount || 0).toLocaleString()}
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-          ${new Date(order.createdAt).toLocaleDateString()}
+          ${order.createdAt || order.created_at ? new Date(order.createdAt || order.created_at).toLocaleDateString() : 'N/A'}
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
           <div class="flex space-x-2">
@@ -232,6 +273,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         </td>
       </tr>
     `).join('');
+    
+    // Update pagination controls
+    updatePagination();
   }
 
   // Update orders count
@@ -239,6 +283,86 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     const countElement = document.getElementById('orders-count');
     if (countElement) {
       countElement.textContent = `Showing ${filteredOrders.length} of ${currentOrders.length} orders`;
+    }
+  }
+
+  // Update pagination controls
+  function updatePagination() {
+    const pageNumbers = document.getElementById('page-numbers');
+    const prevButton = document.getElementById('prev-page');
+    const nextButton = document.getElementById('next-page');
+    
+    if (!pageNumbers || !prevButton || !nextButton) return;
+    
+    // Update previous button
+    prevButton.disabled = currentPage === 1;
+    prevButton.classList.toggle('opacity-50', currentPage === 1);
+    prevButton.classList.toggle('cursor-not-allowed', currentPage === 1);
+    
+    // Update next button
+    nextButton.disabled = currentPage === totalPages || totalPages === 0;
+    nextButton.classList.toggle('opacity-50', currentPage === totalPages || totalPages === 0);
+    nextButton.classList.toggle('cursor-not-allowed', currentPage === totalPages || totalPages === 0);
+    
+    // Generate page numbers
+    let pageNumbersHTML = '';
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      const isActive = i === currentPage;
+      pageNumbersHTML += `
+        <button 
+          class="px-3 py-1 text-sm border rounded-md transition-colors ${
+            isActive 
+              ? 'bg-primary-50 text-primary-700 border-primary-200' 
+              : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'
+          }"
+          onclick="goToPage(${i})"
+        >
+          ${i}
+        </button>
+      `;
+    }
+    
+    pageNumbers.innerHTML = pageNumbersHTML;
+  }
+
+  // Go to specific page
+  function goToPage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderOrders();
+  }
+
+  // Go to next page
+  function nextPage() {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderOrders();
+    }
+  }
+
+  // Go to previous page
+  function prevPage() {
+    if (currentPage > 1) {
+      currentPage--;
+      renderOrders();
+    }
+  }
+
+  // Change items per page
+  function changeItemsPerPage() {
+    const select = document.getElementById('items-per-page');
+    if (select) {
+      itemsPerPage = parseInt(select.value);
+      currentPage = 1; // Reset to first page
+      renderOrders();
     }
   }
 
@@ -262,17 +386,23 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
     filteredOrders = currentOrders.filter(order => {
       // Search filter
+      const orderNumber = order.orderNumber || order.id || '';
+      const customerName = order.customerName || order.customer_name || '';
+      const customerEmail = order.customerEmail || order.customer_email || '';
+      const serviceName = order.serviceName || order.service_name || '';
+      
       const matchesSearch = 
-        order.orderNumber.toLowerCase().includes(searchQuery) ||
-        order.customerName.toLowerCase().includes(searchQuery) ||
-        order.customerEmail.toLowerCase().includes(searchQuery) ||
-        order.serviceName.toLowerCase().includes(searchQuery);
+        orderNumber.toLowerCase().includes(searchQuery) ||
+        customerName.toLowerCase().includes(searchQuery) ||
+        customerEmail.toLowerCase().includes(searchQuery) ||
+        serviceName.toLowerCase().includes(searchQuery);
 
       // Status filter
       const matchesStatus = !statusFilter || order.status === statusFilter;
 
       // Date filter
-      const matchesDate = !dateFilter || filterByDate(order.createdAt, dateFilter);
+      const orderDate = order.createdAt || order.created_at;
+      const matchesDate = !dateFilter || !orderDate || filterByDate(orderDate, dateFilter);
 
       return matchesSearch && matchesStatus && matchesDate;
     });
@@ -305,8 +435,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
   // View order details
   function viewOrder(orderId: string) {
-    const order = adminDataStore.getOrderById(orderId);
-    if (!order) return;
+    const order = currentOrders.find(o => o.id === orderId);
+    if (!order) {
+      console.error('Order not found:', orderId);
+      alert('Order not found');
+      return;
+    }
 
     const modal = document.getElementById('order-modal');
     const modalTitle = document.getElementById('modal-title');
@@ -323,25 +457,25 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Order Number:</span>
-                <span class="text-sm font-medium text-gray-900">${order.orderNumber}</span>
+                <span class="text-sm font-medium text-gray-900">${order.orderNumber || order.id}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Status:</span>
                 <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}">
-                  ${order.status.replace('_', ' ')}
+                  ${(order.status || 'pending').replace('_', ' ')}
                 </span>
               </div>
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Payment Status:</span>
-                <span class="text-sm font-medium text-gray-900">${order.paymentStatus}</span>
+                <span class="text-sm font-medium text-gray-900">${order.paymentStatus || 'Pending'}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Amount:</span>
-                <span class="text-sm font-medium text-gray-900">₹${order.amount.toLocaleString()}</span>
+                <span class="text-sm font-medium text-gray-900">₹${(order.amount || 0).toLocaleString()}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Created:</span>
-                <span class="text-sm text-gray-900">${new Date(order.createdAt).toLocaleDateString()}</span>
+                <span class="text-sm text-gray-900">${order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -352,11 +486,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Name:</span>
-                <span class="text-sm font-medium text-gray-900">${order.customerName}</span>
+                <span class="text-sm font-medium text-gray-900">${order.customerName || 'No Name'}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Email:</span>
-                <span class="text-sm font-medium text-gray-900">${order.customerEmail}</span>
+                <span class="text-sm font-medium text-gray-900">${order.customerEmail || 'No Email'}</span>
               </div>
             </div>
           </div>
@@ -368,54 +502,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           <div class="space-y-2">
             <div class="flex justify-between">
               <span class="text-sm text-gray-500">Service:</span>
-              <span class="text-sm font-medium text-gray-900">${order.serviceName}</span>
+              <span class="text-sm font-medium text-gray-900">${order.serviceName || 'No Service'}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-sm text-gray-500">Type:</span>
-              <span class="text-sm font-medium text-gray-900 capitalize">${order.serviceType}</span>
+              <span class="text-sm font-medium text-gray-900 capitalize">${order.serviceType || 'N/A'}</span>
             </div>
-            ${order.notes ? `
-              <div class="mt-3">
-                <span class="text-sm text-gray-500 block mb-1">Notes:</span>
-                <p class="text-sm text-gray-900 bg-gray-50 p-3 rounded-md">${order.notes}</p>
-              </div>
-            ` : ''}
-          </div>
-        </div>
-
-        <!-- Files -->
-        ${order.files && order.files.length > 0 ? `
-          <div class="space-y-4">
-            <h4 class="text-md font-medium text-gray-900">Attached Files</h4>
-            <div class="space-y-2">
-              ${order.files.map(file => `
-                <div class="flex items-center space-x-2">
-                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                  </svg>
-                  <span class="text-sm text-gray-900">${file}</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        ` : ''}
-
-        <!-- Timeline -->
-        <div class="space-y-4">
-          <h4 class="text-md font-medium text-gray-900">Order Timeline</h4>
-          <div class="space-y-3">
-            ${order.timeline.map(item => `
-              <div class="flex items-start space-x-3">
-                <div class="w-2 h-2 bg-primary-600 rounded-full mt-2"></div>
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-gray-900">${item.status}</p>
-                  <p class="text-sm text-gray-600">${item.message}</p>
-                  <p class="text-xs text-gray-500 mt-1">
-                    ${new Date(item.timestamp).toLocaleString()} by ${item.updatedBy}
-                  </p>
-                </div>
-              </div>
-            `).join('')}
           </div>
         </div>
       `;
@@ -425,31 +517,32 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   }
 
   // Update order status
-  function updateOrderStatus(orderId: string) {
-    const order = adminDataStore.getOrderById(orderId);
-    if (!order) return;
+  async function updateOrderStatus(orderId: string) {
+    const order = currentOrders.find(o => o.id === orderId);
+    if (!order) {
+      console.error('Order not found:', orderId);
+      alert('Order not found');
+      return;
+    }
 
     const newStatus = prompt(
-      `Current status: ${order.status}\n\nEnter new status:\n- pending\n- confirmed\n- in_progress\n- completed\n- cancelled`,
-      order.status
+      `Current status: ${order.status || 'No status'}\n\nEnter new status:\n- pending\n- confirmed\n- in_progress\n- completed\n- cancelled`,
+      order.status || 'pending'
     );
 
     if (newStatus && newStatus !== order.status) {
       try {
-        const updatedOrder = adminDataStore.updateOrder(orderId, { status: newStatus });
-        if (updatedOrder) {
-          // Add timeline entry
-          adminDataStore.addOrderTimeline(orderId, {
-            status: 'Status Updated',
-            message: `Order status changed from ${order.status} to ${newStatus}`,
-            timestamp: new Date().toISOString(),
-            updatedBy: 'Admin'
-          });
-
-          // Refresh the page
-          loadOrders();
-          alert('Order status updated successfully!');
+        // Update local array only (since this is example data)
+        const orderIndex = currentOrders.findIndex(o => o.id === orderId);
+        if (orderIndex > -1) {
+          currentOrders[orderIndex].status = newStatus;
+          currentOrders[orderIndex].updatedAt = new Date().toISOString();
+          filteredOrders = [...currentOrders];
+          renderOrders();
+          updateOrdersCount();
         }
+
+        alert('Order status updated successfully!');
       } catch (error) {
         alert('Failed to update order status');
         console.error('Error updating order status:', error);
@@ -457,52 +550,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     }
   }
 
-  // Test orders function
-  function testOrders() {
-    console.log('Testing orders in admin orders page...');
-    
-    try {
-      // Test adminDataStore
-      const adminOrders = adminDataStore.getOrders();
-      console.log('Orders from adminDataStore:', adminOrders);
-      
-      // Test sharedDataStore directly
-      const sharedOrders = sharedDataStore.getOrders();
-      console.log('Orders from sharedDataStore:', sharedOrders);
-      
-      // Test localStorage
-      const localStorageOrders = localStorage.getItem('shared-orders');
-      console.log('Orders from localStorage:', localStorageOrders);
-      
-      if (localStorageOrders) {
-        const parsedOrders = JSON.parse(localStorageOrders);
-        console.log('Parsed orders from localStorage:', parsedOrders);
-      }
-      
-      alert(`AdminDataStore: ${adminOrders.length} orders\nSharedDataStore: ${sharedOrders.length} orders\nlocalStorage: ${localStorageOrders ? 'Found' : 'Not found'}`);
-      
-    } catch (error) {
-      console.error('Error testing orders:', error);
-      alert('Error testing orders: ' + error.message);
-    }
-  }
 
-  // Export orders to CSV
-  function exportOrders() {
-    try {
-      const csvContent = adminDataStore.exportOrdersToCSV();
-      const blob = new Blob([csvContent], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `orders-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      alert('Failed to export orders');
-      console.error('Error exporting orders:', error);
-    }
-  }
 
   // Setup event listeners
   function setupEventListeners() {
@@ -511,11 +559,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     document.getElementById('status-filter')?.addEventListener('change', filterOrders);
     document.getElementById('date-filter')?.addEventListener('change', filterOrders);
 
-    // Export button
-    document.getElementById('export-btn')?.addEventListener('click', exportOrders);
-    
-    // Test button
-    document.getElementById('test-orders')?.addEventListener('click', testOrders);
+    // Pagination controls
+    document.getElementById('items-per-page')?.addEventListener('change', changeItemsPerPage);
+    document.getElementById('prev-page')?.addEventListener('click', prevPage);
+    document.getElementById('next-page')?.addEventListener('click', nextPage);
+    document.getElementById('refresh-orders')?.addEventListener('click', loadOrders);
 
     // Modal close button
     document.getElementById('close-modal')?.addEventListener('click', () => {
@@ -536,5 +584,8 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   // Make functions globally available for onclick handlers
   (window as any).viewOrder = viewOrder;
   (window as any).updateOrderStatus = updateOrderStatus;
-  (window as any).testOrders = testOrders;
+  (window as any).goToPage = goToPage;
+  (window as any).nextPage = nextPage;
+  (window as any).prevPage = prevPage;
+  (window as any).changeItemsPerPage = changeItemsPerPage;
 </script>

@@ -162,6 +162,37 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             </tbody>
           </table>
         </div>
+        
+        <!-- Pagination -->
+        <div class="bg-white px-6 py-3 border-t border-gray-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-gray-700">Show</span>
+              <select id="items-per-page" class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span class="text-sm text-gray-700">entries</span>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <button id="refresh-transactions" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Refresh
+              </button>
+              <button id="prev-page" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Previous
+              </button>
+              <div id="page-numbers" class="flex items-center space-x-1">
+                <!-- Page numbers will be generated dynamically -->
+              </div>
+              <button id="next-page" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Transaction Details Modal -->
@@ -196,6 +227,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
   let currentTransactions: any[] = [];
   let filteredTransactions: any[] = [];
+  
+  // Pagination variables
+  let currentPage = 1;
+  let itemsPerPage = 10;
+  let totalPages = 1;
 
   // Initialize billing page
   function initializeBillingPage() {
@@ -208,6 +244,10 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     try {
       currentTransactions = adminDataStore.getRevenue();
       filteredTransactions = [...currentTransactions];
+      
+      // Reset pagination when loading new data
+      currentPage = 1;
+      
       renderTransactions();
       updateRevenueStats();
       updateTransactionsCount();
@@ -256,10 +296,17 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           </td>
         </tr>
       `;
+      updatePagination();
       return;
     }
 
-    tbody.innerHTML = filteredTransactions.map(transaction => `
+    // Calculate pagination
+    totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedTransactions = filteredTransactions.slice(startIndex, endIndex);
+
+    tbody.innerHTML = paginatedTransactions.map(transaction => `
       <tr class="hover:bg-gray-50">
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
           ${transaction.transactionId || 'N/A'}
@@ -301,6 +348,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         </td>
       </tr>
     `).join('');
+    
+    // Update pagination controls
+    updatePagination();
   }
 
   // Update transactions count
@@ -308,6 +358,86 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     const countElement = document.getElementById('transactions-count');
     if (countElement) {
       countElement.textContent = `Showing ${filteredTransactions.length} of ${currentTransactions.length} transactions`;
+    }
+  }
+
+  // Update pagination controls
+  function updatePagination() {
+    const pageNumbers = document.getElementById('page-numbers');
+    const prevButton = document.getElementById('prev-page');
+    const nextButton = document.getElementById('next-page');
+    
+    if (!pageNumbers || !prevButton || !nextButton) return;
+    
+    // Update previous button
+    prevButton.disabled = currentPage === 1;
+    prevButton.classList.toggle('opacity-50', currentPage === 1);
+    prevButton.classList.toggle('cursor-not-allowed', currentPage === 1);
+    
+    // Update next button
+    nextButton.disabled = currentPage === totalPages || totalPages === 0;
+    nextButton.classList.toggle('opacity-50', currentPage === totalPages || totalPages === 0);
+    nextButton.classList.toggle('cursor-not-allowed', currentPage === totalPages || totalPages === 0);
+    
+    // Generate page numbers
+    let pageNumbersHTML = '';
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      const isActive = i === currentPage;
+      pageNumbersHTML += `
+        <button 
+          class="px-3 py-1 text-sm border rounded-md transition-colors ${
+            isActive 
+              ? 'bg-primary-50 text-primary-700 border-primary-200' 
+              : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'
+          }"
+          onclick="goToPage(${i})"
+        >
+          ${i}
+        </button>
+      `;
+    }
+    
+    pageNumbers.innerHTML = pageNumbersHTML;
+  }
+
+  // Go to specific page
+  function goToPage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderTransactions();
+  }
+
+  // Go to next page
+  function nextPage() {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTransactions();
+    }
+  }
+
+  // Go to previous page
+  function prevPage() {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTransactions();
+    }
+  }
+
+  // Change items per page
+  function changeItemsPerPage() {
+    const select = document.getElementById('items-per-page');
+    if (select) {
+      itemsPerPage = parseInt(select.value);
+      currentPage = 1; // Reset to first page
+      renderTransactions();
     }
   }
 
@@ -477,6 +607,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     document.getElementById('status-filter')?.addEventListener('change', filterTransactions);
     document.getElementById('date-filter')?.addEventListener('change', filterTransactions);
 
+    // Pagination controls
+    document.getElementById('items-per-page')?.addEventListener('change', changeItemsPerPage);
+    document.getElementById('prev-page')?.addEventListener('click', prevPage);
+    document.getElementById('next-page')?.addEventListener('click', nextPage);
+    document.getElementById('refresh-transactions')?.addEventListener('click', loadBillingData);
+
     // Export button
     document.getElementById('export-btn')?.addEventListener('click', exportTransactions);
 
@@ -499,4 +635,8 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   // Make functions globally available for onclick handlers
   (window as any).viewTransaction = viewTransaction;
   (window as any).refundTransaction = refundTransaction;
+  (window as any).goToPage = goToPage;
+  (window as any).nextPage = nextPage;
+  (window as any).prevPage = prevPage;
+  (window as any).changeItemsPerPage = changeItemsPerPage;
 </script>

@@ -12,6 +12,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
       <!-- Search and Filters -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">Search & Filter Users</h2>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Search -->
           <div class="md:col-span-2">
@@ -63,10 +66,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-medium text-gray-900">All Users</h3>
             <div class="flex items-center space-x-3">
-                             <span id="users-count" class="text-sm text-gray-500">No users</span>
-              <button id="add-user-btn" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                Add User
-              </button>
+              <span id="users-count" class="text-sm text-gray-500">No users</span>
             </div>
           </div>
         </div>
@@ -89,6 +89,37 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
               </tr>
             </tbody>
           </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="bg-white px-6 py-3 border-t border-gray-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-gray-700">Show</span>
+              <select id="items-per-page" class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span class="text-sm text-gray-700">entries</span>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <button id="refresh-users" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Refresh
+              </button>
+              <button id="prev-page" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Previous
+              </button>
+              <div id="page-numbers" class="flex items-center space-x-1">
+                <!-- Page numbers will be generated dynamically -->
+              </div>
+              <button id="next-page" class="px-3 py-1 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -262,15 +293,39 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 </AdminLayout>
 
 <script>
-  import { supabase } from '../../lib/supabase';
-
+  // Supabase configuration
+  const SUPABASE_URL = 'https://lmrrdcaavwwletcjcpqv.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ';
+  
+  let supabase = null;
   let currentUsers = [];
   let filteredUsers = [];
   let isEditing = false;
+  
+  // Pagination variables
+  let currentPage = 1;
+  let itemsPerPage = 10;
+  let totalPages = 1;
+
+  // Wait for Supabase to load
+  function waitForSupabase() {
+    return new Promise((resolve) => {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        resolve(supabase);
+      } else {
+        setTimeout(() => waitForSupabase().then(resolve), 100);
+      }
+    });
+  }
 
   // Initialize users page
-  function initializeUsersPage() {
-    loadUsers();
+  async function initializeUsersPage() {
+    console.log('🚀 Initializing users page...');
+    console.log('🔍 Supabase available:', !!window.supabase);
+    console.log('🔍 Current users before load:', currentUsers.length);
+    
+    await loadUsers();
     setupEventListeners();
   }
 
@@ -279,25 +334,79 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     try {
       console.log('🔄 Loading ALL users from Supabase...');
       
+      // Wait for Supabase to be available
+      if (!supabase) {
+        console.log('⏳ Waiting for Supabase to load...');
+        await waitForSupabase();
+      }
+      
+      console.log('✅ Supabase client ready:', !!supabase);
+      
+      // Get current user first to ensure we're authenticated
+      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !currentUser) {
+        console.error('❌ Not authenticated:', userError);
+        return;
+      }
+      
+      console.log('✅ Authenticated as:', currentUser.email);
+      
+      // First, let's check if there are any users at all
+      const { count, error: countError } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+      
+      if (countError) {
+        console.error('❌ Error checking user count:', countError);
+      } else {
+        console.log('📊 Total users in database:', count);
+      }
+      
       const { data: users, error } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading users:', error);
+        console.error('❌ Error loading users:', error);
+        console.error('Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
         return;
       }
 
-      currentUsers = users || [];
+      console.log('✅ Raw users data from Supabase:', users);
+      
+      // Process users data to ensure all fields exist
+      currentUsers = (users || []).map(user => ({
+        id: user.id,
+        full_name: user.full_name || 'No Name',
+        email: user.email || 'No Email',
+        phone: user.phone || '',
+        company_name: user.company_name || '',
+        role: user.role || 'customer',
+        status: user.status || 'active',
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+        last_login_at: user.last_login_at || null
+      }));
+      
       filteredUsers = [...currentUsers];
       
-      console.log('✅ Loaded users from Supabase:', currentUsers);
+      // Reset pagination when loading new users
+      currentPage = 1;
+      
+      console.log('✅ Processed users data:', currentUsers);
+      console.log('📊 Total users found:', currentUsers.length);
       
       renderUsers();
       updateUsersCount();
     } catch (error) {
-      console.error('Error loading users:', error);
+      console.error('❌ Error loading users:', error);
     }
   }
 
@@ -320,20 +429,27 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           </td>
         </tr>
       `;
+      updatePagination();
       return;
     }
 
-    tbody.innerHTML = filteredUsers.map(user => `
+    // Calculate pagination
+    totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+    tbody.innerHTML = paginatedUsers.map(user => `
       <tr class="hover:bg-gray-50">
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="flex items-center">
             <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
-              <span class="text-sm font-medium text-primary-600">${user.full_name ? user.full_name.charAt(0) : 'U'}</span>
+              <span class="text-sm font-medium text-primary-600">${user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}</span>
             </div>
             <div>
               <div class="text-sm font-medium text-gray-900">${user.full_name || 'No Name'}</div>
               <div class="text-sm text-gray-500">${user.email}</div>
-              ${user.companyName ? `<div class="text-xs text-gray-400">${user.companyName}</div>` : ''}
+              ${user.company_name ? `<div class="text-xs text-gray-400">${user.company_name}</div>` : ''}
             </div>
           </div>
         </td>
@@ -348,10 +464,10 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           </span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-          ${user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Never'}
+          ${user.last_login_at ? new Date(user.last_login_at).toLocaleDateString() : 'Never'}
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-          ${new Date(user.createdAt).toLocaleDateString()}
+          ${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Invalid Date'}
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
           <div class="flex space-x-2">
@@ -361,22 +477,13 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             >
               View
             </button>
-            <button 
-              onclick="editUser('${user.id}')"
-              class="text-green-600 hover:text-green-900"
-            >
-              Edit
-            </button>
-            <button 
-              onclick="deleteUser('${user.id}')"
-              class="text-red-600 hover:text-red-900"
-            >
-              Delete
-            </button>
           </div>
         </td>
       </tr>
     `).join('');
+    
+    // Update pagination controls
+    updatePagination();
   }
 
   // Update users count
@@ -384,6 +491,86 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     const countElement = document.getElementById('users-count');
     if (countElement) {
       countElement.textContent = `Showing ${filteredUsers.length} of ${currentUsers.length} users`;
+    }
+  }
+
+  // Update pagination controls
+  function updatePagination() {
+    const pageNumbers = document.getElementById('page-numbers');
+    const prevButton = document.getElementById('prev-page');
+    const nextButton = document.getElementById('next-page');
+    
+    if (!pageNumbers || !prevButton || !nextButton) return;
+    
+    // Update previous button
+    prevButton.disabled = currentPage === 1;
+    prevButton.classList.toggle('opacity-50', currentPage === 1);
+    prevButton.classList.toggle('cursor-not-allowed', currentPage === 1);
+    
+    // Update next button
+    nextButton.disabled = currentPage === totalPages || totalPages === 0;
+    nextButton.classList.toggle('opacity-50', currentPage === totalPages || totalPages === 0);
+    nextButton.classList.toggle('cursor-not-allowed', currentPage === totalPages || totalPages === 0);
+    
+    // Generate page numbers
+    let pageNumbersHTML = '';
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      const isActive = i === currentPage;
+      pageNumbersHTML += `
+        <button 
+          class="px-3 py-1 text-sm border rounded-md transition-colors ${
+            isActive 
+              ? 'bg-primary-50 text-primary-700 border-primary-200' 
+              : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'
+          }"
+          onclick="goToPage(${i})"
+        >
+          ${i}
+        </button>
+      `;
+    }
+    
+    pageNumbers.innerHTML = pageNumbersHTML;
+  }
+
+  // Go to specific page
+  function goToPage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderUsers();
+  }
+
+  // Go to next page
+  function nextPage() {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderUsers();
+    }
+  }
+
+  // Go to previous page
+  function prevPage() {
+    if (currentPage > 1) {
+      currentPage--;
+      renderUsers();
+    }
+  }
+
+  // Change items per page
+  function changeItemsPerPage() {
+    const select = document.getElementById('items-per-page');
+    if (select) {
+      itemsPerPage = parseInt(select.value);
+      currentPage = 1; // Reset to first page
+      renderUsers();
     }
   }
 
@@ -411,16 +598,21 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
   // Search and filter users
   function filterUsers() {
-    const searchQuery = (document.getElementById('search') as HTMLInputElement).value.toLowerCase();
-    const roleFilter = (document.getElementById('role-filter') as HTMLSelectElement).value;
-    const statusFilter = (document.getElementById('status-filter') as HTMLSelectElement).value;
+    const searchQuery = (document.getElementById('search') as HTMLInputElement)?.value?.toLowerCase() || '';
+    const roleFilter = (document.getElementById('role-filter') as HTMLSelectElement)?.value || '';
+    const statusFilter = (document.getElementById('status-filter') as HTMLSelectElement)?.value || '';
 
     filteredUsers = currentUsers.filter(user => {
+      // Add null checks to prevent undefined errors
+      const fullName = user.full_name || '';
+      const email = user.email || '';
+      const companyName = user.company_name || '';
+      
       // Search filter
       const matchesSearch = 
-        user.fullName.toLowerCase().includes(searchQuery) ||
-        user.email.toLowerCase().includes(searchQuery) ||
-        (user.companyName && user.companyName.toLowerCase().includes(searchQuery));
+        fullName.toLowerCase().includes(searchQuery) ||
+        email.toLowerCase().includes(searchQuery) ||
+        (companyName && companyName.toLowerCase().includes(searchQuery));
 
       // Role filter
       const matchesRole = !roleFilter || user.role === roleFilter;
@@ -435,22 +627,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     updateUsersCount();
   }
 
-  // Add new user
-  function addUser() {
-    isEditing = false;
-    resetUserForm();
-    showUserModal('Add New User');
-  }
 
-  // Edit existing user
-  function editUser(userId: string) {
-    const user = adminDataStore.getUserById(userId);
-    if (!user) return;
-
-    isEditing = true;
-    populateUserForm(user);
-    showUserModal('Edit User');
-  }
 
   // View user details
   async function viewUser(userId) {
@@ -467,6 +644,16 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         console.error('Error loading user details:', error);
         return;
       }
+
+      console.log('✅ User data retrieved:', user);
+      console.log('📊 User fields:', {
+        full_name: user.full_name,
+        company_name: user.company_name,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+        last_login_at: user.last_login_at,
+        login_count: user.login_count
+      });
 
       const modal = document.getElementById('user-details-modal');
       const modalTitle = document.getElementById('details-modal-title');
@@ -495,7 +682,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
               </div>
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Company:</span>
-                <span class="text-sm font-medium text-gray-900">${user.companyName || 'Not provided'}</span>
+                <span class="text-sm font-medium text-gray-900">${user.company_name || 'Not provided'}</span>
               </div>
             </div>
           </div>
@@ -518,11 +705,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
               </div>
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Login Count:</span>
-                <span class="text-sm font-medium text-gray-900">${user.loginCount}</span>
+                <span class="text-sm font-medium text-gray-900">${user.login_count || user.loginCount || '0'}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Last Login:</span>
-                <span class="text-sm font-medium text-gray-900">${user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Never'}</span>
+                <span class="text-sm font-medium text-gray-900">${user.last_login_at || user.lastLoginAt ? new Date(user.last_login_at || user.lastLoginAt).toLocaleString() : 'Never'}</span>
               </div>
             </div>
           </div>
@@ -534,11 +721,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           <div class="space-y-2">
             <div class="flex justify-between">
               <span class="text-sm text-gray-500">Created:</span>
-              <span class="text-sm font-medium text-gray-900">${new Date(user.createdAt).toLocaleString()}</span>
+              <span class="text-sm font-medium text-gray-900">${user.created_at || user.createdAt ? new Date(user.created_at || user.createdAt).toLocaleString() : 'Not available'}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-sm text-gray-500">Last Updated:</span>
-              <span class="text-sm font-medium text-gray-900">${new Date(user.updatedAt).toLocaleString()}</span>
+              <span class="text-sm font-medium text-gray-900">${user.updated_at || user.updatedAt ? new Date(user.updated_at || user.updatedAt).toLocaleString() : 'Not available'}</span>
             </div>
           </div>
         </div>
@@ -551,25 +738,6 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     }
   }
 
-  // Delete user
-  function deleteUser(userId: string) {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      const success = adminDataStore.deleteUser(userId);
-      if (success) {
-        loadUsers();
-        alert('User deleted successfully!');
-      } else {
-        alert('Failed to delete user');
-      }
-    } catch (error) {
-      alert('Failed to delete user');
-      console.error('Error deleting user:', error);
-    }
-  }
 
   // Show user modal
   function showUserModal(title: string) {
@@ -612,12 +780,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   // Populate user form for editing
   function populateUserForm(user: any) {
     (document.getElementById('user-id') as HTMLInputElement).value = user.id;
-    (document.getElementById('full-name') as HTMLInputElement).value = user.fullName;
-    (document.getElementById('email') as HTMLInputElement).value = user.email;
+    (document.getElementById('full-name') as HTMLInputElement).value = user.full_name || '';
+    (document.getElementById('email') as HTMLInputElement).value = user.email || '';
     (document.getElementById('phone') as HTMLInputElement).value = user.phone || '';
-    (document.getElementById('company-name') as HTMLInputElement).value = user.companyName || '';
-    (document.getElementById('role') as HTMLSelectElement).value = user.role;
-    (document.getElementById('status') as HTMLSelectElement).value = user.status;
+    (document.getElementById('company-name') as HTMLInputElement).value = user.company_name || '';
+    (document.getElementById('role') as HTMLSelectElement).value = user.role || 'customer';
+    (document.getElementById('status') as HTMLSelectElement).value = user.status || 'active';
   }
 
   // Handle user form submission
@@ -655,12 +823,17 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
     try {
       if (isEditing) {
-        // Update existing user
-        const updatedUser = adminDataStore.updateUser(userId, userData);
-        if (updatedUser) {
+        // Update existing user in local array
+        const userIndex = currentUsers.findIndex(u => u.id === userId);
+        if (userIndex > -1) {
+          currentUsers[userIndex] = { ...currentUsers[userIndex], ...userData };
+          filteredUsers = [...currentUsers];
+          renderUsers();
+          updateUsersCount();
           alert('User updated successfully!');
           hideUserModal();
-          loadUsers();
+        } else {
+          alert('User not found');
         }
       } else {
         // Add new user (this would need to be implemented in the data store)
@@ -679,8 +852,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     document.getElementById('role-filter')?.addEventListener('change', filterUsers);
     document.getElementById('status-filter')?.addEventListener('change', filterUsers);
 
-    // Add user button
-    document.getElementById('add-user-btn')?.addEventListener('click', addUser);
+    // Pagination controls
+    document.getElementById('items-per-page')?.addEventListener('change', changeItemsPerPage);
+    document.getElementById('prev-page')?.addEventListener('click', prevPage);
+    document.getElementById('next-page')?.addEventListener('click', nextPage);
+    document.getElementById('refresh-users')?.addEventListener('click', loadUsers);
 
     // User form
     document.getElementById('user-form')?.addEventListener('submit', handleUserFormSubmit);
@@ -706,11 +882,28 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     });
   }
 
+  // Make pagination functions globally available
+  window.goToPage = goToPage;
+  window.nextPage = nextPage;
+  window.prevPage = prevPage;
+  window.changeItemsPerPage = changeItemsPerPage;
+
   // Initialize page when DOM loads
-  document.addEventListener('DOMContentLoaded', initializeUsersPage);
+  document.addEventListener('DOMContentLoaded', async () => {
+    console.log('📄 Users page DOM loaded, initializing...');
+    console.log('🔍 Supabase available:', !!window.supabase);
+    console.log('🔍 Current users before load:', currentUsers.length);
+    await initializeUsersPage();
+  });
+
+  // Also try to initialize after a short delay in case of timing issues
+  setTimeout(async () => {
+    if (currentUsers.length === 0) {
+      console.log('⏰ Retrying user load after delay...');
+      await initializeUsersPage();
+    }
+  }, 2000);
 
   // Make functions globally available for onclick handlers
   (window as any).viewUser = viewUser;
-  (window as any).editUser = editUser;
-  (window as any).deleteUser = deleteUser;
 </script>

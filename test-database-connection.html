@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Connection Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Database Connection Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const SUPABASE_URL = 'https://lmrrdcaavwwletcjcpqv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        async function testDatabase() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                // Test 1: Check user count
+                console.log('Testing database connection...');
+                resultsDiv.innerHTML += '<p>Testing database connection...</p>';
+                
+                const { count, error: countError } = await supabase
+                    .from('profiles')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (countError) {
+                    resultsDiv.innerHTML += `<p style="color: red;">❌ Count Error: ${countError.message}</p>`;
+                    console.error('Count error:', countError);
+                } else {
+                    resultsDiv.innerHTML += `<p style="color: green;">✅ Total users in database: ${count}</p>`;
+                    console.log('Total users:', count);
+                }
+                
+                // Test 2: Get all users
+                const { data: users, error: usersError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (usersError) {
+                    resultsDiv.innerHTML += `<p style="color: red;">❌ Users Error: ${usersError.message}</p>`;
+                    console.error('Users error:', usersError);
+                } else {
+                    resultsDiv.innerHTML += `<p style="color: green;">✅ Users loaded: ${users.length}</p>`;
+                    console.log('Users data:', users);
+                    
+                    // Display users in a table
+                    if (users.length > 0) {
+                        let tableHTML = '<table border="1" style="border-collapse: collapse; margin-top: 20px;">';
+                        tableHTML += '<tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th></tr>';
+                        
+                        users.forEach(user => {
+                            tableHTML += `<tr>
+                                <td>${user.id}</td>
+                                <td>${user.full_name || 'No Name'}</td>
+                                <td>${user.email || 'No Email'}</td>
+                                <td>${user.role || 'No Role'}</td>
+                                <td>${user.status || 'No Status'}</td>
+                                <td>${user.created_at || 'No Date'}</td>
+                            </tr>`;
+                        });
+                        
+                        tableHTML += '</table>';
+                        resultsDiv.innerHTML += tableHTML;
+                    } else {
+                        resultsDiv.innerHTML += '<p style="color: orange;">⚠️ No users found in database</p>';
+                    }
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML += `<p style="color: red;">❌ General Error: ${error.message}</p>`;
+                console.error('General error:', error);
+            }
+        }
+        
+        // Run test when page loads
+        window.addEventListener('load', testDatabase);
+    </script>
+</body>
+</html>

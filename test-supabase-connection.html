@@ -3,122 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supabase Connection Test</title>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <title>Test Supabase Connection</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
-        .success { background-color: #d4edda; border-color: #c3e6cb; }
-        .error { background-color: #f8d7da; border-color: #f5c6cb; }
-        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
-        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .error { color: red; background: #ffe6e6; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .success { color: green; background: #e6ffe6; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .warning { color: orange; background: #fff3cd; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .info { color: blue; background: #e6f3ff; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .code { background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
-    <h1>Supabase Connection Test</h1>
-    
-    <div class="test-section">
-        <h3>1. Test Connection</h3>
-        <button onclick="testConnection()">Test Supabase Connection</button>
-        <div id="connection-result"></div>
-    </div>
-
-    <div class="test-section">
-        <h3>2. Test Cart Customizations Table</h3>
-        <button onclick="testCartCustomizations()">Test Cart Customizations Insert</button>
-        <div id="cart-result"></div>
-    </div>
-
-    <div class="test-section">
-        <h3>3. View All Cart Customizations</h3>
-        <button onclick="viewAllCartCustomizations()">View All Records</button>
-        <div id="view-result"></div>
-    </div>
+    <h1>🔍 Supabase Connection Test</h1>
+    <div id="status"></div>
+    <div id="results"></div>
 
     <script>
-        // Replace with your actual Supabase credentials
         const SUPABASE_URL = 'https://lmrrdcaavwwletcjcpqv.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzI4NzQsImV4cCI6MjA1MDU0ODg3NH0.Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ';
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        async function testConnection() {
-            const resultDiv = document.getElementById('connection-result');
+        async function testSupabaseConnection() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">🔄 Testing Supabase connection...</div>';
+            
             try {
-                const { data, error } = await supabase.from('cart_customizations').select('count').limit(1);
+                // Test 1: Check if we can connect to Supabase
+                console.log('Testing Supabase connection...');
+                
+                // Test 2: Try to query support_tickets table
+                statusDiv.innerHTML = '<div class="info">🔄 Testing support_tickets table...</div>';
+                
+                const { data: tickets, error } = await supabase
+                    .from('support_tickets')
+                    .select('*')
+                    .limit(5);
                 
                 if (error) {
-                    resultDiv.innerHTML = `<div class="error"><strong>Error:</strong> ${error.message}</div>`;
-                } else {
-                    resultDiv.innerHTML = `<div class="success"><strong>Success!</strong> Connected to Supabase successfully.</div>`;
+                    statusDiv.innerHTML = `<div class="error">❌ Database Error: ${error.message}</div>`;
+                    resultsDiv.innerHTML = `
+                        <h2>Database Error Details:</h2>
+                        <div class="code">${JSON.stringify(error, null, 2)}</div>
+                        
+                        <h2>Possible Solutions:</h2>
+                        <ol>
+                            <li><strong>Table doesn't exist:</strong> Run the <code>fix-support-tickets-complete.sql</code> script in Supabase SQL Editor</li>
+                            <li><strong>Permission issue:</strong> Check RLS policies in Supabase</li>
+                            <li><strong>Wrong table name:</strong> The table might have a different name</li>
+                        </ol>
+                        
+                        <h2>Next Steps:</h2>
+                        <p>1. Go to your Supabase dashboard</p>
+                        <p>2. Open the SQL Editor</p>
+                        <p>3. Run the <code>fix-support-tickets-complete.sql</code> script</p>
+                        <p>4. Refresh this page</p>
+                    `;
+                    return;
                 }
+                
+                console.log('Raw tickets data:', tickets);
+                
+                if (!tickets || tickets.length === 0) {
+                    statusDiv.innerHTML = '<div class="warning">⚠️ Table exists but no data found</div>';
+                    resultsDiv.innerHTML = `
+                        <h2>No Data Found</h2>
+                        <p>The support_tickets table exists but contains no data.</p>
+                        
+                        <h2>Solution:</h2>
+                        <p>Run the <code>fix-support-tickets-complete.sql</code> script in Supabase SQL Editor to add sample data.</p>
+                        
+                        <h2>Or create data manually:</h2>
+                        <div class="code">INSERT INTO public.support_tickets (ticket_number, customer_name, customer_email, subject, description, priority, status) VALUES
+('TKT-2024-001', 'John Doe', 'john.doe@example.com', 'App not loading', 'The app keeps showing loading screen', 'high', 'open');</div>
+                    `;
+                    return;
+                }
+                
+                statusDiv.innerHTML = `<div class="success">✅ Success! Found ${tickets.length} tickets in database</div>`;
+                
+                // Show the data
+                let html = `
+                    <h2>Raw Data from Supabase:</h2>
+                    <div class="code">${JSON.stringify(tickets, null, 2)}</div>
+                    
+                    <h2>Field Analysis:</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field Name</th>
+                                <th>Sample Value</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                if (tickets.length > 0) {
+                    const firstTicket = tickets[0];
+                    for (const [key, value] of Object.entries(firstTicket)) {
+                        html += `
+                            <tr>
+                                <td><strong>${key}</strong></td>
+                                <td>${value}</td>
+                                <td>${typeof value}</td>
+                            </tr>
+                        `;
+                    }
+                }
+                
+                html += `
+                        </tbody>
+                    </table>
+                    
+                    <h2>Processed Data (as used in admin panel):</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ticket Number</th>
+                                <th>Customer Name</th>
+                                <th>Customer Email</th>
+                                <th>Subject</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                tickets.forEach(ticket => {
+                    // Use the same field mapping as the admin panel
+                    const processedTicket = {
+                        ticketNumber: ticket.ticket_number || ticket.ticketNumber || ticket.ticket_id || ticket.id,
+                        customerName: ticket.customer_name || ticket.customerName || ticket.name || ticket.user_name || ticket.userName || 'No Name',
+                        customerEmail: ticket.customer_email || ticket.customerEmail || ticket.email || ticket.user_email || ticket.userEmail || 'No Email',
+                        subject: ticket.subject || ticket.title || ticket.issue || 'No Subject',
+                        priority: ticket.priority || ticket.urgency || 'medium',
+                        status: ticket.status || ticket.state || 'open'
+                    };
+                    
+                    html += `
+                        <tr>
+                            <td>${processedTicket.ticketNumber}</td>
+                            <td>${processedTicket.customerName}</td>
+                            <td>${processedTicket.customerEmail}</td>
+                            <td>${processedTicket.subject}</td>
+                            <td>${processedTicket.priority}</td>
+                            <td>${processedTicket.status}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                        </tbody>
+                    </table>
+                    
+                    <h2>✅ Database is working correctly!</h2>
+                    <p>If you're still seeing "No Name" and "No Email" in the admin panel, check the browser console for errors.</p>
+                `;
+                
+                resultsDiv.innerHTML = html;
+                
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error"><strong>Connection Error:</strong> ${error.message}</div>`;
+                statusDiv.innerHTML = `<div class="error">❌ Connection Error: ${error.message}</div>`;
+                resultsDiv.innerHTML = `
+                    <div class="code">${error.stack}</div>
+                `;
             }
         }
-
-        async function testCartCustomizations() {
-            const resultDiv = document.getElementById('cart-result');
-            try {
-                const testData = {
-                    user_email: 'test@example.com',
-                    product_id: 'restaurant-menu',
-                    product_name: 'Restaurant Menu System',
-                    product_description: 'Test description',
-                    base_price: 5000,
-                    custom_name: 'Test Custom Name',
-                    selected_color: '#3B82F6',
-                    selected_features: ['responsive', 'seo'],
-                    project_name: 'Test Project',
-                    contact_person: 'Test User',
-                    restaurant_name: 'Test Restaurant',
-                    cuisine_type: 'indian',
-                    app_name: '',
-                    contact_email: 'test@example.com',
-                    contact_phone: '+91 9876543210',
-                    primary_color: '#3B82F6',
-                    secondary_color: '#A5CF6',
-                    accent_color: '#F59E0B',
-                    text_color: '#1F2937',
-                    additional_requirements: 'Test requirements',
-                    cart_status: 'active',
-                    is_checkout_initiated: false
-                };
-
-                console.log('Sending test data:', testData);
-
-                const { data, error } = await supabase
-                    .from('cart_customizations')
-                    .insert([testData])
-                    .select();
-
-                if (error) {
-                    resultDiv.innerHTML = `<div class="error"><strong>Insert Error:</strong> ${error.message}<br><pre>${JSON.stringify(error, null, 2)}</pre></div>`;
-                } else {
-                    resultDiv.innerHTML = `<div class="success"><strong>Success!</strong> Test data inserted successfully.<br><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
-                }
-            } catch (error) {
-                resultDiv.innerHTML = `<div class="error"><strong>Test Error:</strong> ${error.message}</div>`;
-            }
-        }
-
-        async function viewAllCartCustomizations() {
-            const resultDiv = document.getElementById('view-result');
-            try {
-                const { data, error } = await supabase
-                    .from('cart_customizations')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) {
-                    resultDiv.innerHTML = `<div class="error"><strong>View Error:</strong> ${error.message}</div>`;
-                } else {
-                    resultDiv.innerHTML = `<div class="success"><strong>Found ${data.length} records:</strong><br><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
-                }
-            } catch (error) {
-                resultDiv.innerHTML = `<div class="error"><strong>View Error:</strong> ${error.message}</div>`;
-            }
-        }
+        
+        // Run test when page loads
+        window.addEventListener('load', testSupabaseConnection);
     </script>
 </body>
 </html>

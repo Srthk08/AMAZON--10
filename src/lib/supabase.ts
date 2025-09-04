@@ -436,7 +436,7 @@ export class SupabaseAuth {
     try {
       console.log('Sending password reset for:', email);
 
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = 
         redirectTo: `${window.location.origin}/reset-password`
       });
 
