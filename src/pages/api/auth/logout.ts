@@ -15,12 +15,7 @@ export const POST: APIRoute = async ({ cookies, request }) => {
         cookies.delete('supabase-auth-token', { path: '/' });
         
         // Clear any other Supabase-related cookies
-        const allCookies = cookies.getAll();
-        allCookies.forEach(cookie => {
-          if (cookie.name.startsWith('sb-') || cookie.name.includes('supabase')) {
-            cookies.delete(cookie.name, { path: '/' });
-          }
-        });
+        // Note: Astro doesn't support cookies.getAll(), so we manually clear known cookies
       } catch (error) {
         console.warn('Supabase logout cleanup failed:', error);
       }
@@ -67,12 +62,7 @@ export const GET: APIRoute = async ({ cookies }) => {
     cookies.delete('simple-auth-user', { path: '/' });
 
     // Clear any other Supabase-related cookies
-    const allCookies = cookies.getAll();
-    allCookies.forEach(cookie => {
-      if (cookie.name.startsWith('sb-') || cookie.name.includes('supabase')) {
-        cookies.delete(cookie.name, { path: '/' });
-      }
-    });
+    // Note: Astro doesn't support cookies.getAll(), so we manually clear known cookies
 
     return new Response(JSON.stringify({ 
       success: true, 

@@ -2,11 +2,11 @@
 import Layout from '../../layouts/Layout.astro';
 import { getProducts, getProductsByCategory } from '../../lib/products-data';
 
-const products = getProducts();
-const restaurantProducts = getProductsByCategory('restaurant');
-const mobileProducts = getProductsByCategory('mobile');
-const tvProducts = getProductsByCategory('tv');
-const webProducts = getProductsByCategory('web');
+const products = await getProducts();
+const restaurantProducts = await getProductsByCategory('restaurant');
+const mobileProducts = await getProductsByCategory('mobile');
+const tvProducts = await getProductsByCategory('tv');
+const webProducts = await getProductsByCategory('web');
 ---
 
 <Layout title="Our Products - DevExpress" description="Explore our range of professional digital solutions delivered in 24 hours">

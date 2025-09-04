@@ -3,12 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import { getProductBySlug, getProducts, getProductPlans } from '../../lib/products-data';
 
 export async function getStaticPaths() {
-  const products = getProducts();
+  const products = await getProducts();
   
-  return products.map((product) => ({
+  const paths = await Promise.all(products.map(async (product) => ({
     params: { slug: product.slug },
-    props: { product, productPlans: getProductPlans(product.id) }
-  }));
+    props: { product, productPlans: await getProductPlans(product.id) }
+  })));
+  
+  return paths;
 }
 
 const { product, productPlans } = Astro.props;
