@@ -17,38 +17,7 @@ const { title, description } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     
-    <!-- Tailwind CSS - Using official CDN with proper CORS headers -->
-    <script src="https://cdn.tailwindcss.com/3.4.0"></script>
-    
-    <!-- Fallback styles in case Tailwind doesn't load -->
-    <style>
-      /* Basic fallback styles */
-      .hidden { display: none !important; }
-      .flex { display: flex !important; }
-      .items-center { align-items: center !important; }
-      .justify-center { justify-content: center !important; }
-      .text-center { text-align: center !important; }
-      .bg-white { background-color: white !important; }
-      .bg-gray-50 { background-color: #f9fafb !important; }
-      .text-gray-600 { color: #4b5563 !important; }
-      .text-gray-900 { color: #111827 !important; }
-      .p-6 { padding: 1.5rem !important; }
-      .mb-4 { margin-bottom: 1rem !important; }
-      .rounded-lg { border-radius: 0.5rem !important; }
-      .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important; }
-      .animate-spin { animation: spin 1s linear infinite !important; }
-      .rounded-full { border-radius: 9999px !important; }
-      .h-12 { height: 3rem !important; }
-      .w-12 { width: 3rem !important; }
-      .border-b-2 { border-bottom-width: 2px !important; }
-      .border-blue-600 { border-color: #2563eb !important; }
-      .mx-auto { margin-left: auto !important; margin-right: auto !important; }
-      
-      @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-    </style>
+    <!-- Tailwind CSS is integrated via Astro, no CDN needed -->
     
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
