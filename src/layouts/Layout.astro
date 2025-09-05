@@ -37,6 +37,28 @@ const { title, description = "DevExpress - 24 Hour Delivery" } = Astro.props;
     <!-- EmailJS for email notifications -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+    <!-- Supabase Client -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+      // Initialize Supabase client
+      const supabaseUrl = 'https://lmrrdcaavwwletcjcpqv.supabase.co';
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ';
+      
+      // Wait for Supabase to load, then initialize
+      function initSupabase() {
+        if (typeof supabase !== 'undefined') {
+          window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
+          console.log('✅ Supabase client initialized globally');
+        } else {
+          console.log('⏳ Supabase library not loaded yet, retrying...');
+          setTimeout(initSupabase, 100);
+        }
+      }
+      
+      // Start initialization
+      initSupabase();
+    </script>
+
     <!-- Custom Tailwind Config -->
     <script>
       tailwind.config = {
@@ -114,9 +136,20 @@ const { title, description = "DevExpress - 24 Hour Delivery" } = Astro.props;
 
     <!-- Custom CSS -->
     <style is:global>
-      /* Smooth scrolling */
+      /* Prevent color flashing during page transitions */
       html {
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6) !important;
         scroll-behavior: smooth;
+      }
+      
+      body {
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6) !important;
+        min-height: 100vh;
+      }
+      
+      /* Ensure all pages have consistent blue background */
+      main {
+        background: transparent !important;
       }
 
       /* Custom scrollbar */
@@ -125,16 +158,16 @@ const { title, description = "DevExpress - 24 Hour Delivery" } = Astro.props;
       }
 
       ::-webkit-scrollbar-track {
-        background: #f1f5f9;
+        background: rgba(255, 255, 255, 0.1);
       }
 
       ::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
+        background: rgba(255, 255, 255, 0.3);
         border-radius: 4px;
       }
 
       ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
+        background: rgba(255, 255, 255, 0.5);
       }
 
       /* Focus styles */
@@ -285,7 +318,7 @@ const { title, description = "DevExpress - 24 Hour Delivery" } = Astro.props;
     </style>
   </head>
 
-  <body class="h-full bg-gray-50 font-sans text-gray-900 antialiased">
+  <body class="h-full bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 font-sans text-white antialiased">
     <!-- Header -->
     <Header />
 

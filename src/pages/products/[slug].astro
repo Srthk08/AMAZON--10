@@ -109,6 +109,50 @@ const style = categoryStyles[product.category];
     </div>
   </section>
 
+  <!-- Cuisine Type Section (Only for Restaurant Products) -->
+  {product.category === 'restaurant' && (
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Perfect for Any Cuisine</h2>
+          <p class="text-xl text-gray-600">Our restaurant solutions work beautifully for all types of cuisines</p>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div class={`${style.bg} p-4 rounded-lg text-center hover:shadow-md transition-shadow`}>
+            <div class="text-2xl mb-2">🍛</div>
+            <div class={`font-medium ${style.text} text-sm`}>Indian</div>
+          </div>
+          <div class={`${style.bg} p-4 rounded-lg text-center hover:shadow-md transition-shadow`}>
+            <div class="text-2xl mb-2">🥢</div>
+            <div class={`font-medium ${style.text} text-sm`}>Chinese</div>
+          </div>
+          <div class={`${style.bg} p-4 rounded-lg text-center hover:shadow-md transition-shadow`}>
+            <div class="text-2xl mb-2">🍝</div>
+            <div class={`font-medium ${style.text} text-sm`}>Italian</div>
+          </div>
+          <div class={`${style.bg} p-4 rounded-lg text-center hover:shadow-md transition-shadow`}>
+            <div class="text-2xl mb-2">🍣</div>
+            <div class={`font-medium ${style.text} text-sm`}>Japanese</div>
+          </div>
+          <div class={`${style.bg} p-4 rounded-lg text-center hover:shadow-md transition-shadow`}>
+            <div class="text-2xl mb-2">🌮</div>
+            <div class={`font-medium ${style.text} text-sm`}>Mexican</div>
+          </div>
+          <div class={`${style.bg} p-4 rounded-lg text-center hover:shadow-md transition-shadow`}>
+            <div class="text-2xl mb-2">🍕</div>
+            <div class={`font-medium ${style.text} text-sm`}>Pizza</div>
+          </div>
+        </div>
+        
+        <div class="mt-8 text-center">
+          <p class="text-gray-600 mb-4">Don't see your cuisine type? No problem!</p>
+          <p class="text-sm text-gray-500">We customize our solutions to perfectly match your restaurant's unique style and cuisine</p>
+        </div>
+      </div>
+    </section>
+  )}
+
 
 
   <!-- Process Section -->
@@ -263,7 +307,7 @@ const style = categoryStyles[product.category];
         >
           Add to Cart - ₹{productPlans[0]?.price.toLocaleString()}
         </button>
-        <a href="/contact" class="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-3 rounded-lg font-semibold transition-all">
+        <a href={`/contact?product=${encodeURIComponent(product.name)}&project_type=${product.category}&project_details=${encodeURIComponent(`I'm interested in the ${product.name}. ${product.description}`)}&price=${productPlans[0]?.price || product.base_price}`} class="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-3 rounded-lg font-semibold transition-all">
           Contact Us
         </a>
       </div>
@@ -305,17 +349,24 @@ const style = categoryStyles[product.category];
 
   // Redirect to cart functionality
   window.redirectToCart = function(productId: string, price: number) {
+    console.log('🛒 redirectToCart called with:', { productId, price });
+    
     // Check if user is authenticated using global auth manager
     const authManager = window.globalAuthManager || window.simpleAuthManager;
+    console.log('🔍 Auth manager found:', !!authManager);
     
     if (authManager && authManager.isUserLoggedIn()) {
       // User is authenticated, redirect to cart
       console.log('✅ User authenticated, redirecting to cart');
-      window.location.href = `/cart?product=${productId}&price=${price}`;
+      const cartUrl = `/cart?product=${productId}&price=${price}`;
+      console.log('🔗 Redirecting to:', cartUrl);
+      window.location.href = cartUrl;
     } else {
       // User is not authenticated, redirect to login with return URL
       console.log('❌ User not authenticated, redirecting to login');
-      window.location.href = `/login?redirect=/cart?product=${productId}&price=${price}`;
+      const loginUrl = `/login?redirect=/cart?product=${productId}&price=${price}`;
+      console.log('🔗 Redirecting to:', loginUrl);
+      window.location.href = loginUrl;
     }
   };
 

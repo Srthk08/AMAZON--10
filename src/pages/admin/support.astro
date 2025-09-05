@@ -377,7 +377,6 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
            <div class="flex items-center space-x-2">
              <button onclick="viewTicket('${ticket.id}')" class="text-primary-600 hover:text-primary-900">View & Reply</button>
-             <button onclick="assignTicket('${ticket.id}')" class="text-green-600 hover:text-green-900">Assign</button>
            </div>
          </td>
       </tr>
@@ -609,13 +608,6 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     document.getElementById('ticket-modal').classList.add('hidden');
   }
   
-  function assignTicket(ticketId) {
-    if (confirm('Assign this ticket to yourself?')) {
-      // Implementation for assigning ticket
-      console.log('Assigning ticket:', ticketId);
-      alert('Ticket assigned successfully!');
-    }
-  }
   
   async function reopenTicket(ticketId) {
     if (confirm('Reopen this ticket?')) {
@@ -800,7 +792,6 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   // Make functions globally available for onclick handlers
   (window as any).viewTicket = viewTicket;
   (window as any).closeTicketModal = closeTicketModal;
-  (window as any).assignTicket = assignTicket;
   (window as any).reopenTicket = reopenTicket;
   (window as any).updateTicket = updateTicket;
 

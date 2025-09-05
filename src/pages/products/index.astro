@@ -22,7 +22,7 @@ const webProducts = await getProductsByCategory('web');
   </section>
 
   <!-- Filter Section -->
-  <section class="py-8 bg-gray-50 sticky top-16 z-40">
+  <section class="py-8 bg-transparent sticky top-16 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-wrap justify-center gap-4">
         <button class="filter-btn active px-6 py-2 rounded-full bg-primary-600 text-white font-medium transition-all" data-filter="all">
@@ -84,17 +84,21 @@ const webProducts = await getProductsByCategory('web');
                   </div>
                 </div>
 
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="text-sm text-gray-500">Starting from</span>
-                    <div class="text-2xl font-bold text-primary-600">₹{product.base_price.toLocaleString()}</div>
+                <div class="flex flex-col space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span class="text-sm text-gray-500">Starting from</span>
+                      <div class="text-2xl font-bold text-primary-600">₹{product.base_price.toLocaleString()}</div>
+                    </div>
                   </div>
-                  <a 
-                    href={`/products/${product.slug}`}
-                    class="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl inline-block text-center"
-                  >
-                    View Details
-                  </a>
+                  <div class="flex justify-center">
+                    <a 
+                      href={`/products/${product.slug}`}
+                      class="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-center"
+                    >
+                      View Details
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -111,7 +115,7 @@ const webProducts = await getProductsByCategory('web');
       <p class="text-xl mb-8 opacity-90">
         Don't see exactly what you need? Contact us for a custom solution tailored to your requirements.
       </p>
-      <a href="/contact" class="bg-white text-primary-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-colors">
+      <a href="/contact?project_type=custom&project_details=I'm interested in a custom solution tailored to my specific requirements. Please provide more information about your custom development services." class="bg-white text-primary-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-colors">
         Get Custom Quote
       </a>
     </div>

@@ -116,7 +116,7 @@ import{s as o}from"./supabase.ASU9rNY7.js";import"./hoisted.UJltcVt3.js";import"
           
           <div class="bg-gray-50 p-4 rounded-lg">
             <h5 class="font-medium text-gray-900 mb-2">Project Details</h5>
-            <p class="text-sm text-gray-600">${t.project_details||"No additional details provided"}</p>
+            <p class="text-sm text-gray-600">${t.project_details||t.message||"No additional details provided"}</p>
           </div>
         </div>
       `,e.classList.remove("hidden")}catch(t){console.error("Error viewing contact details:",t)}};window.viewTicketDetails=async function(s){console.log("Viewing ticket details for:",s);try{const{data:t,error:a}=await o.from("support_tickets").select("*").eq("id",s).single();if(a){console.error("Error loading ticket details:",a);return}const e=document.getElementById("details-modal"),r=document.getElementById("modal-title"),n=document.getElementById("modal-content");r.textContent=`Support Ticket #${t.id}`,n.innerHTML=`

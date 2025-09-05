@@ -46,12 +46,12 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
 <Layout title="Shopping Cart">
 
-  <div class="min-h-screen bg-gray-50 py-12">
+  <div class="min-h-screen bg-transparent py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Page Header -->
       <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">Shopping Cart</h1>
-        <p class="text-xl text-gray-600">Customize your project and proceed to checkout</p>
+        <h1 class="text-4xl font-bold text-white mb-4">Shopping Cart</h1>
+        <p class="text-xl text-gray-200">Customize your project and proceed to checkout</p>
       </div>
 
                 <!-- Cart Content - Now always visible since AuthGuard handles authentication -->
@@ -59,13 +59,13 @@ import { sharedDataStore } from '../lib/shared-data-store';
       
         <!-- Empty Cart Message -->
         <div id="empty-cart" class="text-center py-16">
-          <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0V19a2 2 0 002 2h7a2 2 0 002-2v-.5"></path>
             </svg>
           </div>
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
-          <p class="text-gray-600 mb-6">Browse our products and add something to get started</p>
+          <h2 class="text-2xl font-bold text-white mb-2">Your cart is empty</h2>
+          <p class="text-gray-200 mb-6">Browse our products and add something to get started</p>
           <a href="/products" class="inline-block bg-primary-600 hover:bg-primary-700 text-white font-medium px-8 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
             Browse Products
           </a>
@@ -81,7 +81,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
                 <div class="flex items-start justify-between mb-6">
                   <div>
                     <h3 class="text-2xl font-bold text-gray-900 product-name mb-2">Product Name</h3>
-                    <p class="text-gray-600 product-description text-lg mb-4">Product description</p>
+                    <p class="text-gray-200 product-description text-lg mb-4">Product description</p>
                     <p class="text-3xl font-bold text-primary-600 product-price">₹0</p>
                     
                     <!-- Product Type Badge -->
@@ -101,36 +101,36 @@ import { sharedDataStore } from '../lib/shared-data-store';
               <div class="flex-1 space-y-6">
                 <!-- Product Name Input -->
                 <div>
-                  <label class="block text-lg font-semibold text-gray-700 mb-3">Custom Product Name</label>
+                  <label class="block text-lg font-semibold text-white mb-3">Custom Product Name</label>
                   <input type="text" class="product-name-input w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your custom product name">
-                  <p class="text-sm text-gray-500 mt-2">Give your product a unique name</p>
+                  <p class="text-sm text-gray-300 mt-2">Give your product a unique name</p>
                 </div>
 
                 <!-- Restaurant Name Input (shown only for restaurant products) -->
                 <div id="restaurant-name-customization" class="hidden">
-                  <label class="block text-lg font-semibold text-gray-700 mb-3">Restaurant Name</label>
+                  <label class="block text-lg font-semibold text-white mb-3">Restaurant Name</label>
                   <input type="text" class="restaurant-name-input w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your restaurant name">
-                  <p class="text-sm text-gray-500 mt-2">Enter the name of your restaurant</p>
+                  <p class="text-sm text-gray-300 mt-2">Enter the name of your restaurant</p>
                 </div>
 
                 <!-- Logo Upload -->
                 <div>
-                  <label class="block text-lg font-semibold text-gray-700 mb-3">Upload Your Logo</label>
+                  <label class="block text-lg font-semibold text-white mb-3">Upload Your Logo</label>
                   <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                     <input type="file" accept="image/*" class="logo-upload hidden" />
                     <button type="button" class="logo-upload-btn w-full sm:w-auto px-6 py-3 border-2 border-primary-300 rounded-lg text-lg font-medium text-primary-600 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all transform hover:scale-105">
                       Choose Logo File
                     </button>
-                    <div class="logo-preview w-20 h-20 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center flex-shrink-0">
-                      <span class="text-gray-400 text-sm">Logo</span>
+                    <div class="logo-preview w-20 h-20 bg-blue-100 rounded-xl border-2 border-dashed border-blue-300 flex items-center justify-center flex-shrink-0">
+                      <span class="text-blue-400 text-sm">Logo</span>
                     </div>
                   </div>
-                  <p class="text-sm text-gray-500 mt-2">Upload your company or brand logo</p>
+                  <p class="text-sm text-gray-300 mt-2">Upload your company or brand logo</p>
                 </div>
 
                 <!-- Color Selection -->
                 <div>
-                  <label class="block text-lg font-semibold text-gray-700 mb-3">Choose Color Theme</label>
+                  <label class="block text-lg font-semibold text-white mb-3">Choose Color Theme</label>
                   <div class="flex flex-wrap gap-4">
                     <button type="button" class="color-option w-12 h-12 rounded-full border-4 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-110" data-color="#3B82F6" style="background-color: #3B82F6;"></button>
                     <button type="button" class="color-option w-12 h-12 rounded-full border-4 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-110" data-color="#8B5CF6" style="background-color: #8B5CF6;"></button>
@@ -139,27 +139,27 @@ import { sharedDataStore } from '../lib/shared-data-store';
                     <button type="button" class="color-option w-12 h-12 rounded-full border-4 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-110" data-color="#EF4444" style="background-color: #EF4444;"></button>
                     <button type="button" class="color-option w-12 h-12 rounded-full border-4 border-gray-300 hover:border-gray-400 transition-all transform hover:scale-110" data-color="#000000" style="background-color: #000000;"></button>
                   </div>
-                  <p class="text-sm text-gray-500 mt-2">Select your preferred color scheme</p>
+                  <p class="text-sm text-gray-300 mt-2">Select your preferred color scheme</p>
                 </div>
 
                 <!-- Additional Options -->
                 <div>
-                  <label class="block text-lg font-semibold text-gray-700 mb-3">Additional Features</label>
+                  <label class="block text-lg font-semibold text-white mb-3">Additional Features</label>
                   <div class="space-y-3">
-                    <label class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <label class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer">
                       <input type="checkbox" class="feature-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-5 h-5" data-feature="responsive" data-price="500">
-                      <span class="ml-3 text-lg text-gray-700">Responsive Design (+₹500)</span>
+                      <span class="ml-3 text-lg text-white">Responsive Design (+₹500)</span>
                     </label>
-                    <label class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <label class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer">
                       <input type="checkbox" class="feature-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-5 h-5" data-feature="seo" data-price="300">
-                      <span class="ml-3 text-lg text-gray-700">SEO Optimization (+₹300)</span>
+                      <span class="ml-3 text-lg text-white">SEO Optimization (+₹300)</span>
                     </label>
-                    <label class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <label class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer">
                       <input type="checkbox" class="feature-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-5 h-5" data-feature="analytics" data-price="200">
-                      <span class="ml-3 text-lg text-gray-700">Analytics Integration (+₹200)</span>
+                      <span class="ml-3 text-lg text-white">Analytics Integration (+₹200)</span>
                     </label>
                   </div>
-                  <p class="text-sm text-gray-500 mt-2">Select additional features for your product</p>
+                  <p class="text-sm text-gray-300 mt-2">Select additional features for your product</p>
                 </div>
               </div>
             </div>
@@ -187,14 +187,14 @@ import { sharedDataStore } from '../lib/shared-data-store';
             <!-- Project Details Section -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                <label class="block text-lg font-semibold text-white mb-3">
                   Project Name <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="projectName" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your project name">
               </div>
               
               <div>
-                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                <label class="block text-lg font-semibold text-white mb-3">
                   Contact Person <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="contactPerson" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Your full name">
@@ -202,7 +202,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
               
                           <!-- App Name Field (for all products) -->
             <div id="app-name-fields">
-              <label class="block text-lg font-semibold text-gray-700 mb-3">
+              <label class="block text-lg font-semibold text-white mb-3">
                 App Name <span class="text-red-500">*</span>
               </label>
               <input type="text" name="appName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter your app name">
@@ -210,7 +210,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
             <!-- Product Description Field (for all products) -->
             <div id="product-description-fields">
-              <label class="block text-lg font-semibold text-gray-700 mb-3">
+              <label class="block text-lg font-semibold text-white mb-3">
                 Product Description <span class="text-red-500">*</span>
               </label>
               <textarea name="productDescription" rows="3" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Describe your product requirements and features"></textarea>
@@ -218,7 +218,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
                         <!-- Restaurant Specific Fields (hidden by default) -->
             <div id="restaurant-fields" class="hidden">
-                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                <label class="block text-lg font-semibold text-white mb-3">
                   Restaurant Name <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="restaurantName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Enter restaurant name">
@@ -226,7 +226,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
               
             <!-- Cuisine Type Field (ONLY for restaurant products) -->
             <div id="restaurant-cuisine-fields" class="hidden">
-                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                <label class="block text-lg font-semibold text-white mb-3">
                 Cuisine Type <span class="text-red-500">*</span>
                 </label>
                 <select name="cuisineType" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg">
@@ -245,17 +245,17 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
             <!-- Dynamic Upload Section -->
             <div id="logo-upload-section">
-              <label class="block text-lg font-semibold text-gray-700 mb-3">
+              <label class="block text-lg font-semibold text-white mb-3">
                 <span id="upload-label">App Icon</span>
               </label>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                   </svg>
                 </div>
-                <p class="text-lg font-medium text-gray-700 mb-2" id="upload-text">Upload app icon or drag and drop</p>
-                <p class="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                <p class="text-lg font-medium text-white mb-2" id="upload-text">Upload app icon or drag and drop</p>
+                <p class="text-sm text-gray-300">PNG, JPG, GIF up to 10MB</p>
                 <input type="file" name="restaurantLogo" accept="image/*" class="hidden" id="logo-upload">
                 <button type="button" onclick="document.getElementById('logo-upload').click()" class="mt-4 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all transform hover:scale-105">
                   Choose File
@@ -269,14 +269,14 @@ import { sharedDataStore } from '../lib/shared-data-store';
               <h4 class="text-xl font-semibold text-gray-800 mb-4">Contact Information</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label class="block text-lg font-semibold text-gray-700 mb-3">
+                  <label class="block text-lg font-semibold text-white mb-3">
                     Email <span class="text-red-500">*</span>
                   </label>
                   <input type="email" name="email" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="your@email.com">
                 </div>
                 
                 <div>
-                  <label class="block text-lg font-semibold text-gray-700 mb-3">
+                  <label class="block text-lg font-semibold text-white mb-3">
                     Phone Number <span class="text-red-500">*</span>
                   </label>
                   <input type="tel" name="phone" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="+91 9876543210">
@@ -286,17 +286,17 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
             <!-- Dynamic Menu/App Photos Section -->
             <div id="photos-upload-section">
-              <label class="block text-lg font-semibold text-gray-700 mb-3">
+              <label class="block text-lg font-semibold text-white mb-3">
                 <span id="photos-label">App Screenshots (Optional)</span>
               </label>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 0 002 2z"></path>
                   </svg>
                 </div>
-                <p class="text-lg font-medium text-gray-700 mb-2" id="photos-text">Upload app screenshots or drag and drop</p>
-                <p class="text-sm text-gray-500">Multiple images allowed</p>
+                <p class="text-lg font-medium text-white mb-2" id="photos-text">Upload app screenshots or drag and drop</p>
+                <p class="text-sm text-gray-300">Multiple images allowed</p>
                 <input type="file" name="menuPhotos" accept="image/*" multiple class="hidden" id="menu-upload">
                 <button type="button" onclick="document.getElementById('menu-upload').click()" class="mt-4 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all transform hover:scale-105">
                   Choose Files
@@ -307,12 +307,12 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
             <!-- Brand Colors Section -->
             <div>
-              <label class="block text-lg font-semibold text-gray-700 mb-3">
+              <label class="block text-lg font-semibold text-white mb-3">
                 Brand Colors (Optional)
               </label>
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-600 mb-2">Primary</label>
+                  <label class="block text-sm font-medium text-gray-200 mb-2">Primary</label>
                   <div class="flex items-center space-x-2">
                     <div class="w-8 h-2 bg-blue-500 rounded"></div>
                     <input type="color" name="primaryColor" value="#3B82F6" class="w-12 h-10 border-2 border-gray-300 rounded-lg cursor-pointer">
@@ -320,7 +320,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-600 mb-2">Secondary</label>
+                  <label class="block text-sm font-medium text-gray-200 mb-2">Secondary</label>
                   <div class="flex items-center space-x-2">
                     <div class="w-8 h-2 bg-yellow-500 rounded"></div>
                     <input type="color" name="secondaryColor" value="#A5CF6" class="w-12 h-10 border-2 border-gray-300 rounded-lg cursor-pointer">
@@ -328,7 +328,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-600 mb-2">Accent</label>
+                  <label class="block text-sm font-medium text-gray-200 mb-2">Accent</label>
                   <div class="flex items-center space-x-2">
                     <div class="w-8 h-2 bg-orange-500 rounded"></div>
                     <input type="color" name="accentColor" value="#F59E0B" class="w-12 h-10 border-2 border-gray-300 rounded-lg cursor-pointer">
@@ -336,7 +336,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-600 mb-2">Text</label>
+                  <label class="block text-sm font-medium text-gray-200 mb-2">Text</label>
                   <div class="flex items-center space-x-2">
                     <div class="w-8 h-2 bg-gray-800 rounded"></div>
                     <input type="color" name="textColor" value="#1F2937" class="w-12 h-10 border-2 border-gray-300 rounded-lg cursor-pointer">
@@ -347,7 +347,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
             <!-- Additional Requirements Section -->
             <div>
-              <label class="block text-lg font-semibold text-gray-700 mb-3">
+              <label class="block text-lg font-semibold text-white mb-3">
                 Additional Requirements
               </label>
               <textarea name="additionalRequirements" rows="4" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg" placeholder="Any specific features, integrations, or customizations you need..."></textarea>
@@ -355,7 +355,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
             <!-- Requirements Form Actions -->
             <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
-              <button type="button" id="back-to-cart" class="flex-1 sm:flex-none sm:w-32 bg-gray-500 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
+              <button type="button" id="back-to-cart" class="flex-1 sm:flex-none sm:w-32 bg-blue-500 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
                 Back to Cart
               </button>
               <button type="button" id="submit-requirements" class="flex-1 sm:flex-none sm:w-40 bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
@@ -371,38 +371,38 @@ import { sharedDataStore } from '../lib/shared-data-store';
           
           <div class="space-y-6">
             <!-- Project Summary -->
-            <div class="bg-gray-50 rounded-lg p-6">
+            <div class="bg-blue-50 rounded-lg p-6">
               <h4 class="text-lg font-semibold text-gray-800 mb-4">Project Summary</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p class="text-sm text-gray-600">Project Name:</p>
+                  <p class="text-sm text-gray-200">Project Name:</p>
                   <p class="font-medium" id="review-project-name">-</p>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-600">Contact Person:</p>
+                  <p class="text-sm text-gray-200">Contact Person:</p>
                   <p class="font-medium" id="review-contact-person">-</p>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-600">App Name:</p>
+                  <p class="text-sm text-gray-200">App Name:</p>
                   <p class="font-medium" id="review-app-name">-</p>
                 </div>
                 <div id="review-restaurant-info" class="hidden">
-                  <p class="text-sm text-gray-600">Restaurant Name:</p>
+                  <p class="text-sm text-gray-200">Restaurant Name:</p>
                   <p class="font-medium" id="review-restaurant-name">-</p>
                 </div>
                 <div id="review-cuisine-info" class="hidden">
-                  <p class="text-sm text-gray-600">Cuisine Type:</p>
+                  <p class="text-sm text-gray-200">Cuisine Type:</p>
                   <p class="font-medium" id="review-cuisine-type">-</p>
                 </div>
               </div>
             </div>
 
             <!-- Customization Summary -->
-            <div class="bg-gray-50 rounded-lg p-6">
+            <div class="bg-blue-50 rounded-lg p-6">
               <h4 class="text-lg font-semibold text-gray-800 mb-4">Customization</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p class="text-sm text-gray-600">Selected Colors:</p>
+                  <p class="text-sm text-gray-200">Selected Colors:</p>
                   <div class="flex space-x-2 mt-2">
                     <div class="w-6 h-6 rounded-full border-2 border-gray-300" id="review-primary-color" style="background-color: #3B82F6;"></div>
                     <div class="w-6 h-6 rounded-full border-2 border-gray-300" id="review-secondary-color" style="background-color: #A5CF6;"></div>
@@ -411,35 +411,35 @@ import { sharedDataStore } from '../lib/shared-data-store';
                   </div>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-600">Logo Status:</p>
+                  <p class="text-sm text-gray-200">Logo Status:</p>
                   <p class="font-medium" id="review-logo-status">Not uploaded</p>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-600">Photos Status:</p>
+                  <p class="text-sm text-gray-200">Photos Status:</p>
                   <p class="font-medium" id="review-photos-status">Not uploaded</p>
                 </div>
               </div>
             </div>
 
             <!-- Contact Information -->
-            <div class="bg-gray-50 rounded-lg p-6">
+            <div class="bg-blue-50 rounded-lg p-6">
               <h4 class="text-lg font-semibold text-gray-800 mb-4">Contact Information</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p class="text-sm text-gray-600">Email:</p>
+                  <p class="text-sm text-gray-200">Email:</p>
                   <p class="font-medium" id="review-email">-</p>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-600">Phone:</p>
+                  <p class="text-sm text-gray-200">Phone:</p>
                   <p class="font-medium" id="review-phone">-</p>
                 </div>
               </div>
             </div>
 
             <!-- Additional Requirements -->
-            <div class="bg-gray-50 rounded-lg p-6">
+            <div class="bg-blue-50 rounded-lg p-6">
               <h4 class="text-lg font-semibold text-gray-800 mb-4">Additional Requirements</h4>
-              <p class="text-sm text-gray-600">Special Features & Requirements:</p>
+              <p class="text-sm text-gray-200">Special Features & Requirements:</p>
               <p class="font-medium mt-2" id="review-additional-requirements">-</p>
             </div>
 
@@ -453,7 +453,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
             <!-- Review Actions -->
             <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
-              <button type="button" id="back-to-requirements" class="flex-1 sm:flex-none sm:w-32 bg-gray-500 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
+              <button type="button" id="back-to-requirements" class="flex-1 sm:flex-none sm:w-32 bg-blue-500 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl text-sm">
                 Back to Requirements
               </button>
             </div>
@@ -464,34 +464,34 @@ import { sharedDataStore } from '../lib/shared-data-store';
         <div id="payment-section" class="hidden bg-white rounded-xl shadow-lg p-8 mt-8">
           <div id="payment-loading" class="text-center py-8 hidden">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-            <p class="text-gray-600">Loading payment details...</p>
+            <p class="text-gray-200">Loading payment details...</p>
           </div>
           
           <div id="payment-content">
             <h3 class="text-2xl font-bold text-gray-900 mb-6">Complete Your Order & Payment</h3>
           
           <!-- Order Summary -->
-          <div class="bg-gray-50 rounded-lg p-6 mb-6">
+          <div class="bg-blue-50 rounded-lg p-6 mb-6">
             <h4 class="text-lg font-semibold text-gray-800 mb-4">Order Summary</h4>
             <div class="space-y-3">
               <div class="flex justify-between">
-                <span class="text-gray-600">Project Name:</span>
+                <span class="text-gray-200">Project Name:</span>
                 <span class="font-medium" id="payment-project-name">-</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">Contact Person:</span>
+                <span class="text-gray-200">Contact Person:</span>
                 <span class="font-medium" id="payment-contact-person">-</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">App Name:</span>
+                <span class="text-gray-200">App Name:</span>
                 <span class="font-medium" id="payment-app-name">-</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">Email:</span>
+                <span class="text-gray-200">Email:</span>
                 <span class="font-medium" id="payment-email">-</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">Phone:</span>
+                <span class="text-gray-200">Phone:</span>
                 <span class="font-medium" id="payment-phone">-</span>
               </div>
               <div class="border-t pt-3 mt-3">
@@ -512,7 +512,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
                   <input type="radio" name="paymentMethod" value="card" class="w-5 h-5 text-primary-600 focus:ring-primary-500" checked>
                   <div class="ml-3">
                     <div class="font-medium text-gray-900">Credit/Debit Card</div>
-                    <div class="text-sm text-gray-500">Visa, Mastercard, RuPay</div>
+                    <div class="text-sm text-gray-300">Visa, Mastercard, RuPay</div>
                   </div>
                 </label>
                 
@@ -520,7 +520,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
                   <input type="radio" name="paymentMethod" value="upi" class="w-5 h-5 text-primary-600 focus:ring-primary-500">
                   <div class="ml-3">
                     <div class="font-medium text-gray-900">UPI</div>
-                    <div class="text-sm text-gray-500">Google Pay, PhonePe, Paytm</div>
+                    <div class="text-sm text-gray-300">Google Pay, PhonePe, Paytm</div>
                   </div>
                 </label>
                 
@@ -528,7 +528,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
                   <input type="radio" name="paymentMethod" value="netbanking" class="w-5 h-5 text-primary-600 focus:ring-primary-500">
                   <div class="ml-3">
                     <div class="font-medium text-gray-900">Net Banking</div>
-                    <div class="text-sm text-gray-500">All major banks</div>
+                    <div class="text-sm text-gray-300">All major banks</div>
                   </div>
                 </label>
               </div>
@@ -539,22 +539,22 @@ import { sharedDataStore } from '../lib/shared-data-store';
               <h4 class="text-lg font-semibold text-gray-800 mb-4">Card Details</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                  <label class="block text-sm font-medium text-white mb-2">Card Number</label>
                   <input type="text" name="cardNumber" placeholder="1234 5678 9012 3456" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
+                  <label class="block text-sm font-medium text-white mb-2">Cardholder Name</label>
                   <input type="text" name="cardholderName" placeholder="John Doe" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                  <label class="block text-sm font-medium text-white mb-2">Expiry Date</label>
                   <input type="text" name="expiryDate" placeholder="MM/YY" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                  <label class="block text-sm font-medium text-white mb-2">CVV</label>
                   <input type="text" name="cvv" placeholder="123" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                 </div>
               </div>
@@ -564,7 +564,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
             <div id="upi-details" class="hidden border-2 border-gray-200 rounded-lg p-6">
               <h4 class="text-lg font-semibold text-gray-800 mb-4">UPI Details</h4>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
+                <label class="block text-sm font-medium text-white mb-2">UPI ID</label>
                 <input type="text" name="upiId" placeholder="username@upi" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
               </div>
             </div>
@@ -573,7 +573,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
             <div id="netbanking-details" class="hidden border-2 border-gray-200 rounded-lg p-6">
               <h4 class="text-lg font-semibold text-gray-800 mb-4">Net Banking</h4>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Select Bank</label>
+                <label class="block text-sm font-medium text-white mb-2">Select Bank</label>
                 <select name="bank" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                   <option value="">Choose your bank</option>
                   <option value="sbi">State Bank of India</option>
@@ -592,7 +592,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
               <button id="final-payment" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl text-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
                 Pay ₹<span id="final-amount">0</span> & Complete Order
               </button>
-              <p class="text-sm text-gray-500 text-center mt-3">Your payment is secured with SSL encryption</p>
+              <p class="text-sm text-gray-300 text-center mt-3">Your payment is secured with SSL encryption</p>
             </div>
           </div>
           </div> <!-- End payment-content -->
@@ -629,6 +629,16 @@ import { sharedDataStore } from '../lib/shared-data-store';
     
     try {
       console.log('🔍 Creating Cart instance...');
+      
+      // Check authentication before initializing cart
+      const authManager = window.globalAuthManager || window.simpleAuthManager;
+      console.log('🔍 Auth manager available:', !!authManager);
+      
+      if (authManager) {
+        const currentUser = authManager.getCurrentUser();
+        console.log('🔍 Current user:', currentUser ? `${currentUser.email} (${currentUser.full_name || 'No name'})` : 'Not logged in');
+      }
+      
       const cart = new Cart();
       console.log('✅ Cart created, items count:', cart.items.length);
       
@@ -679,42 +689,84 @@ import { sharedDataStore } from '../lib/shared-data-store';
       this.requirements = {};
       this.currentSharedOrderId = null;
       this.debouncedSaveToSupabase = this.debounce(this.saveCartToSupabase.bind(this), 1000);
-      this.init();
+      this.init().catch(error => {
+        console.error('❌ Error initializing cart:', error);
+      });
     }
 
-    init() {
-      this.loadCart();
+    async init() {
+      console.log('🚀 Cart initialization started');
+      await this.loadCart();
+      console.log('📦 Cart loaded, items count:', this.items.length);
+      
+      // Validate cart ownership to prevent cross-user data leakage
+      if (!window.validateCartOwnership()) {
+        console.log('🔄 Cart ownership validated, reloading...');
+        await this.loadCart();
+        console.log('📦 Cart reloaded after validation, items count:', this.items.length);
+      }
+      
       this.checkUrlParams();
+      // Populate form fields with loaded data first
+      this.populateFormFields();
+      console.log('📝 Form fields populated');
       this.renderCart();
+      console.log('🎨 Cart rendered');
       this.bindEvents();
+      console.log('🔗 Events bound, initialization complete');
     }
 
     checkUrlParams() {
+      console.log('🔍 Checking URL parameters...');
       const urlParams = new URLSearchParams(window.location.search);
       const product = urlParams.get('product');
       const price = urlParams.get('price');
 
+      console.log('📦 URL parameters found:', { product, price });
+
       if (product && price) {
+        console.log('✅ Product and price found, adding to cart...');
         this.addProductFromUrl(product, parseInt(price));
         // Clear URL parameters
         window.history.replaceState({}, document.title, window.location.pathname);
+        console.log('✅ URL parameters cleared');
+      } else {
+        console.log('❌ No product or price found in URL parameters');
       }
     }
 
     addProductFromUrl(productId, price) {
+      console.log('🛒 Adding product from URL:', { productId, price });
+      
       // Clear existing items first - only one product at a time
       this.items = [];
       
       const productNames = {
+        '1': 'Restaurant Menu System',
+        '2': 'Android TV App', 
+        '3': 'Streaming Mobile App',
+        '4': 'Restaurant Website',
         'restaurant-menu': 'Restaurant Menu System',
         'android-tv': 'Android TV App',
-        'mobile-streaming': 'Mobile Streaming App'
+        'mobile-streaming': 'Mobile Streaming App',
+        'restaurant-menu-system': 'Restaurant Menu System',
+        'android-tv-app': 'Android TV App',
+        'streaming-mobile-app': 'Streaming Mobile App',
+        'restaurant-website': 'Restaurant Website'
       };
 
       const productDescriptions = {
+        '1': 'Digital menu system with QR code ordering, real-time updates, and analytics dashboard.',
+        '2': 'Custom Android TV application with streaming capabilities and smart remote support.',
+        '3': 'Cross-platform mobile app for video streaming with offline download support.',
+        '4': 'Professional restaurant website with online ordering and reservation system.',
         'restaurant-menu': 'Digital menu system with QR code ordering, real-time updates, and analytics dashboard.',
         'android-tv': 'Custom Android TV application with streaming capabilities and smart remote support.',
-        'mobile-streaming': 'Cross-platform mobile app for video streaming with offline download support.'
+        'mobile-streaming': 'Cross-platform mobile app for video streaming with offline download support.',
+        'restaurant-menu-system': 'Digital menu system with QR code ordering, real-time updates, and analytics dashboard.',
+        'android-tv-app': 'Custom Android TV application with streaming capabilities and smart remote support.',
+        'streaming-mobile-app': 'Cross-platform mobile app for video streaming with offline download support.',
+        'restaurant-website': 'Professional restaurant website with online ordering and reservation system.'
       };
 
       const newItem = {
@@ -729,19 +781,251 @@ import { sharedDataStore } from '../lib/shared-data-store';
         features: []
       };
 
+      console.log('📦 Created cart item:', newItem);
+
       this.items.push(newItem);
       this.saveCart();
+      
+      console.log('✅ Product added to cart, items count:', this.items.length);
     }
 
-    loadCart() {
-      const cartData = localStorage.getItem('cart-items');
-      if (cartData) {
-        this.items = JSON.parse(cartData);
+    async loadCart() {
+      // First try to load from Supabase if user is authenticated
+      const authManager = window.globalAuthManager || window.simpleAuthManager;
+      const currentUser = authManager?.getCurrentUser();
+      
+      if (currentUser && supabase) {
+        try {
+          console.log('🔄 Loading cart from Supabase for user:', currentUser.email);
+          const { data: cartData, error } = await supabase
+            .from('cart_customizations')
+            .select('*')
+            .eq('user_email', currentUser.email)
+            .eq('cart_status', 'active')
+            .order('created_at', { ascending: false });
+
+          if (error) {
+            console.error('❌ Error loading cart from Supabase:', error);
+          } else if (cartData && cartData.length > 0) {
+            console.log('✅ Loaded cart from Supabase:', cartData);
+            console.log('📊 Cart data details:', {
+              count: cartData.length,
+              firstItem: cartData[0],
+              basePrice: cartData[0]?.base_price,
+              productName: cartData[0]?.product_name
+            });
+            // Convert Supabase data back to cart items format
+            this.items = cartData.map(item => ({
+              id: item.product_id,
+              name: item.product_name,
+              description: item.product_description,
+              price: item.base_price,
+              quantity: 1,
+              customName: item.custom_name || '',
+              restaurantName: item.restaurant_name_customization || '',
+              color: item.selected_color || '#3B82F6',
+              features: item.selected_features || [],
+              projectName: item.project_name || '',
+              contactPerson: item.contact_person || '',
+              restaurantName: item.restaurant_name || '',
+              cuisineType: item.cuisine_type || '',
+              appName: item.app_name || '',
+              productDescription: item.product_description_custom || '',
+              email: item.contact_email || currentUser.email,
+              phone: item.contact_phone || '',
+              primaryColor: item.primary_color || '#3B82F6',
+              secondaryColor: item.secondary_color || '#A5CF6',
+              accentColor: item.accent_color || '#F59E0B',
+              textColor: item.text_color || '#1F2937',
+              additionalRequirements: item.additional_requirements || ''
+            }));
+            
+            console.log('🔄 Mapped cart items:', this.items);
+            console.log('💰 First item price:', this.items[0]?.price);
+            
+            // Update requirements object with loaded data
+            if (this.items.length > 0) {
+              const item = this.items[0];
+              this.requirements = {
+                projectName: item.projectName,
+                contactPerson: item.contactPerson,
+                restaurantName: item.restaurantName,
+                cuisineType: item.cuisineType,
+                appName: item.appName,
+                productDescription: item.productDescription,
+                email: item.email,
+                phone: item.phone,
+                primaryColor: item.primaryColor,
+                secondaryColor: item.secondaryColor,
+                accentColor: item.accentColor,
+                textColor: item.textColor,
+                additionalRequirements: item.additionalRequirements
+              };
+            }
+            
+            console.log('✅ Cart loaded from Supabase with', this.items.length, 'items');
+            return; // Exit early since we loaded from Supabase
+          } else {
+            // No cart data found in Supabase for this user, clear localStorage for this user
+            console.log('🔄 No cart data found in Supabase, clearing localStorage for user:', currentUser.email);
+            this.clearUserCartFromLocalStorage(currentUser.email);
+          }
+        } catch (error) {
+          console.error('❌ Error loading cart from Supabase:', error);
+        }
+      }
+
+      // Only load from localStorage if user is not authenticated
+      if (!currentUser) {
+        console.log('🔄 No authenticated user, loading cart from localStorage');
+        const cartData = localStorage.getItem('cart-items');
+        if (cartData) {
+          this.items = JSON.parse(cartData);
+          console.log('✅ Cart loaded from localStorage with', this.items.length, 'items');
+        }
+      } else {
+        // User is authenticated but no Supabase data, ensure cart is empty
+        console.log('🔄 User authenticated but no cart data, starting with empty cart');
+        this.items = [];
       }
     }
 
     saveCart() {
-      localStorage.setItem('cart-items', JSON.stringify(this.items));
+      // Only save to localStorage if user is not authenticated
+      const authManager = window.globalAuthManager || window.simpleAuthManager;
+      const currentUser = authManager?.getCurrentUser();
+      
+      if (!currentUser) {
+        localStorage.setItem('cart-items', JSON.stringify(this.items));
+        console.log('💾 Cart saved to localStorage for anonymous user');
+      } else {
+        // For authenticated users, data is saved to Supabase, not localStorage
+        console.log('💾 Cart data will be saved to Supabase for authenticated user');
+      }
+    }
+
+    clearUserCartFromLocalStorage(userEmail) {
+      // Clear localStorage when user changes to prevent cross-user data leakage
+      const storedCart = localStorage.getItem('cart-items');
+      if (storedCart) {
+        try {
+          const cartData = JSON.parse(storedCart);
+          // Check if the stored cart belongs to a different user
+          if (cartData.length > 0 && cartData[0].email && cartData[0].email !== userEmail) {
+            console.log('🧹 Clearing localStorage cart data from different user');
+            localStorage.removeItem('cart-items');
+            this.items = [];
+          }
+        } catch (error) {
+          console.error('❌ Error checking localStorage cart data:', error);
+          // If there's an error parsing, clear it anyway
+          localStorage.removeItem('cart-items');
+          this.items = [];
+        }
+      }
+    }
+
+    populateFormFields() {
+      if (this.items.length === 0) return;
+
+      const item = this.items[0];
+      console.log('🔄 Populating form fields with loaded data:', item);
+
+      // Populate basic product info
+      const projectNameInput = document.getElementById('projectName') as HTMLInputElement;
+      if (projectNameInput && item.projectName) {
+        projectNameInput.value = item.projectName;
+      }
+
+      const contactPersonInput = document.getElementById('contactPerson') as HTMLInputElement;
+      if (contactPersonInput && item.contactPerson) {
+        contactPersonInput.value = item.contactPerson;
+      }
+
+      const restaurantNameInput = document.getElementById('restaurantName') as HTMLInputElement;
+      if (restaurantNameInput && item.restaurantName) {
+        restaurantNameInput.value = item.restaurantName;
+      }
+
+      const cuisineTypeSelect = document.getElementById('cuisineType') as HTMLSelectElement;
+      if (cuisineTypeSelect && item.cuisineType) {
+        cuisineTypeSelect.value = item.cuisineType;
+      }
+
+      const appNameInput = document.getElementById('appName') as HTMLInputElement;
+      if (appNameInput && item.appName) {
+        appNameInput.value = item.appName;
+      }
+
+      const productDescriptionTextarea = document.getElementById('productDescription') as HTMLTextAreaElement;
+      if (productDescriptionTextarea && item.productDescription) {
+        productDescriptionTextarea.value = item.productDescription;
+      }
+
+      const emailInput = document.getElementById('email') as HTMLInputElement;
+      if (emailInput && item.email) {
+        emailInput.value = item.email;
+      }
+
+      const phoneInput = document.getElementById('phone') as HTMLInputElement;
+      if (phoneInput && item.phone) {
+        phoneInput.value = item.phone;
+      }
+
+      // Populate color inputs
+      const primaryColorInput = document.querySelector('input[name="primaryColor"]') as HTMLInputElement;
+      if (primaryColorInput && item.primaryColor) {
+        primaryColorInput.value = item.primaryColor;
+      }
+
+      const secondaryColorInput = document.querySelector('input[name="secondaryColor"]') as HTMLInputElement;
+      if (secondaryColorInput && item.secondaryColor) {
+        secondaryColorInput.value = item.secondaryColor;
+      }
+
+      const accentColorInput = document.querySelector('input[name="accentColor"]') as HTMLInputElement;
+      if (accentColorInput && item.accentColor) {
+        accentColorInput.value = item.accentColor;
+      }
+
+      const textColorInput = document.querySelector('input[name="textColor"]') as HTMLInputElement;
+      if (textColorInput && item.textColor) {
+        textColorInput.value = item.textColor;
+      }
+
+      const additionalRequirementsTextarea = document.getElementById('additionalRequirements') as HTMLTextAreaElement;
+      if (additionalRequirementsTextarea && item.additionalRequirements) {
+        additionalRequirementsTextarea.value = item.additionalRequirements;
+      }
+
+      // Populate feature checkboxes
+      if (item.features && Array.isArray(item.features)) {
+        item.features.forEach(feature => {
+          const checkbox = document.querySelector(`input[data-feature="${feature}"]`) as HTMLInputElement;
+          if (checkbox) {
+            checkbox.checked = true;
+          }
+        });
+      }
+
+      // Update the requirements object
+      this.requirements = {
+        projectName: item.projectName || '',
+        contactPerson: item.contactPerson || '',
+        restaurantName: item.restaurantName || '',
+        cuisineType: item.cuisineType || '',
+        appName: item.appName || '',
+        productDescription: item.productDescription || '',
+        email: item.email || '',
+        phone: item.phone || '',
+        primaryColor: item.primaryColor || '#3B82F6',
+        secondaryColor: item.secondaryColor || '#A5CF6',
+        accentColor: item.accentColor || '#F59E0B',
+        textColor: item.textColor || '#1F2937',
+        additionalRequirements: item.additionalRequirements || ''
+      };
+
+      console.log('✅ Form fields populated successfully');
     }
 
     addItem(product) {
@@ -842,13 +1126,13 @@ import { sharedDataStore } from '../lib/shared-data-store';
       const productTypeText = clone.querySelector('.product-type-text');
       const productTypeBadge = clone.querySelector('.product-type-badge');
       
-      if (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website') {
+      if (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website' || item.id === '1' || item.id === '4') {
         productTypeText.textContent = 'Restaurant Solution';
         productTypeBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium product-type-badge bg-green-100 text-green-800';
-      } else if (item.id === 'android-tv' || item.id === 'android-tv-app') {
+      } else if (item.id === 'android-tv' || item.id === 'android-tv-app' || item.id === '2') {
         productTypeText.textContent = 'Android TV App';
         productTypeBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium product-type-badge bg-purple-100 text-purple-800';
-      } else if (item.id === 'mobile-streaming' || item.id === 'streaming-mobile-app') {
+      } else if (item.id === 'mobile-streaming' || item.id === 'streaming-mobile-app' || item.id === '3') {
         productTypeText.textContent = 'Mobile Streaming App';
         productTypeBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium product-type-badge bg-orange-100 text-orange-800';
       } else {
@@ -858,7 +1142,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
 
       // Show/hide restaurant name field based on product type
       const restaurantNameField = clone.querySelector('#restaurant-name-customization');
-      if (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website') {
+      if (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website' || item.id === '1' || item.id === '4') {
         restaurantNameField?.classList.remove('hidden');
       } else {
         restaurantNameField?.classList.add('hidden');
@@ -962,12 +1246,22 @@ import { sharedDataStore } from '../lib/shared-data-store';
     }
 
     updateSummary() {
+      console.log('💰 updateSummary called with items:', this.items);
+      
       const subtotal = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const featuresTotal = this.items.reduce((sum, item) => {
         return sum + (item.features.length * 500); // Each feature costs ₹500
       }, 0);
       const tax = Math.round((subtotal + featuresTotal) * 0.18); // 18% GST
       const total = subtotal + featuresTotal + tax;
+
+      console.log('💰 Amount calculation:', {
+        subtotal,
+        featuresTotal,
+        tax,
+        total,
+        itemsCount: this.items.length
+      });
 
       // Update summary display
       const subtotalElement = document.getElementById('subtotal');
@@ -976,11 +1270,34 @@ import { sharedDataStore } from '../lib/shared-data-store';
       const totalElement = document.getElementById('total');
       const finalAmountElement = document.getElementById('final-amount');
 
-      if (subtotalElement) subtotalElement.textContent = `₹${subtotal.toLocaleString()}`;
-      if (featuresTotalElement) featuresTotalElement.textContent = `₹${featuresTotal.toLocaleString()}`;
-      if (taxElement) taxElement.textContent = `₹${tax.toLocaleString()}`;
-      if (totalElement) totalElement.textContent = `₹${total.toLocaleString()}`;
-      if (finalAmountElement) finalAmountElement.textContent = total.toLocaleString();
+      console.log('💰 Summary elements found:', {
+        subtotalElement: !!subtotalElement,
+        featuresTotalElement: !!featuresTotalElement,
+        taxElement: !!taxElement,
+        totalElement: !!totalElement,
+        finalAmountElement: !!finalAmountElement
+      });
+
+      if (subtotalElement) {
+        subtotalElement.textContent = `₹${subtotal.toLocaleString()}`;
+        console.log('✅ Updated subtotal:', subtotalElement.textContent);
+      }
+      if (featuresTotalElement) {
+        featuresTotalElement.textContent = `₹${featuresTotal.toLocaleString()}`;
+        console.log('✅ Updated features total:', featuresTotalElement.textContent);
+      }
+      if (taxElement) {
+        taxElement.textContent = `₹${tax.toLocaleString()}`;
+        console.log('✅ Updated tax:', taxElement.textContent);
+      }
+      if (totalElement) {
+        totalElement.textContent = `₹${total.toLocaleString()}`;
+        console.log('✅ Updated total:', totalElement.textContent);
+      }
+      if (finalAmountElement) {
+        finalAmountElement.textContent = total.toLocaleString();
+        console.log('✅ Updated final amount:', finalAmountElement.textContent);
+      }
     }
 
     bindEvents() {
@@ -1328,7 +1645,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
       restaurantCuisineFields?.classList.add('hidden');
 
       // Show appropriate fields based on project type
-      if (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website') {
+      if (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website' || item.id === '1' || item.id === '4') {
         console.log('🍕 Showing restaurant fields for restaurant product:', item.id);
         
         // Show restaurant-specific fields
@@ -1596,13 +1913,71 @@ import { sharedDataStore } from '../lib/shared-data-store';
         const accentColor = document.querySelector('input[name="accentColor"]')?.value || '#F59E0B';
         const textColor = document.querySelector('input[name="textColor"]')?.value || '#1F2937';
 
+        // Calculate total amount including features and tax
+        const basePrice = item.price;
+        const featuresTotal = item.features.reduce((sum, feature) => {
+          const featurePrices = {
+            responsive: 500,
+            seo: 300,
+            analytics: 200
+          };
+          return sum + (featurePrices[feature] || 0);
+        }, 0);
+        const subtotal = basePrice + featuresTotal;
+        const tax = Math.round(subtotal * 0.18); // 18% GST
+        const totalAmount = subtotal + tax;
+
+        // Handle file uploads with hash generation for duplicate detection
+        const restaurantLogoFile = document.querySelector('input[name="restaurantLogo"]')?.files?.[0];
+        const menuPhotosFiles = document.querySelector('input[name="menuPhotos"]')?.files;
+        
+        let restaurantLogoUrl = '';
+        let restaurantLogoFilename = '';
+        let restaurantLogoSize = 0;
+        let restaurantLogoType = '';
+        let restaurantLogoHash = '';
+        
+        let menuPhotosUrls = [];
+        let menuPhotosFilenames = [];
+        let menuPhotosSizes = [];
+        let menuPhotosTypes = [];
+        let menuPhotosHashes = [];
+        
+        // Generate hash for restaurant logo (for duplicate detection)
+        if (restaurantLogoFile) {
+          console.log('📸 Processing restaurant logo upload:', restaurantLogoFile.name);
+          restaurantLogoFilename = restaurantLogoFile.name;
+          restaurantLogoSize = restaurantLogoFile.size;
+          restaurantLogoType = restaurantLogoFile.type;
+          restaurantLogoUrl = `pending_upload_${Date.now()}_${restaurantLogoFile.name}`;
+          
+          // Generate hash for duplicate detection (simplified - in production use actual file hash)
+          restaurantLogoHash = `hash_${restaurantLogoFile.name}_${restaurantLogoFile.size}_${Date.now()}`;
+        }
+        
+        // Handle menu photos upload with hash generation
+        if (menuPhotosFiles && menuPhotosFiles.length > 0) {
+          console.log('📸 Processing menu photos upload:', menuPhotosFiles.length, 'files');
+          Array.from(menuPhotosFiles).forEach(file => {
+            menuPhotosFilenames.push(file.name);
+            menuPhotosSizes.push(file.size);
+            menuPhotosTypes.push(file.type);
+            menuPhotosUrls.push(`pending_upload_${Date.now()}_${file.name}`);
+            
+            // Generate hash for duplicate detection (simplified - in production use actual file hash)
+            menuPhotosHashes.push(`hash_${file.name}_${file.size}_${Date.now()}`);
+          });
+        }
+
         // Prepare cart data for Supabase
         const cartData = {
           user_email: currentUser.email,
+          user_id: currentUser.id || null,
           product_id: item.id,
           product_name: item.name,
           product_description: item.description,
           base_price: item.price,
+          total_amount: totalAmount,
           custom_name: item.customName || '',
           restaurant_name_customization: item.restaurantName || '',
           selected_color: item.color || '#3B82F6',
@@ -1619,8 +1994,18 @@ import { sharedDataStore } from '../lib/shared-data-store';
           secondary_color: secondaryColor,
           accent_color: accentColor,
           text_color: textColor,
+          restaurant_logo_url: restaurantLogoUrl,
+          restaurant_logo_filename: restaurantLogoFilename,
+          restaurant_logo_size: restaurantLogoSize,
+          restaurant_logo_type: restaurantLogoType,
+          restaurant_logo_hash: restaurantLogoHash,
+          menu_photos_urls: menuPhotosUrls,
+          menu_photos_filenames: menuPhotosFilenames,
+          menu_photos_sizes: menuPhotosSizes,
+          menu_photos_types: menuPhotosTypes,
+          menu_photos_hashes: menuPhotosHashes,
           additional_requirements: formData.additionalRequirements || '',
-          cart_status: 'active',
+          cart_status: 'pending', // Default to pending until payment is made
           is_checkout_initiated: false
         };
 
@@ -1630,43 +2015,212 @@ import { sharedDataStore } from '../lib/shared-data-store';
         console.log('🔍 Testing Supabase connection...');
         const { data: testData, error: testError } = await supabase
           .from('cart_customizations')
-          .select('id')
+          .select('*')
           .limit(1);
           
         if (testError) {
           console.error('❌ Supabase connection test failed:', testError);
+          console.error('❌ Test error details:', {
+            code: testError.code,
+            message: testError.message,
+            details: testError.details,
+            hint: testError.hint
+          });
+          
+          // Try to create the table if it doesn't exist
+          console.log('🔍 Attempting to create table if it doesn\'t exist...');
+          const createTableResult = await supabase.rpc('create_cart_customizations_table');
+          if (createTableResult.error) {
+            console.error('❌ Failed to create table:', createTableResult.error);
+          } else {
+            console.log('✅ Table creation attempted');
+          }
+          
           return null;
         }
         
         console.log('✅ Supabase connection test successful');
+        console.log('🔍 Test data received:', testData);
+        console.log('🔍 Table structure check - columns available:', testData.length > 0 ? Object.keys(testData[0]) : 'No data to check');
 
-        // Use upsert to handle both insert and update
-        console.log('🚀 Attempting to save to Supabase...');
-        const { data, error } = await supabase
-          .from('cart_customizations')
-          .upsert([cartData], {
-            onConflict: 'user_email,product_id'
-          })
-          .select();
-
-        if (error) {
-          console.error('❌ Error saving cart to Supabase:', error);
-          console.error('❌ Error details:', {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            hint: error.hint
+        // Use the simple upsert function with unique constraint duplicate prevention
+        console.log('🚀 Attempting to save to Supabase using simple upsert function...');
+        
+        // Use the simple upsert function with all parameters
+        const { data: upsertResult, error: upsertError } = await supabase
+          .rpc('upsert_cart_customization', {
+            p_user_email: currentUser.email,
+            p_user_id: currentUser.id || null,
+            p_product_id: item.id,
+            p_product_name: item.name,
+            p_product_description: item.description,
+            p_base_price: item.price,
+            p_total_amount: totalAmount,
+            p_project_name: formData.projectName || '',
+            p_app_name: formData.appName || '',
+            p_contact_person: formData.contactPerson || '',
+            p_product_description_custom: formData.productDescription || '',
+            p_restaurant_name: formData.restaurantName || '',
+            p_cuisine_type: formData.cuisineType || '',
+            p_contact_email: formData.email || currentUser.email,
+            p_contact_phone: formData.phone || currentUser.phone || '',
+            p_restaurant_logo_url: restaurantLogoUrl,
+            p_restaurant_logo_filename: restaurantLogoFilename,
+            p_restaurant_logo_size: restaurantLogoSize,
+            p_restaurant_logo_type: restaurantLogoType,
+            p_restaurant_logo_hash: restaurantLogoHash,
+            p_menu_photos_urls: menuPhotosUrls,
+            p_menu_photos_filenames: menuPhotosFilenames,
+            p_menu_photos_sizes: menuPhotosSizes,
+            p_menu_photos_types: menuPhotosTypes,
+            p_menu_photos_hashes: menuPhotosHashes,
+            p_primary_color: primaryColor,
+            p_secondary_color: secondaryColor,
+            p_accent_color: accentColor,
+            p_text_color: textColor,
+            p_additional_requirements: formData.additionalRequirements || ''
           });
-          return null;
-        }
+        
+        if (upsertError) {
+          console.error('❌ Upsert function failed, trying direct upsert:', upsertError);
+          
+          // Fallback to direct upsert
+          let { data, error } = await supabase
+            .from('cart_customizations')
+            .upsert([cartData], {
+              onConflict: 'user_email,product_id'
+            })
+            .select();
 
-        console.log('✅ Successfully saved to Supabase:', data);
-        return data[0];
+          // If upsert fails, try insert as final fallback
+          if (error) {
+            console.warn('⚠️ Direct upsert failed, trying insert as fallback:', error);
+            const insertResult = await supabase
+              .from('cart_customizations')
+              .insert([cartData])
+              .select();
+            
+            if (insertResult.error) {
+              console.error('❌ Insert also failed:', insertResult.error);
+              error = insertResult.error;
+            } else {
+              console.log('✅ Insert successful as fallback');
+              data = insertResult.data;
+              error = null;
+            }
+          }
+          
+          // Use the fallback results
+          if (error) {
+            console.error('❌ All save methods failed:', error);
+            return null;
+          } else {
+            console.log('✅ Cart saved successfully via fallback method');
+            return data[0];
+          }
+        } else {
+          console.log('✅ Cart saved successfully via upsert function');
+          console.log('🔍 Upsert result:', upsertResult);
+          
+          // Get the saved cart data
+          const { data: savedCart, error: fetchError } = await supabase
+            .from('cart_customizations')
+            .select('*')
+            .eq('id', upsertResult)
+            .single();
+          
+          if (fetchError) {
+            console.error('❌ Failed to fetch saved cart:', fetchError);
+            return null;
+          }
+          
+          return savedCart;
+        }
 
       } catch (error) {
         console.error('❌ Error in saveCartToSupabase:', error);
         console.error('❌ Error stack:', error.stack);
         return null; // Return null instead of throwing
+      }
+    }
+
+    // Function to mark order as completed after payment
+    async markOrderAsCompleted(orderId) {
+      try {
+        console.log('💳 Marking order as completed:', orderId);
+        
+        const authManager = window.globalAuthManager || window.simpleAuthManager;
+        const currentUser = authManager?.getCurrentUser();
+        
+        if (!currentUser) {
+          console.error('❌ No user found for order completion');
+          return false;
+        }
+
+        const supabase = window.supabase?.createClient(
+          'https://lmrrdcaavwwletcjcpqv.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ'
+        );
+
+        const { data, error } = await supabase
+          .from('cart_customizations')
+          .update({ 
+            cart_status: 'completed',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', orderId)
+          .eq('user_email', currentUser.email);
+
+        if (error) {
+          console.error('❌ Error marking order as completed:', error);
+          return false;
+        }
+
+        console.log('✅ Order marked as completed successfully');
+        return true;
+      } catch (error) {
+        console.error('❌ Error in markOrderAsCompleted:', error);
+        return false;
+      }
+    }
+
+    // Function to cancel an order
+    async cancelOrder(orderId) {
+      try {
+        console.log('❌ Cancelling order:', orderId);
+        
+        const authManager = window.globalAuthManager || window.simpleAuthManager;
+        const currentUser = authManager?.getCurrentUser();
+        
+        if (!currentUser) {
+          console.error('❌ No user found for order cancellation');
+          return false;
+        }
+
+        const supabase = window.supabase?.createClient(
+          'https://lmrrdcaavwwletcjcpqv.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJkY2Fhdnd3bGV0Y2pjcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MDQ0ODgsImV4cCI6MjA3MTA4MDQ4OH0.AU59Qfr6K9i880Gcn5y-3pjCf8PXsDIq4OI0-lPQVuQ'
+        );
+
+        const { data, error } = await supabase
+          .from('cart_customizations')
+          .update({ 
+            cart_status: 'cancelled',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', orderId)
+          .eq('user_email', currentUser.email);
+
+        if (error) {
+          console.error('❌ Error cancelling order:', error);
+          return false;
+        }
+
+        console.log('✅ Order cancelled successfully');
+        return true;
+      } catch (error) {
+        console.error('❌ Error in cancelOrder:', error);
+        return false;
       }
     }
 
@@ -1750,7 +2304,7 @@ import { sharedDataStore } from '../lib/shared-data-store';
         const restaurantNameEl = document.getElementById('review-restaurant-name');
         const cuisineTypeEl = document.getElementById('review-cuisine-type');
         
-        if (item && (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website')) {
+        if (item && (item.id === 'restaurant-menu' || item.id === 'restaurant-menu-system' || item.id === 'restaurant-website' || item.id === '1' || item.id === '4')) {
           if (restaurantInfoEl) restaurantInfoEl.classList.remove('hidden');
           if (cuisineInfoEl) cuisineInfoEl.classList.remove('hidden');
           if (restaurantNameEl) restaurantNameEl.textContent = this.requirements.restaurantName || '-';
@@ -2017,7 +2571,8 @@ import { sharedDataStore } from '../lib/shared-data-store';
     saveOrderToHistory() {
       if (this.items.length === 0) return;
 
-      const currentUser = AuthGuard.getCurrentUser();
+      const authManager = window.globalAuthManager || window.simpleAuthManager;
+      const currentUser = authManager?.getCurrentUser();
       if (!currentUser) return;
 
       const item = this.items[0];
@@ -2226,6 +2781,15 @@ import { sharedDataStore } from '../lib/shared-data-store';
   document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 DOM Content Loaded - Starting cart initialization...');
     
+    // Check authentication before initializing cart
+    const authManager = window.globalAuthManager || window.simpleAuthManager;
+    console.log('🔍 Auth manager available:', !!authManager);
+    
+    if (authManager) {
+      const currentUser = authManager.getCurrentUser();
+      console.log('🔍 Current user:', currentUser ? `${currentUser.email} (${currentUser.full_name || 'No name'})` : 'Not logged in');
+    }
+    
     try {
       const cart = new Cart();
       console.log('✅ Cart initialized successfully');
@@ -2260,4 +2824,83 @@ import { sharedDataStore } from '../lib/shared-data-store';
       alert('Error initializing cart: ' + error.message);
     }
   });
+
+  // Global functions for payment integration
+  window.markOrderAsCompleted = async function(orderId) {
+    if (window.cart) {
+      return await window.cart.markOrderAsCompleted(orderId);
+    }
+    console.error('❌ Cart not initialized');
+    return false;
+  };
+
+  window.cancelOrder = async function(orderId) {
+    if (window.cart) {
+      return await window.cart.cancelOrder(orderId);
+    }
+    console.error('❌ Cart not initialized');
+    return false;
+  };
+
+  // Example payment success handler
+  window.handlePaymentSuccess = async function(orderId) {
+    console.log('💳 Payment successful for order:', orderId);
+    const success = await window.markOrderAsCompleted(orderId);
+    if (success) {
+      alert('✅ Payment successful! Your order has been completed.');
+      // Redirect to success page or show success message
+    } else {
+      alert('❌ Error updating order status. Please contact support.');
+    }
+  };
+
+  // Example payment failure handler
+  window.handlePaymentFailure = async function(orderId) {
+    console.log('❌ Payment failed for order:', orderId);
+    // Order remains in 'pending' status
+    alert('❌ Payment failed. Please try again or contact support.');
+  };
+
+  // Example order cancellation handler
+  window.handleOrderCancellation = async function(orderId) {
+    console.log('❌ Order cancelled:', orderId);
+    const success = await window.cancelOrder(orderId);
+    if (success) {
+      alert('❌ Order has been cancelled.');
+      // Redirect to home page or show cancellation message
+    } else {
+      alert('❌ Error cancelling order. Please contact support.');
+    }
+  };
+
+  // Function to clear cart when user changes
+  window.clearCartForNewUser = function() {
+    console.log('🧹 Clearing cart for new user');
+    if (window.cart) {
+      window.cart.items = [];
+      window.cart.requirements = {};
+      localStorage.removeItem('cart-items');
+      console.log('✅ Cart cleared for new user');
+    }
+  };
+
+  // Function to check if cart belongs to current user
+  window.validateCartOwnership = function() {
+    const authManager = window.globalAuthManager || window.simpleAuthManager;
+    const currentUser = authManager?.getCurrentUser();
+    
+    if (!currentUser) {
+      return true; // Anonymous user, localStorage is fine
+    }
+
+    if (window.cart && window.cart.items.length > 0) {
+      const firstItem = window.cart.items[0];
+      if (firstItem.email && firstItem.email !== currentUser.email) {
+        console.log('⚠️ Cart belongs to different user, clearing...');
+        window.clearCartForNewUser();
+        return false;
+      }
+    }
+    return true;
+  };
 </script>

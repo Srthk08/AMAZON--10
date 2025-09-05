@@ -363,38 +363,80 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   async function loadCartData() {
     try {
       console.log('🔄 Loading cart customizations data...');
+      console.log('🔍 Supabase client available:', !!supabase);
+      
+      if (!supabase) {
+        console.error('❌ Supabase client not available');
+        const tbody = document.getElementById('cart-table-body');
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Supabase client not available</td></tr>';
+        }
+        return;
+      }
+
       const { data: carts, error } = await supabase
         .from('cart_customizations')
         .select('*')
         .order('created_at', { ascending: false });
 
+      console.log('🔍 Cart data query result:', { data: carts, error });
+
       if (error) {
-        console.error('Error loading cart data:', error);
+        console.error('❌ Error loading cart data:', error);
+        const tbody = document.getElementById('cart-table-body');
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+        }
         return;
       }
 
       const tbody = document.getElementById('cart-table-body');
-      if (!tbody) return;
+      if (!tbody) {
+        console.error('❌ Cart table body not found');
+        return;
+      }
+
+      console.log('🔍 Cart data received:', carts);
 
       if (carts && carts.length > 0) {
-        tbody.innerHTML = carts.map(cart => `
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cart.user_email}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cart.project_name || '-'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cart.app_name || '-'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cart.contact_person || '-'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${cart.total_amount ? cart.total_amount.toLocaleString() : '0'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${new Date(cart.created_at).toLocaleDateString()}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <button onclick="viewCartDetails('${cart.id}')" class="text-blue-600 hover:text-blue-900">View Details</button>
-            </td>
-          </tr>
-        `).join('');
+        console.log(`✅ Found ${carts.length} cart customizations`);
+        tbody.innerHTML = carts.map(cart => {
+          // Use stored total_amount if available, otherwise calculate it
+          let totalAmount = cart.total_amount;
+          if (!totalAmount || totalAmount === 0) {
+            // Calculate total amount including features
+            const basePrice = cart.base_price || 0;
+            const features = cart.selected_features || [];
+            const featuresTotal = features.length * 500; // Each feature costs ₹500
+            const subtotal = basePrice + featuresTotal;
+            const tax = Math.round(subtotal * 0.18); // 18% GST
+            totalAmount = subtotal + tax;
+          }
+          
+          return `
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cart.user_email}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cart.project_name || '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cart.app_name || '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cart.contact_person || '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${totalAmount.toLocaleString()}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${new Date(cart.created_at).toLocaleDateString()}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <button onclick="viewCartDetails('${cart.id}')" class="text-blue-600 hover:text-blue-900">View Details</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
       } else {
+        console.log('ℹ️ No cart customizations found');
         tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No cart customizations found</td></tr>';
       }
     } catch (error) {
-      console.error('Error loading cart data:', error);
+      console.error('❌ Error loading cart data:', error);
+      const tbody = document.getElementById('cart-table-body');
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+      }
     }
   }
 
@@ -403,7 +445,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       // Get counts for summary cards
       const [usersResult, contactsResult, ticketsResult, cartsResult] = await Promise.all([
         supabase.from('profiles').select('*', { count: 'exact', head: true }),
-        supabase.from('contact_form_data').select('*', { count: 'exact', head: true }),
+        supabase.from('contact_submissions').select('*', { count: 'exact', head: true }),
         supabase.from('support_tickets').select('*', { count: 'exact', head: true }),
         supabase.from('cart_customizations').select('*', { count: 'exact', head: true })
       ]);
@@ -544,7 +586,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           
           <div class="bg-gray-50 p-4 rounded-lg">
             <h5 class="font-medium text-gray-900 mb-2">Project Details</h5>
-            <p class="text-sm text-gray-600">${contact.project_details || 'No additional details provided'}</p>
+            <p class="text-sm text-gray-600">${contact.project_details || contact.message || 'No additional details provided'}</p>
           </div>
         </div>
       `;

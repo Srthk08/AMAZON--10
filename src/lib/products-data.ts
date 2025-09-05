@@ -72,7 +72,7 @@ const mockProducts: Product[] = [
     slug: 'restaurant-website',
     description: 'Beautiful, responsive restaurant websites with online reservation system, menu showcase, and social media integration. SEO optimized for local search.',
     short_description: 'Professional restaurant websites with reservations',
-    category: 'web',
+    category: 'restaurant',
     base_price: 25000,
     featured_image: 'https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg',
     gallery: [],
